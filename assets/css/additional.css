@@ -1,0 +1,10 @@
+.img-cover {
+    object-fit: cover;
+    height: 100%;
+    width: 100%;
+}
+
+.carousel-item img {
+    max-height: 450px;
+    object-fit: contain;
+}
