@@ -17,37 +17,46 @@
         crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/virtual-select-plugin@1.0.46/dist/virtual-select.min.css">
     <link href="https://unpkg.com/filepond/dist/filepond.css" rel="stylesheet">
-    <link href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css" rel="stylesheet">
+    <link href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css"
+        rel="stylesheet">
     <link href="https://unpkg.com/fullcalendar@5.10.1/main.min.css" rel="stylesheet">
     <link rel="stylesheet" href="./assets/css/components.css">
     <style>
         .fc-daygrid-day {
             border: 1px solid #ddd;
         }
+
         .fc-daygrid-day:hover {
             background-color: #f0f8ff;
         }
+
         .card {
             border-radius: 10px;
         }
+
         .card-body {
             padding: 15px;
         }
+
         .btn-success {
             margin-right: 5px;
         }
+
         .no-selection {
             text-align: center;
             padding: 50px;
             color: #888;
         }
+
         .no-selection h2 {
             font-size: 24px;
             margin-bottom: 10px;
         }
+
         .no-selection p {
             font-size: 18px;
         }
+
         .calendar-container {
             height: 100%;
             max-height: 500px;
@@ -58,6 +67,7 @@
             padding: 10px;
             background-color: #fff;
         }
+
         @media (max-width: 768px) {
             .calendar-container {
                 margin: 10px 0;
@@ -99,7 +109,7 @@
                 </li>
 
                 <li class="sidebar-item">
-                    <a href="admin-reservas.html" class="sidebar-link">
+                    <a href="admin-reservas.html" class="sidebar-link active">
                         <i class='bx bxs-message-dots'></i>
                         <span>Reservas</span>
                     </a>
@@ -113,7 +123,7 @@
                 </li>
 
                 <li class="sidebar-item">
-                    <a href="admin-sedes.html" class="sidebar-link active">
+                    <a href="admin-sedes.html" class="sidebar-link ">
                         <i class='bx bxs-building-house'></i>
                         <span>Sedes</span>
                     </a>
@@ -157,14 +167,104 @@
             <div class="container-fluid p-4">
                 <!-- Header -->
                 <div class="row">
-                    <div class="col-12 bg-primary shadow py-2 px-4 rounded-5 d-flex justify-content-end align-content-center text-white fw-bold">
+                    <div
+                        class="col-12 bg-primary shadow py-2 px-4 rounded-5 d-flex justify-content-end align-content-center text-white fw-bold">
                         <h1>Gestión de Reservas y Horarios</h1>
                     </div>
                 </div>
                 <!-- Search and Filter -->
                 <div class="row my-3">
-                    <div class="col-9">
-                        <input type="text" id="searchInput" class="form-control rounded" placeholder="Escribe para buscar...">
+                    <div class="col-3 ms-auto">
+                        <div class="input-group">
+                            <input type="text" id="searchInput" class="form-control rounded"
+                                placeholder="Escribe para buscar... " aria-label="Buscar " />
+                            <span class="input-group-text">
+                                <i class="bi bi-search"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Filter Cards -->
+                <div class="row row-cols-1 row-cols-md-5 g-3 mb-4">
+                    <!-- All Reservations -->
+                    <div class="col">
+                        <div class="card card-clickeable h-100 border-0 shadow" id="cardTodos">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="card-subtitle mb-1 text-muted">Todos</h6>
+                                        <h2 id="totalItems" class="card-title mb-0">0</h2>
+                                    </div>
+                                    <div class="icon-shape fondo-naranja text-white rounded-circle shadow">
+                                        <i class="bi bi-box"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- High Capacity -->
+                    <div class="col">
+                        <div class="card card-clickeable h-100 border-0 shadow" id="cardCapacidadAlta">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="card-subtitle mb-1 text-muted">Capacidad Alta</h6>
+                                        <h2 id="totalCapacidadAlta" class="card-title mb-0">0</h2>
+                                    </div>
+                                    <div class="icon-shape fondo-verde text-white rounded-circle shadow">
+                                        <i class="bi bi-people"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Medium Capacity -->
+                    <div class="col">
+                        <div class="card card-clickeable h-100 border-0 shadow" id="cardCapacidadMedia">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="card-subtitle mb-1 text-muted">Capacidad Media</h6>
+                                        <h2 id="totalCapacidadMedia" class="card-title mb-0">0</h2>
+                                    </div>
+                                    <div class="icon-shape fondo-amarillo text-white rounded-circle shadow">
+                                        <i class="bi bi-people"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Low Capacity -->
+                    <div class="col">
+                        <div class="card card-clickeable h-100 border-0 shadow" id="cardCapacidadBaja">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="card-subtitle mb-1 text-muted">Capacidad Baja</h6>
+                                        <h2 id="totalCapacidadBaja" class="card-title mb-0">0</h2>
+                                    </div>
+                                    <div class="icon-shape fondo-rojo text-white rounded-circle shadow">
+                                        <i class="bi bi-people"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Recent Reservations -->
+                    <div class="col">
+                        <div class="card card-clickeable h-100 border-0 shadow" id="cardRecientes">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="card-subtitle mb-1 text-muted">Recientes</h6>
+                                        <h2 id="totalRecientes" class="card-title mb-0">0</h2>
+                                    </div>
+                                    <div class="icon-shape fondo-verde-agua text-white rounded-circle shadow">
+                                        <i class="bi bi-clock"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <!-- Branch Cards -->
@@ -176,7 +276,7 @@
     </div>
     <!-- Modal for Branch Details and Schedule -->
     <div class="modal fade " id="branchDetailsModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-dialog modal-lg-calendar modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="branchModalLabel">Detalles de la Sede</h5>
@@ -192,7 +292,8 @@
                             <div id="dayScheduleCalendar" class="reservations-container">
                                 <div class="no-selection">
                                     <h2>Seleccione una fecha para ver las reservas</h2>
-                                    <p>Por favor, seleccione una fecha en el calendario para ver las reservas correspondientes.</p>
+                                    <p>Por favor, seleccione una fecha en el calendario para ver las reservas
+                                        correspondientes.</p>
                                 </div>
                             </div>
                         </div>

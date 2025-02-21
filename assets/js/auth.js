@@ -1,7 +1,9 @@
 let API_BASE_URL = 'http://localhost:8080';
 let API_ENDPOINTS = {
     LOGIN: `${API_BASE_URL}/user/login`,
-    SIGNUP: `${API_BASE_URL}/user/signup`
+    SIGNUP: `${API_BASE_URL}/user/signup`,
+    SEND_RESET_CODE: `${API_BASE_URL}/user/sendResetCode`,
+    RESET_PASSWORD: `${API_BASE_URL}/user/resetPassword`
 };
 
 // Utility functions for validation
@@ -42,7 +44,7 @@ class AuthenticationSystem {
         document.body.insertAdjacentHTML('beforeend', `
             <!-- Login Modal -->
             <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog">
+                <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title">Iniciar Sesión</h5>
@@ -80,86 +82,182 @@ class AuthenticationSystem {
 
             <!-- Register Modal -->
             <div class="modal fade" id="registerModal" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-lg">
+                <div class="modal-dialog modal-dialog-centered modal-lg">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title">Registro</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            <form id="registerForm" class="needs-validation" novalidate>
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <input type="text" class="form-control" id="registerName" 
-                                               placeholder="Nombre" required>
-                                        <div class="invalid-feedback">
-                                            El nombre es requerido
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <input type="text" class="form-control" id="registerSurname" 
-                                               placeholder="Apellido" required>
-                                        <div class="invalid-feedback">
-                                            El apellido es requerido
-                                        </div>
-                                    </div>
+                            <div class="row">
+                                <div class="col-md-6 d-none d-md-block bg-light p-4">
+                                    <img src="path/to/your/image.jpg" alt="Register Image" class="img-fluid rounded">
                                 </div>
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <input type="email" class="form-control" id="registerEmail" 
-                                               placeholder="Correo electrónico" required>
-                                        <div class="invalid-feedback">
-                                            Ingrese un correo válido
+                                <div class="col-md-6">
+                                    <form id="registerForm" class="needs-validation" novalidate>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <input type="text" class="form-control" id="registerName" 
+                                                       placeholder="Nombre" required>
+                                                <div class="invalid-feedback">
+                                                    El nombre es requerido
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <input type="text" class="form-control" id="registerSurname" 
+                                                       placeholder="Apellido" required>
+                                                <div class="invalid-feedback">
+                                                    El apellido es requerido
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <input type="tel" class="form-control" id="registerPhone" 
-                                               placeholder="Teléfono" required>
-                                        <div class="invalid-feedback">
-                                            Ingrese un número de teléfono válido
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <input type="email" class="form-control" id="registerEmail" 
+                                                       placeholder="Correo electrónico" required>
+                                                <div class="invalid-feedback">
+                                                    Ingrese un correo válido
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <input type="tel" class="form-control" id="registerPhone" 
+                                                       placeholder="Teléfono" required>
+                                                <div class="invalid-feedback">
+                                                    Ingrese un número de teléfono válido
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
+                                        <div class="mb-3">
+                                            <input type="text" class="form-control" id="registerAddress" 
+                                                   placeholder="Dirección" required>
+                                            <div class="invalid-feedback">
+                                                La dirección es requerida
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <input type="text" class="form-control" id="registerCity" 
+                                                       placeholder="Ciudad" required>
+                                                <div class="invalid-feedback">
+                                                    La ciudad es requerida
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <input type="date" class="form-control" id="registerBirthdate" required>
+                                                <div class="invalid-feedback">
+                                                    Debe ser mayor de edad
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <input type="password" class="form-control" id="registerPassword" 
+                                                       placeholder="Contraseña" required>
+                                                <div class="invalid-feedback">
+                                                    La contraseña debe tener al menos 8 caracteres, una mayúscula y un número
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <input type="password" class="form-control" id="registerConfirmPassword" 
+                                                       placeholder="Confirmar contraseña" required>
+                                                <div class="invalid-feedback">
+                                                    Las contraseñas no coinciden
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="d-grid gap-2">
+                                            <button type="submit" class="btn btn-primary">Registrarse</button>
+                                        </div>
+                                    </form>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Forgot Password Modal -->
+            <div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Restablecer Contraseña</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="forgotPasswordForm" novalidate>
                                 <div class="mb-3">
-                                    <input type="text" class="form-control" id="registerAddress" 
-                                           placeholder="Dirección" required>
+                                    <input type="email" class="form-control" id="forgotPasswordEmail" 
+                                           placeholder="Correo electrónico" required>
                                     <div class="invalid-feedback">
-                                        La dirección es requerida
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <input type="text" class="form-control" id="registerCity" 
-                                               placeholder="Ciudad" required>
-                                        <div class="invalid-feedback">
-                                            La ciudad es requerida
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <input type="date" class="form-control" id="registerBirthdate" required>
-                                        <div class="invalid-feedback">
-                                            Debe ser mayor de edad
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <input type="password" class="form-control" id="registerPassword" 
-                                               placeholder="Contraseña" required>
-                                        <div class="invalid-feedback">
-                                            La contraseña debe tener al menos 8 caracteres, una mayúscula y un número
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <input type="password" class="form-control" id="registerConfirmPassword" 
-                                               placeholder="Confirmar contraseña" required>
-                                        <div class="invalid-feedback">
-                                            Las contraseñas no coinciden
-                                        </div>
+                                        Por favor ingrese un correo válido
                                     </div>
                                 </div>
                                 <div class="d-grid gap-2">
-                                    <button type="submit" class="btn btn-primary">Registrarse</button>
+                                    <button type="submit" class="btn btn-primary">Enviar Código</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Enter Reset Code Modal -->
+            <div class="modal fade" id="enterResetCodeModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Ingrese el Código de Restablecimiento</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="enterResetCodeForm" novalidate>
+                                <div class="mb-3 d-flex justify-content-center">
+                                    <input type="text" class="form-control code-input mx-1 text-center" maxlength="1" required>
+                                    <input type="text" class="form-control code-input mx-1 text-center" maxlength="1" required>
+                                    <input type="text" class="form-control code-input mx-1 text-center" maxlength="1" required>
+                                    <input type="text" class="form-control code-input mx-1 text-center" maxlength="1" required>
+                                    <input type="text" class="form-control code-input mx-1 text-center" maxlength="1" required>
+                                    <input type="text" class="form-control code-input mx-1 text-center" maxlength="1" required>
+                                    <div class="invalid-feedback">
+                                        Por favor ingrese el código de 6 dígitos
+                                    </div>
+                                </div>
+                                <div class="d-grid gap-2">
+                                    <button type="submit" class="btn btn-primary">Verificar Código</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reset Password Modal -->
+            <div class="modal fade" id="resetPasswordModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Restablecer Contraseña</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="resetPasswordForm" novalidate>
+                                <div class="mb-3">
+                                    <input type="password" class="form-control" id="newPassword" 
+                                           placeholder="Nueva Contraseña" required>
+                                    <div class="invalid-feedback">
+                                        La contraseña es requerida
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <input type="password" class="form-control" id="confirmNewPassword" 
+                                           placeholder="Confirmar Nueva Contraseña" required>
+                                    <div class="invalid-feedback">
+                                        Las contraseñas no coinciden
+                                    </div>
+                                </div>
+                                <div class="d-grid gap-2">
+                                    <button type="submit" class="btn btn-primary">Restablecer Contraseña</button>
                                 </div>
                             </form>
                         </div>
@@ -182,6 +280,9 @@ class AuthenticationSystem {
         // Initialize Bootstrap modals
         this.loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
         this.registerModal = new bootstrap.Modal(document.getElementById('registerModal'));
+        this.forgotPasswordModal = new bootstrap.Modal(document.getElementById('forgotPasswordModal'));
+        this.enterResetCodeModal = new bootstrap.Modal(document.getElementById('enterResetCodeModal'));
+        this.resetPasswordModal = new bootstrap.Modal(document.getElementById('resetPasswordModal'));
 
         // Attach event listeners to buttons
         document.getElementById('authButton')?.addEventListener('click', () => this.loginModal.show());
@@ -190,6 +291,9 @@ class AuthenticationSystem {
         // Form submissions
         document.getElementById('loginForm')?.addEventListener('submit', (e) => this.handleLogin(e));
         document.getElementById('registerForm')?.addEventListener('submit', (e) => this.handleRegister(e));
+        document.getElementById('forgotPasswordForm')?.addEventListener('submit', (e) => this.handleSendResetCode(e));
+        document.getElementById('enterResetCodeForm')?.addEventListener('submit', (e) => this.handleVerifyResetCode(e));
+        document.getElementById('resetPasswordForm')?.addEventListener('submit', (e) => this.handleResetPassword(e));
 
         // Modal navigation
         document.getElementById('showRegisterLink')?.addEventListener('click', (e) => {
@@ -201,7 +305,18 @@ class AuthenticationSystem {
         // Forgot password
         document.getElementById('forgotPasswordLink')?.addEventListener('click', (e) => {
             e.preventDefault();
-            this.showForgotPasswordModal();
+            this.loginModal.hide();
+            this.forgotPasswordModal.show();
+        });
+
+        // Auto-focus for code inputs
+        const codeInputs = document.querySelectorAll('.code-input');
+        codeInputs.forEach((input, index) => {
+            input.addEventListener('input', () => {
+                if (input.value.length === 1 && index < codeInputs.length - 1) {
+                    codeInputs[index + 1].focus();
+                }
+            });
         });
     }
 
@@ -315,6 +430,86 @@ class AuthenticationSystem {
         }
 
         return errors;
+    }
+
+    async handleSendResetCode(event) {
+        event.preventDefault();
+        const email = document.getElementById('forgotPasswordEmail').value;
+
+        if (!ValidationUtils.isValidEmail(email)) {
+            this.showAlert('Error', 'Por favor ingrese un correo válido', 'error');
+            return;
+        }
+
+        try {
+            const response = await fetch(API_ENDPOINTS.SEND_RESET_CODE, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                this.showAlert('Éxito', 'Código de restablecimiento enviado a su correo', 'success');
+                this.forgotPasswordModal.hide();
+                this.enterResetCodeModal.show();
+            } else {
+                this.showAlert('Error', data.message || 'Error al enviar el código de restablecimiento', 'error');
+            }
+        } catch (error) {
+            console.error('Error al enviar el código de restablecimiento:', error);
+            this.showAlert('Error', 'Error al enviar el código de restablecimiento', 'error');
+        }
+    }
+
+    async handleVerifyResetCode(event) {
+        event.preventDefault();
+        const codeInputs = document.querySelectorAll('.code-input');
+        const code = Array.from(codeInputs).map(input => input.value).join('');
+
+        if (code.length !== 6) {
+            this.showAlert('Error', 'Por favor ingrese el código de 6 dígitos', 'error');
+            return;
+        }
+
+        // Store the code for later use
+        this.resetCode = code;
+        this.enterResetCodeModal.hide();
+        this.resetPasswordModal.show();
+    }
+
+    async handleResetPassword(event) {
+        event.preventDefault();
+        const newPassword = document.getElementById('newPassword').value;
+        const confirmNewPassword = document.getElementById('confirmNewPassword').value;
+
+        if (!newPassword || newPassword !== confirmNewPassword) {
+            this.showAlert('Error', 'Por favor complete todos los campos correctamente', 'error');
+            return;
+        }
+
+        try {
+            const email = document.getElementById('forgotPasswordEmail').value; // Reutilizar el email ingresado anteriormente
+            const response = await fetch(API_ENDPOINTS.RESET_PASSWORD, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, code: this.resetCode, newPassword })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                this.showAlert('Éxito', 'Contraseña restablecida correctamente', 'success');
+                this.resetPasswordModal.hide();
+                this.loginModal.show();
+            } else {
+                this.showAlert('Error', data.message || 'Error al restablecer la contraseña', 'error');
+            }
+        } catch (error) {
+            console.error('Error al restablecer la contraseña:', error);
+            this.showAlert('Error', 'Error al restablecer la contraseña', 'error');
+        }
     }
 
     showAlert(title, message, icon) {

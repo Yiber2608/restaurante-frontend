@@ -265,13 +265,7 @@ input:checked+.slider::before {
     max-width: 90%;
 }
 
-.modal-fullscreen {
-    max-width: 100%;
-    width: 100%;
-    height: 100%;
-}
-
-.modal-lg {
+.modal-lg-calendar {
     max-width: 80%;
     width: 80%;
     height: 80%;
@@ -289,6 +283,43 @@ input:checked+.slider::before {
 /* Estilos específicos para FullCalendar */
 .fc {
     height: 100% !important;
+    width: 100% !important;
+}
+
+.fc .fc-daygrid-body {
+    width: 100% !important;
+}
+
+.fc .fc-daygrid-body table {
+    width: 100% !important;
+}
+
+.fc .fc-scrollgrid {
+    border: none !important;
+}
+
+.fc .fc-scrollgrid-section table {
+    width: 100% !important;
+}
+
+.fc .fc-daygrid-day {
+    border: 1px solid #ddd !important;
+    min-height: 60px !important;
+    background-color: #fff;
+}
+
+.fc .fc-daygrid-day:hover {
+    background-color: #f8f9fa;
+}
+
+.fc .fc-daygrid-day.fc-day-today {
+    background-color: #e8f4ff !important;
+}
+
+.fc .fc-col-header-cell {
+    background-color: #f8f9fa;
+    padding: 8px !important;
+    font-weight: bold;
 }
 
 .fc-view {
@@ -317,4 +348,107 @@ input:checked+.slider::before {
     height: 500px;
     overflow-y: auto;
     margin: 0 auto;
+}
+
+/* Estilos para los modales */
+.modal-content {
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+    background-color: var(--bs-primary);
+    color: var(--bs-white);
+    border-bottom: none;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.modal-title {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: bold;
+}
+
+.modal-body {
+    padding: 2rem;
+}
+
+.modal-footer {
+    border-top: none;
+    padding: 1rem 2rem;
+}
+
+.btn-primary {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+}
+
+.btn-primary:hover {
+    background-color: var(--bs-primary-dark);
+    border-color: var(--bs-primary-dark);
+}
+
+.btn-close {
+    color: var(--bs-white);
+    opacity: 1;
+}
+
+.btn-close:hover {
+    color: var(--bs-light);
+}
+
+.form-control {
+    border-radius: 5px;
+    border: 1px solid var(--bs-gray-300);
+}
+
+.form-control:focus {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.25);
+}
+
+.code-input {
+    width: 3rem;
+    height: 3rem;
+    font-size: 1.5rem;
+    text-align: center;
+    margin: 0 0.25rem;
+    border-radius: 5px;
+    border: 1px solid var(--bs-gray-300);
+}
+
+.code-input:focus {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.25);
+}
+
+/* Estilos para el modal de registro */
+#registerModal .modal-body {
+    display: flex;
+    flex-direction: row;
+    padding: 0;
+}
+
+#registerModal .modal-body .col-md-6 {
+    padding: 2rem;
+}
+
+#registerModal .modal-body .bg-light {
+    background-color: var(--bs-light);
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+
+#registerModal .modal-body .form-control {
+    margin-bottom: 1rem;
+}
+
+#registerModal .modal-body .btn-primary {
+    background-color: var(--bs-secondary);
+    border-color: var(--bs-secondary);
+}
+
+#registerModal .modal-body .btn-primary:hover {
+    background-color: var(--bs-secondary-dark);
+    border-color: var(--bs-secondary-dark);
 }

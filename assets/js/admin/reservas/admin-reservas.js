@@ -15,6 +15,28 @@ document.addEventListener("DOMContentLoaded", () => {
             }, 100);
         }
     });
+
+    // Agregar eventos a las tarjetas de filtro
+    document.querySelectorAll('.card-clickeable').forEach(card => {
+        card.addEventListener('click', () => {
+            const cardId = card.id;
+
+            let filteredBranches;
+            if (cardId === 'cardTodos') {
+                filteredBranches = branchesGlobal;
+            } else if (cardId === 'cardCapacidadAlta') {
+                filteredBranches = branchesGlobal.filter(branch => branch.capacity > 100);
+            } else if (cardId === 'cardCapacidadMedia') {
+                filteredBranches = branchesGlobal.filter(branch => branch.capacity <= 100 && branch.capacity > 50);
+            } else if (cardId === 'cardCapacidadBaja') {
+                filteredBranches = branchesGlobal.filter(branch => branch.capacity <= 50);
+            } else if (cardId === 'cardRecientes') {
+                filteredBranches = branchesGlobal.filter(branch => new Date(branch.createdAt) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000));
+            }
+
+            displayBranchCards(filteredBranches);
+        });
+    });
 });
 
 async function loadBranches() {
@@ -35,6 +57,7 @@ async function loadBranches() {
         if (response.ok && data.success) {
             branchesGlobal = data.data;
             displayBranchCards(branchesGlobal);
+            conteoItemsTarjetas();
         } else {
             handleError(`Error en la respuesta: ${data.message || 'Error desconocido'}`);
         }
@@ -419,12 +442,18 @@ async function saveSchedules(dates) {
     }
 }
 
-function handleError(message) {
-    console.error(message);
-    Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: message,
-        showConfirmButton: true
-    });
+function conteoItemsTarjetas() {
+    const conteos = {
+        total: branchesGlobal.length,
+        alta: branchesGlobal.filter(branch => branch.capacity > 100).length,
+        media: branchesGlobal.filter(branch => branch.capacity <= 100 && branch.capacity > 50).length,
+        baja: branchesGlobal.filter(branch => branch.capacity <= 50).length,
+        recientes: branchesGlobal.filter(branch => new Date(branch.createdAt) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)).length
+    };
+
+    document.getElementById('totalItems').innerText = conteos.total;
+    document.getElementById('totalCapacidadAlta').innerText = conteos.alta;
+    document.getElementById('totalCapacidadMedia').innerText = conteos.media;
+    document.getElementById('totalCapacidadBaja').innerText = conteos.baja;
+    document.getElementById('totalRecientes').innerText = conteos.recientes;
 }
