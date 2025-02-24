@@ -115,35 +115,32 @@
                 <div class="row">
                     <div
                         class="col-12 bg-primary shadow py-2 px-4 rounded-5 d-flex justify-content-end align-content-center text-white fw-bold">
-                        <h1>Gestion De Menu</h1>
+                        <h1>Gestión de Usuarios</h1>
                     </div>
                 </div>
 
                 <div class="row">
                     <!-- tab botones  -->
                     <div class="col-9">
-                        <button class="btn btn-outline-dark my-3" id="addItemsButton" data-bs-toggle="modal"
-                            data-bs-target="#addItems">Crear
-                            Nuevo Item</button>
+                        <button class="btn btn-outline-dark my-3" id="addUserButton" data-bs-toggle="modal"
+                            data-bs-target="#addUser">Crear Nuevo Usuario</button>
                     </div>
 
                     <div class="col-3">
                         <div class="d-flex justify-content-center align-items-center h-100">
                             <div class="input-group">
                                 <input type="text" id="searchInput" class="form-control rounded"
-                                    placeholder="Escribe para buscar... " aria-label="Buscar " />
+                                    placeholder="Escribe para buscar..." aria-label="Buscar" />
                                 <span class="input-group-text">
                                     <i class="bi bi-search"></i>
                                 </span>
                             </div>
-
                         </div>
                     </div>
 
-                    <!-- tab cantidades menu -->
+                    <!-- tab cantidades usuarios -->
                     <div class="col-12">
-                        <div class="row row-cols-1 row-cols-md-6 g-3 mb-4">
-
+                        <div class="row row-cols-1 row-cols-md-5 g-3 mb-4">
                             <!-- tab Todos -->
                             <div class="col">
                                 <div class="card card-clickeable h-100 border-0 shadow" id="cardTodos">
@@ -151,95 +148,78 @@
                                         <div class="d-flex justify-content-between align-items-center">
                                             <div>
                                                 <h6 class="card-subtitle mb-1 text-muted">Todos</h6>
-                                                <h2 id="totalItems" class="card-title mb-0">34</h2>
+                                                <h2 id="totalUsers" class="card-title mb-0">0</h2>
                                             </div>
                                             <div class="icon-shape fondo-naranja text-white rounded-circle shadow">
-                                                <i class="bi bi-box"></i>
+                                                <i class="bi bi-people"></i>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- tab entradas -->
+                            <!-- tab Administradores -->
                             <div class="col">
-                                <div class="card card-clickeable h-100 border-0 shadow" id="cardEntradas">
+                                <div class="card card-clickeable h-100 border-0 shadow" id="cardAdmins">
                                     <div class="card-body">
                                         <div class="d-flex justify-content-between align-items-center">
                                             <div>
-                                                <h6 class="card-subtitle mb-1 text-muted">Entradas</h6>
-                                                <h2 id="totalEntradas" class="card-title mb-0">789</h2>
+                                                <h6 class="card-subtitle mb-1 text-muted">Administradores</h6>
+                                                <h2 id="totalAdmins" class="card-title mb-0">0</h2>
                                             </div>
                                             <div class="icon-shape fondo-verde text-white rounded-circle shadow">
-                                                <i class='bx bxs-bowl-rice'></i>
+                                                <i class="bi bi-person-badge"></i>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- tab platos principales -->
+                            <!-- tab Usuarios -->
                             <div class="col">
-                                <div class="card card-clickeable h-100 border-0 shadow " id="cardPlatosPrincipales">
+                                <div class="card card-clickeable h-100 border-0 shadow" id="cardUsers">
                                     <div class="card-body">
                                         <div class="d-flex justify-content-between align-items-center">
                                             <div>
-                                                <h6 class="card-subtitle mb-1 text-muted">Platos Principales</h6>
-                                                <h2 id="totalPlatos" class="card-title mb-0">345</h2>
+                                                <h6 class="card-subtitle mb-1 text-muted">Usuarios</h6>
+                                                <h2 id="totalUser" class="card-title mb-0">0</h2>
                                             </div>
-                                            <div class="icon-shape fondo-amarillo text-white rounded-circle shadow">
-                                                <i class='bx bxs-dish'></i>
+                                            <div class="icon-shape fondo-azul text-white rounded-circle shadow">
+                                                <i class="bi bi-person"></i>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- tab postres -->
+                            <!-- tab Activos -->
                             <div class="col">
-                                <div class="card card-clickeable h-100 border-0 shadow" id="cardPostres">
+                                <div class="card card-clickeable h-100 border-0 shadow" id="cardActivos">
                                     <div class="card-body">
                                         <div class="d-flex justify-content-between align-items-center">
                                             <div>
-                                                <h6 class="card-subtitle mb-1 text-muted">Postres</h6>
-                                                <h2 id="totalPostres" class="card-title mb-0">345</h2>
+                                                <h6 class="card-subtitle mb-1 text-muted">Activos</h6>
+                                                <h2 id="totalActivos" class="card-title mb-0">0</h2>
+                                            </div>
+                                            <div class="icon-shape fondo-verde text-white rounded-circle shadow">
+                                                <i class="bi bi-check-circle"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- tab Inactivos -->
+                            <div class="col">
+                                <div class="card card-clickeable h-100 border-0 shadow" id="cardInactivos">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="card-subtitle mb-1 text-muted">Inactivos</h6>
+                                                <h2 id="totalInactivos" class="card-title mb-0">0</h2>
                                             </div>
                                             <div class="icon-shape fondo-rojo text-white rounded-circle shadow">
-                                                <i class='bx bxs-cookie'></i>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- tab bebidas calientes  -->
-                            <div class="col">
-                                <div class="card  card-clickeable h-100 border-0 shadow" id="cardBebidasCalientes">
-                                    <div class="card-body">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <div>
-                                                <h6 class="card-subtitle mb-1 text-muted">Bebidas Calientes</h6>
-                                                <h2 id="totalBebidasCalientes" class="card-title mb-0">100</h2>
-                                            </div>
-                                            <div class="icon-shape fondo-verde-agua text-white rounded-circle shadow">
-                                                <i class='bx bxs-coffee'></i>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- tab otras bebidas -->
-                            <div class="col">
-                                <div class="card card-clickeable h-100 border-0 shadow" id="cardOtrasBebidas">
-                                    <div class="card-body">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <div>
-                                                <h6 class="card-subtitle mb-1 text-muted">Otras Bebidas</h6>
-                                                <h2 id="totalOtrasBebidas" class="card-title mb-0">100</h2>
-                                            </div>
-                                            <div class="icon-shape bg-warning text-white rounded-circle shadow">
-                                                <i class='bx bxs-wine'></i>
+                                                <i class="bi bi-x-circle"></i>
                                             </div>
                                         </div>
                                     </div>
@@ -247,17 +227,162 @@
                             </div>
                         </div>
 
-                        <!-- tab tabla de items -->
+                        <!-- tab tabla de usuarios -->
                         <div class="col-12">
                             <div id="table-container"></div>
                         </div>
-
                     </div>
                 </div>
             </div>
         </div>
-
     </div>
+
+    <!-- Modal para agregar usuarios -->
+    <div class="modal fade" id="addUser" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addUserModalLabel">Crear Nuevo Usuario</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addUserForm" class="needs-validation" novalidate>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="name" class="form-label">Nombre <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="name" required minlength="3">
+                                <div class="invalid-feedback">Por favor, ingresa un nombre válido (mínimo 3 caracteres).</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="surname" class="form-label">Apellido <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="surname" required minlength="3">
+                                <div class="invalid-feedback">Por favor, ingresa un apellido válido (mínimo 3 caracteres).</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="email" class="form-label">Correo Electrónico <span class="text-danger">*</span></label>
+                                <input type="email" class="form-control" id="email" required>
+                                <div class="invalid-feedback">Por favor, ingresa un correo electrónico válido.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="password" class="form-label">Contraseña <span class="text-danger">*</span></label>
+                                <input type="password" class="form-control" id="password" required minlength="6">
+                                <div class="invalid-feedback">Por favor, ingresa una contraseña válida (mínimo 6 caracteres).</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="phone" class="form-label">Teléfono <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="phone" required>
+                                <div class="invalid-feedback">Por favor, ingresa un número de teléfono válido.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="address" class="form-label">Dirección <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="address" required>
+                                <div class="invalid-feedback">Por favor, ingresa una dirección válida.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="city" class="form-label">Ciudad <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="city" required>
+                                <div class="invalid-feedback">Por favor, ingresa una ciudad válida.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="birthdate" class="form-label">Fecha de Nacimiento <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" id="birthdate" required>
+                                <div class="invalid-feedback">Por favor, ingresa una fecha de nacimiento válida.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="role" class="form-label">Rol <span class="text-danger">*</span></label>
+                                <select id="role" class="form-select" required>
+                                    <option value="user">Usuario</option>
+                                    <option value="admin">Administrador</option>
+                                </select>
+                                <div class="invalid-feedback">Por favor, selecciona un rol.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="status" class="form-label">Estado <span class="text-danger">*</span></label>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="status">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                        <!-- Botones -->
+                        <div class="d-flex justify-content-end mt-3">
+                            <button type="button" class="btn btn-dark me-3" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" id="saveUser" class="btn btn-primary">Guardar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para actualizar usuarios -->
+    <div class="modal fade" id="updateUserModal" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="updateUserModalLabel">Actualizar Usuario</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="updateUserForm" class="needs-validation" novalidate>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="updateName" class="form-label">Nombre <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="updateName" required minlength="3">
+                                <div class="invalid-feedback">Por favor, ingresa un nombre válido (mínimo 3 caracteres).</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="updateSurname" class="form-label">Apellido <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="updateSurname" required minlength="3">
+                                <div class="invalid-feedback">Por favor, ingresa un apellido válido (mínimo 3 caracteres).</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="updatePhone" class="form-label">Teléfono <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="updatePhone" required>
+                                <div class="invalid-feedback">Por favor, ingresa un número de teléfono válido.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="updateAddress" class="form-label">Dirección <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="updateAddress" required>
+                                <div class="invalid-feedback">Por favor, ingresa una dirección válida.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="updateCity" class="form-label">Ciudad <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="updateCity" required>
+                                <div class="invalid-feedback">Por favor, ingresa una ciudad válida.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="updateBirthdate" class="form-label">Fecha de Nacimiento <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" id="updateBirthdate" required>
+                                <div class="invalid-feedback">Por favor, ingresa una fecha de nacimiento válida.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="updateRole" class="form-label">Rol <span class="text-danger">*</span></label>
+                                <select id="updateRole" class="form-select" required>
+                                    <option value="user">Usuario</option>
+                                    <option value="admin">Administrador</option>
+                                </select>
+                                <div class="invalid-feedback">Por favor, selecciona un rol.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="updateStatus" class="form-label">Estado <span class="text-danger">*</span></label>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="updateStatus">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                        <!-- Botones -->
+                        <div class="d-flex justify-content-end mt-3">
+                            <button type="button" class="btn btn-dark me-3" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" id="saveUpdatedUser" class="btn btn-primary">Guardar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- tab agregar items -->
     <div class="modal fade" id="addItems" data-bs-backdrop="static">
         <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
@@ -318,7 +443,7 @@
                                     <div class="col-md-12">
                                         <label for="typeItem" class="form-label">Tipo de Item <span
                                                 class="text-danger">*</span></label>
-                                        <select id="typeItem" class="form-select" required>
+                                        <select id="typeItem" class="form-select" required></select>
                                             <option value="">Selecciona el tipo</option>
                                             <option value="Entradas">Entradas</option>
                                             <option value="Platos Principales">Platos Principales</option>
@@ -429,7 +554,7 @@
                                     </div>
                                     <div class="col-md-12">
                                         <label for="updateTypeItem" class="form-label">Tipo de Item</label>
-                                        <select id="updateTypeItem" class="form-select" required>
+                                        <select id="updateTypeItem" class="form-select" required></select>
                                             <option value="">Selecciona el tipo</option>
                                             <option value="Entradas">Entradas</option>
                                             <option value="Platos Principales">Platos Principales</option>
@@ -505,6 +630,8 @@
     <script src="./assets/js/config/logout.js"></script>
 
     <script src="./assets/js/admin/usuarios/admin-usuarios.js"></script>
+    <script src="./assets/js/admin/usuarios/admin-usuarios-add.js"></script>
+    <script src="./assets/js/admin/usuarios/admin-usuarios-update.js"></script>
     <script src="https://widget.cloudinary.com/v2.0/global/all.js" type="text/javascript"></script>
 
 </body>

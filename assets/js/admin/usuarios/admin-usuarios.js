@@ -1,34 +1,28 @@
-
 // Primero validamos que solo los admins puedan acceder
 document.addEventListener("DOMContentLoaded", () => {
-    // Verificar si hay una sesión activa
     if (!AuthValidator.validateSession()) {
         window.location.href = '/index.html';
         return;
     }
 
-    // Verificar si el usuario es admin
     if (!AuthValidator.validateRole('admin')) {
         window.location.href = '/index.html';
         return;
     }
 
-    // Si pasa las validaciones, inicializar la aplicación
     initializeAdminDashboard();
 });
 
 function initializeAdminDashboard() {
-    loadData();
+    loadUsers();
 }
 
+let usersGlobal = [];
 
-let itemsGlobal = []
-
-
-async function loadData() {
+async function loadUsers() {
     const token = localStorage.getItem('token');
     try {
-        const response = await fetch('http://localhost:8080/api/v1/items', {
+        const response = await fetch('http://localhost:8080/user/all', {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -38,25 +32,20 @@ async function loadData() {
         const data = await response.json();
 
         if (response.ok && data.success) {
-            // Si la respuesta es exitosa
-            itemsGlobal = data.data;
-            buildTable(itemsGlobal);
-            conteoItemsTarjetas();
+            usersGlobal = data.data;
+            buildTable(usersGlobal);
+            conteoUsuariosTarjetas();
         } else if (response.status === 401 || response.status === 403) {
-            // Token inválido o expirado
             localStorage.removeItem('token');
             window.location.href = '/index.html';
         } else {
-            // Manejo de errores específicos del backend
             handleError(`Error en la respuesta: ${data.message || 'Error desconocido'}`);
         }
     } catch (error) {
-        // Manejo de errores de red o problemas en la solicitud
-        console.error('Error al cargar los datos:', error);
-        handleError('Error al cargar los datos. Por favor, intente nuevamente.');
+        console.error('Error al cargar los usuarios:', error);
+        handleError('Error al cargar los usuarios. Por favor, intente nuevamente.');
     }
 }
-
 
 function handleError(message) {
     console.error(message);
@@ -68,23 +57,29 @@ function handleError(message) {
     });
 }
 
-
-//funcio que crea la tabla con tabulator 
 function buildTable(data) {
     const tableContainer = document.getElementById("table-container");
 
     const table = new Tabulator(tableContainer, {
-        data: data, // Usa directamente los datos tal cual vienen
-        layout: "fitColumns", // Ajusta las columnas al contenedor
-        responsiveLayout: "collapse", // Habilita el diseño responsive
+        data: data,
+        layout: "fitColumns",
+        responsiveLayout: "collapse",
         tableClass: "table table-striped table-bordered table-hover",
-        pagination: "local", // Paginación local
-        paginationSize: 10, // Número de filas por página
-        locale: true, // Habilita la localización
+        pagination: "local",
+        paginationSize: 10,
+        locale: true,
         langs: {
-            "es-419": { // Configuración en español
+            "es-419": {
                 "columns": {
                     "name": "Nombre",
+                    "surname": "Apellido",
+                    "email": "Correo",
+                    "phone": "Teléfono",
+                    "address": "Dirección",
+                    "city": "Ciudad",
+                    "role": "Rol",
+                    "status": "Estado",
+                    "birthdate": "Fecha de Nacimiento"
                 },
                 "pagination": {
                     "first": "Primera",
@@ -97,91 +92,89 @@ function buildTable(data) {
                     "next_title": "Página siguiente",
                     "page_size": "Tamaño de página",
                 },
-                "groups": {
-                    "item": "ítem",
-                    "items": "ítems",
-                },
                 "data": {
                     "loading": "Cargando datos...",
                     "error": "Error al cargar datos.",
-                },
-                "paginationCounter": {
-                    "showing": "Mostrando",
-                    "of": "de",
-                    "pages": "páginas",
-                },
+                }
             },
         },
-        initialLocale: "es-419", // Idioma inicial
-        paginationSizeSelector: [10, 20, 50, 100], // Selector de tamaño de página
+        initialLocale: "es-419",
+        paginationSizeSelector: [10, 20, 50, 100],
         columns: [
             { title: "ID", field: "id", width: 80, hozAlign: "center", headerSort: false },
-            { title: "Tipo", field: "typeItem", widthGrow: 1 }, // Usar 'typeItem' directamente
-            { title: "Nombre", field: "name", widthGrow: 2 }, // Usar 'name' directamente
+            { title: "Nombre", field: "name", widthGrow: 1 },
+            { title: "Apellido", field: "surname", widthGrow: 1 },
+            { title: "Correo", field: "email", widthGrow: 2 },
+            { title: "Teléfono", field: "phone", widthGrow: 1 },
+            { title: "Dirección", field: "address", widthGrow: 2 },
+            { title: "Ciudad", field: "city", widthGrow: 1 },
             {
-                title: "Descripción",
-                field: "description", // Usar 'description' directamente
+                title: "Rol",
+                field: "role",
+                widthGrow: 1,
                 formatter: (cell) => {
-                    const text = cell.getValue();
-                    return `<div style="white-space: pre-wrap; word-wrap: break-word;">${text}</div>`;
+                    const role = cell.getValue();
+                    const icon = role === 'admin' ? 'bi-key' : 'bi-person';
+                    return `<i class="bi ${icon}"></i> ${role}`;
                 },
-                widthGrow: 3.5
-            },
-            {
-                title: "Precio",
-                field: "unitPrice", // Usar 'unitPrice' directamente
-                formatter: "money",
-                formatterParams: { symbol: "$", precision: 2 },
-                widthGrow: 1.2
-            },
-            {
-                title: "Imagen",
-                field: "imageUrl", // Usar 'imageUrl' directamente
-                formatter: () => `
-                    <button class='btn bg-info btn-sm view-img-btn'>
-                        <i class="bi bi-eye"></i>
-                    </button>
-                `,
-                hozAlign: "center",
-                widthGrow: 1.5,
                 cellClick: (e, cell) => {
-                    const imageUrl = cell.getRow().getData().imageUrl;
-                    if (imageUrl) {
-                        showImageModal(imageUrl);
-                    } else {
-                        alert("Este ítem no tiene imagen.");
+                    const role = cell.getValue();
+                    if (role === 'admin') {
+                        cell.getElement().style.backgroundColor = 'lightgreen';
                     }
-                },
+                }
             },
             {
                 title: "Estado",
-                field: "status", // Usar 'status' directamente
-                formatter: "tickCross",
-                sorter: "boolean",
-                hozAlign: "center",
-                widthGrow: 1
+                field: "status",
+                widthGrow: 1,
+                formatter: (cell) => {
+                    const status = cell.getValue() === 'true';
+                    return `
+                        <label class="toggle-switch">
+                            <input type="checkbox" ${status ? 'checked' : ''} class="status-switch">
+                            <span class="slider"></span>
+                        </label>
+                    `;
+                },
+                cellClick: async (e, cell) => {
+                    const userId = cell.getRow().getData().id;
+                    const currentStatus = cell.getValue() === 'true';
+                    const newStatus = !currentStatus;
+
+                    const result = await Swal.fire({
+                        title: `¿Estás seguro de que deseas ${newStatus ? 'activar' : 'desactivar'} este usuario?`,
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#3085d6",
+                        cancelButtonColor: "#d33",
+                        confirmButtonText: "Sí, cambiar",
+                        cancelButtonText: "Cancelar",
+                    });
+
+                    if (result.isConfirmed) {
+                        toggleUserStatus(userId, newStatus, cell);
+                    }
+                }
             },
             {
                 title: "Acciones",
                 field: "acciones",
                 hozAlign: "center",
                 formatter: () => `
-                    <button class='btn bg-warning btn-sm edit-btn'><i class="bi bi-pencil-square"></i></button>
+                    <button class='btn fondo-amarillo btn-sm edit-btn'><i class="bi bi-pencil-square"></i></button>
                     <button class='btn fondo-rojo btn-sm delete-btn'><i class="bi bi-trash3-fill"></i></button>
                 `,
                 cellClick: (e, cell) => {
                     const target = e.target.closest('button');
+                    const userId = cell.getRow().getData().id;
 
                     if (target && target.classList.contains('edit-btn')) {
-                        const itemId = cell.getRow().getData().id;
-                        loadDataById(itemId);
+                        loadUserData(userId); // Precargar datos en el formulario de actualización
                     } else if (target && target.classList.contains('delete-btn')) {
-                        // Lógica para el botón de eliminación
-                        const itemId = cell.getRow().getData().id;
-                        deleteItem(itemId, cell.getRow()); // Llama a la función de eliminación
+                        deleteUser(userId, cell.getRow());
                     }
-                }
-                ,
+                },
                 widthGrow: 2
             }
         ],
@@ -190,218 +183,235 @@ function buildTable(data) {
     console.log("Tabla creada con éxito");
 }
 
-// Función de cargar cantidades
-function conteoItemsTarjetas() {
-    const conteos = {
-        total: 0,
-        "Entradas": 0,
-        "Platos Principales": 0,
-        "Postres": 0,
-        "Bebidas Calientes": 0,
-        "Otras Bebidas": 0
-    };
+async function toggleUserStatus(userId, newStatus, cell) {
+    const token = localStorage.getItem("token");
 
-    // Itera sobre itemsGlobal para contar
-    for (let item of itemsGlobal) {
-        conteos.total++;
-        // Usar el valor de 'typeItem' para contar por tipo
-        if (conteos[item.typeItem] !== undefined) {
-            conteos[item.typeItem]++;
-        }
-    }
-
-    // Actualiza los contadores en el DOM
-    document.getElementById('totalItems').innerText = conteos.total;
-    document.getElementById('totalEntradas').innerText = conteos["Entradas"];
-    document.getElementById('totalPlatos').innerText = conteos["Platos Principales"];
-    document.getElementById('totalPostres').innerText = conteos["Postres"];
-    document.getElementById('totalBebidasCalientes').innerText = conteos["Bebidas Calientes"];
-    document.getElementById('totalOtrasBebidas').innerText = conteos["Otras Bebidas"];
-}
-
-
-
-
-// Función para mostrar la imagen en un modal
-function showImageModal(imageUrl) {
-    // Actualizar el atributo "src" del <img> en el modal
-    const modalImage = document.getElementById("modalImage");
-    modalImage.src = imageUrl;
-
-    // Mostrar el modal
-    const modal = new bootstrap.Modal(document.getElementById("imageModal"));
-    modal.show();
-}
-
-
-// Toggle Sidebar
-document.querySelector('.toggle-btn').addEventListener('click', function () {
-    const sidebar = document.querySelector('.sidebar');
-    const main = document.querySelector('.main');
-
-    sidebar.classList.toggle('hidden');
-
-    // Ajustar el ancho del main cuando el sidebar está oculto
-    if (sidebar.classList.contains('hidden')) {
-        main.style.width = '100%';
-    } else {
-        main.style.width = 'calc(100% - 90px)';
-    }
-});
-
-
-let searchTimeout; // Variable para almacenar el timeout
-
-// Evento de Escuchar el filtro
-document.getElementById("searchInput").addEventListener("input", function () {
-    const searchTerm = this.value.trim().toLowerCase(); // Elimina espacios en blanco y convierte a minúsculas
-
-    // Si hay menos de 3 caracteres, limpia la tabla
-    if (searchTerm.length < 4) {
-        buildTable(itemsGlobal); // Muestra todos los elementos
-        return; // Sal del listener
-    }
-
-    // Retrasar la búsqueda para reducir eventos
-    clearTimeout(searchTimeout); // Limpia cualquier timeout previo
-    searchTimeout = setTimeout(() => {
-        const filteredItems = itemsGlobal.filter(item => 
-            item.nombre.toLowerCase().includes(searchTerm)
-        );
-
-        // Si no se encuentran resultados
-        if (filteredItems.length === 0) {
-            Swal.fire({
-                icon: 'info',
-                title: 'No se encontraron resultados',
-                text: 'No hay productos que coincidan con tu búsqueda.',
-                showConfirmButton: false,
-                timer: 1500 // 1.5 segundos de duración
-            });
-
-            // No cargar la tabla vacía
-            return;
-        }
-
-        // Si hay resultados, actualiza la tabla con los elementos filtrados
-        buildTable(filteredItems);
-    }, 300); // Retraso de 300ms antes de ejecutar el filtro
-});
-
-
-//Evento de previsuaviliazr imagen
-document.getElementById('imagePreview').addEventListener('click', function () {
-    document.getElementById('itemImage').click();
-});
-
-document.getElementById('itemImage').addEventListener('change', function (event) {
-    const file = event.target.files[0];
-    const preview = document.getElementById('previewImage');
-    const placeholder = document.getElementById('imagePlaceholder');
-    const removeBtn = document.getElementById('removeImage');
-
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            preview.src = e.target.result;
-            preview.style.display = 'block';
-            placeholder.style.display = 'none';
-            removeBtn.classList.remove('d-none');
-        };
-        reader.readAsDataURL(file);
-    }
-});
-
-// Evento de remover imagen
-document.getElementById('removeImage').addEventListener('click', function () {
-    const preview = document.getElementById('previewImage');
-    const placeholder = document.getElementById('imagePlaceholder');
-    const fileInput = document.getElementById('itemImage');
-    const removeBtn = document.getElementById('removeImage');
-
-    preview.src = '';
-    preview.style.display = 'none';
-    placeholder.style.display = 'block';
-    fileInput.value = '';
-    removeBtn.classList.add('d-none');
-});
-
-
-// Evento de filtro de tarjetas 
-document.querySelectorAll('.card-clickeable').forEach(card => {
-    card.addEventListener('click', () => {
-        const cardId = card.id;
-
-        // Diccionario de tipos para simplificar los filtros
-        const tipos = {
-            'cardEntradas': 'Entradas',
-            'cardPlatosPrincipales': 'Platos Principales',
-            'cardPostres': 'Postres',
-            'cardBebidasCalientes': 'Bebidas Calientes',
-            'cardOtrasBebidas': 'Otras Bebidas',
-            'cardTodos': 'Todos'
-        };
-
-        // Mostrar spinner de carga
-        Swal.fire({
-            title: 'Cargando...',
-            html: 'Por favor espera mientras se carga la información.',
-            allowOutsideClick: false,
-            didOpen: () => {
-                Swal.showLoading();
-            }
+    try {
+        const response = await fetch(`http://localhost:8080/user/status/${userId}`, {
+            method: "PUT",
+            headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ status: newStatus })
         });
 
-        setTimeout(() => {
-            let filteredItems;
+        const responseData = await response.json();
 
-            // Si la tarjeta seleccionada es "Todos", no filtra
-            if (cardId === 'cardTodos') {
-                filteredItems = itemsGlobal;
-            } else if (tipos[cardId]) {
-                const tipo = tipos[cardId];
+        if (response.ok && responseData.success) {
+            cell.setValue(newStatus ? 'true' : 'false');
+            Swal.fire({
+                icon: "success",
+                title: "¡Éxito!",
+                text: responseData.message || "El estado del usuario ha sido cambiado con éxito.",
+                timer: 1500,
+                showConfirmButton: false,
+            });
+        } else {
+            throw new Error(responseData.message || "No se pudo cambiar el estado del usuario.");
+        }
+    } catch (error) {
+        Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: error.message,
+            timer: 2000,
+            showConfirmButton: false,
+        });
+        console.error("Error al cambiar el estado del usuario:", error);
+    }
+}
 
-                // Filtrar los elementos de acuerdo al tipo de "typeItem" (campo del JSON)
-                filteredItems = itemsGlobal.filter(item => item.typeItem === tipo);
-            } else {
-                Swal.close();
-                alert('¡Hiciste clic en otra tarjeta!');
-                return;
-            }
+async function editUser(userId) {
+    // Lógica para editar usuario
+    console.log(`Editar usuario con ID: ${userId}`);
+}
 
-            Swal.close();
+async function deleteUser(userId, row) {
+    const token = localStorage.getItem("token");
 
-            // Mostrar el resultado del filtro
-            if (filteredItems.length > 0) {
+    if (!token) {
+        Swal.fire({
+            icon: "error",
+            title: "Autenticación requerida",
+            text: "No se encontró un token de autenticación. Por favor, inicia sesión nuevamente.",
+        });
+        return;
+    }
+
+    const result = await Swal.fire({
+        title: "¿Estás seguro?",
+        text: "No podrás recuperar este usuario después de eliminarlo.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Sí, eliminar",
+        cancelButtonText: "Cancelar",
+    });
+
+    if (result.isConfirmed) {
+        try {
+            const response = await fetch(`http://localhost:8080/user/${userId}`, {
+                method: "DELETE",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+            });
+
+            const responseData = await response.json();
+
+            if (response.ok && responseData.success) {
+                row.delete();
                 Swal.fire({
                     icon: "success",
-                    title: "¡Datos cargados!",
-                    text: `Se encontraron ${filteredItems.length} ${tipos[cardId]}${filteredItems.length > 1 ? '' : ''}.`,
-                    timer: 2000, // 2 segundos
+                    title: "¡Éxito!",
+                    text: responseData.message || "El usuario ha sido eliminado con éxito.",
+                    timer: 1500,
                     showConfirmButton: false,
-                }).then(() => {
-                    buildTable(filteredItems);
                 });
             } else {
                 Swal.fire({
                     icon: "error",
-                    title: "Sin resultados",
-                    text: `No se encontraron productos del tipo ${tipos[cardId]}.`,
-                    timer: 2000, // 2 segundos
+                    title: "Error",
+                    text: responseData.message || "No se pudo eliminar el usuario.",
+                    timer: 2000,
                     showConfirmButton: false,
-                }).then(() => {
-                    buildTable(itemsGlobal); // Mostrar todos los elementos si no hay resultados
                 });
             }
-        }, 1000); 
+        } catch (error) {
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "Ocurrió un problema al intentar eliminar el usuario.",
+                timer: 2000,
+                showConfirmButton: false,
+            });
+            console.error("Error al eliminar el usuario:", error);
+        }
+    }
+}
+
+let searchTimeout;
+
+document.getElementById("searchInput").addEventListener("input", function () {
+    const searchTerm = this.value.trim().toLowerCase();
+
+    clearTimeout(searchTimeout);
+
+    if (searchTerm === '') {
+        buildTable(usersGlobal);
+        return;
+    }
+
+    searchTimeout = setTimeout(() => {
+        const filteredUsers = usersGlobal.filter(user => {
+            return user.name.toLowerCase().includes(searchTerm) ||
+                   user.surname.toLowerCase().includes(searchTerm) ||
+                   user.email.toLowerCase().includes(searchTerm) ||
+                   user.phone.toLowerCase().includes(searchTerm) ||
+                   user.address.toLowerCase().includes(searchTerm) ||
+                   user.city.toLowerCase().includes(searchTerm);
+        });
+
+        buildTable(filteredUsers);
+
+        if (filteredUsers.length === 0) {
+            Swal.fire({
+                icon: 'info',
+                title: 'No se encontraron resultados',
+                text: 'No se encontraron usuarios que coincidan con tu búsqueda.',
+                showConfirmButton: false,
+                timer: 1500
+            });
+        } else {
+            Swal.fire({
+                icon: 'success',
+                title: 'Resultados encontrados',
+                text: `${filteredUsers.length} usuario(s) coinciden con tu búsqueda.`,
+                showConfirmButton: false,
+                timer: 1500
+            });
+        }
+    }, 1500);
+});
+
+document.querySelectorAll('.card-clickeable').forEach(card => {
+    card.addEventListener('click', () => {
+        const cardId = card.id;
+        filterUsers(cardId);
     });
 });
 
+function filterUsers(cardId) {
+    let filteredUsers;
+
+    if (cardId === 'cardTodos') {
+        filteredUsers = usersGlobal;
+    } else if (cardId === 'cardAdmins') {
+        filteredUsers = usersGlobal.filter(user => user.role === 'admin');
+    } else if (cardId === 'cardUsers') {
+        filteredUsers = usersGlobal.filter(user => user.role === 'user');
+    } else if (cardId === 'cardActivos') {
+        filteredUsers = usersGlobal.filter(user => user.status === 'true');
+    } else if (cardId === 'cardInactivos') {
+        filteredUsers = usersGlobal.filter(user => user.status === 'false');
+    }
+
+    buildTable(filteredUsers);
+}
 
 
-// Método para ejecutar al cargar la página
-document.addEventListener("DOMContentLoaded", () => {
-    buildTable(itemsGlobal); // Llama a la función para crear la tabla
-    conteoItemsTarjetas();
-    console.log("Tabla creada al cargar la página");
-});
+function conteoUsuariosTarjetas() {
+    const conteos = {
+        total: 0,
+        admins: 0,
+        users: 0,
+        activos: 0,
+        inactivos: 0
+    };
+
+    for (let user of usersGlobal) {
+        conteos.total++;
+        if (user.role === 'admin') {
+            conteos.admins++;
+        } else if (user.role === 'user') {
+            conteos.users++;
+        }
+        if (user.status === 'true') {
+            conteos.activos++;
+        } else {
+            conteos.inactivos++;
+        }
+    }
+
+    document.getElementById('totalUsers').innerText = conteos.total;
+    document.getElementById('totalAdmins').innerText = conteos.admins;
+    document.getElementById('totalUser').innerText = conteos.users;
+    document.getElementById('totalActivos').innerText = conteos.activos;
+    document.getElementById('totalInactivos').innerText = conteos.inactivos;
+}
+
+function loadUserData(userId) {
+    const user = usersGlobal.find(user => user.id === userId);
+    if (!user) {
+        console.error("Usuario no encontrado");
+        return;
+    }
+
+    document.getElementById("updateName").value = user.name;
+    document.getElementById("updateSurname").value = user.surname;
+    document.getElementById("updatePhone").value = user.phone;
+    document.getElementById("updateAddress").value = user.address;
+    document.getElementById("updateCity").value = user.city;
+    document.getElementById("updateBirthdate").value = user.birthdate;
+    document.getElementById("updateRole").value = user.role;
+    document.getElementById("updateStatus").checked = user.status === "true";
+
+    const updateUserForm = document.getElementById("updateUserForm");
+    updateUserForm.dataset.userId = userId;
+
+    const updateModal = new bootstrap.Modal(document.getElementById("updateUserModal"));
+    updateModal.show();
+}

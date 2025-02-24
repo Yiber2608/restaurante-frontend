@@ -417,7 +417,10 @@ class AuthenticationSystem {
             errors.push('Email inválido');
         }
         if (!ValidationUtils.isValidPassword(data.password)) {
-            errors.push('La contraseña debe tener al menos 8 caracteres, una mayúscula y un número');
+            errors.push('La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número');
+        }
+        if (data.password !== document.getElementById('registerConfirmPassword').value) {
+            errors.push('Las contraseñas no coinciden');
         }
         if (!ValidationUtils.isValidPhone(data.phone)) {
             errors.push('Número de teléfono inválido');
@@ -528,6 +531,14 @@ class AuthenticationSystem {
     
     
 }
+
+// Agregar clase personalizada al modal de registro
+document.addEventListener('DOMContentLoaded', function() {
+    var registerModal = document.getElementById('registerModal');
+    if (registerModal) {
+        registerModal.classList.add('custom-register-modal');
+    }
+});
 
 // Initialize the authentication system when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {

@@ -176,5 +176,36 @@ body {
     background: linear-gradient(to right, rgba(255, 179, 128, 0.2), rgba(240, 228, 155, 0.2));
 }
 
+.custom-register-modal .modal-dialog {
+    max-width: 800px; /* Aumentar el tamaño del modal */
+}
 
-  
+.custom-register-modal .modal-content {
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease-in-out;
+}
+
+.custom-register-modal .modal-header,
+.custom-register-modal .modal-footer {
+    background-color: #f8f9fa;
+    border-bottom: none;
+    border-top: none;
+}
+
+.custom-register-modal .modal-header {
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+}
+
+.custom-register-modal .modal-footer {
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+}
+
+.custom-register-modal .modal-body {
+    padding: 2rem;
+}
+
+
+

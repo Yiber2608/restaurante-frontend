@@ -31,7 +31,12 @@ document.addEventListener("DOMContentLoaded", () => {
     if (addBranchForm) {
         addBranchForm.addEventListener("submit", async (event) => {
             event.preventDefault();
-            await addBranch();
+            if (addBranchForm.checkValidity()) {
+                await addBranch();
+            } else {
+                addBranchForm.classList.add('was-validated');
+                console.log("Formulario no válido");
+            }
         });
     }
 });
@@ -75,6 +80,7 @@ function obtenerDatosFormulario() {
 }
 
 function validarCamposFormulario(name, address, description, latitude, longitude, capacity) {
+    console.log("Validando campos del formulario");
     if (
         !validateTextInput(name, 3, 50, 'Nombre') ||
         !validateTextInput(address, 10, 100, 'Dirección') ||
