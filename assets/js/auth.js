@@ -1,4 +1,4 @@
-let API_BASE_URL = 'http://localhost:8080';
+let API_BASE_URL = 'http://3.148.109.153';
 let API_ENDPOINTS = {
     LOGIN: `${API_BASE_URL}/user/login`,
     SIGNUP: `${API_BASE_URL}/user/signup`,

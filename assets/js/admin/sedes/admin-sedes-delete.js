@@ -23,7 +23,7 @@ async function deleteBranch(branchId, row) {
 
     if (result.isConfirmed) {
         try {
-            const response = await fetch(`http://localhost:8080/api/v1/branches/${branchId}`, {
+            const response = await fetch(`http://3.148.109.153/api/v1/branches/${branchId}`, {
                 method: "DELETE",
                 headers: {
                     Authorization: `Bearer ${token}`,

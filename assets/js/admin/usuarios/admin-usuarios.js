@@ -30,7 +30,7 @@ let usersGlobal = [];
 async function loadUsers() {
     const token = localStorage.getItem('token');
     try {
-        const response = await fetch('http://localhost:8080/user/all', {
+        const response = await fetch('http://3.148.109.153/user/all', {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -216,7 +216,7 @@ async function toggleUserStatus(userId, newStatus, cell) {
     const token = localStorage.getItem("token");
 
     try {
-        const response = await fetch(`http://localhost:8080/user/status/${userId}`, {
+        const response = await fetch(`http://3.148.109.153/user/status/${userId}`, {
             method: "PUT",
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -281,7 +281,7 @@ async function deleteUser(userId, row) {
 
     if (result.isConfirmed) {
         try {
-            const response = await fetch(`http://localhost:8080/user/${userId}`, {
+            const response = await fetch(`http://3.148.109.153/user/${userId}`, {
                 method: "DELETE",
                 headers: {
                     Authorization: `Bearer ${token}`,

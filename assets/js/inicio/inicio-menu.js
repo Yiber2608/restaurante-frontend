@@ -4,7 +4,7 @@ let menuData = {};
 // Función para obtener los ítems del menú desde el servidor
 async function fetchMenuItems() {
     try {
-        const response = await fetch('http://localhost:8080/api/v1/items', {
+        const response = await fetch('http://3.148.109.153/api/v1/items', {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
         });

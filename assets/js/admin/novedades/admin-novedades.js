@@ -5,7 +5,7 @@ async function loadNews() {
     const token = localStorage.getItem('token');
 
     try {
-        const response = await fetch('http://localhost:8080/api/v1/news/private', {
+        const response = await fetch('http://3.148.109.153/api/v1/news/private', {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -191,7 +191,7 @@ async function toggleNewsStatus(newsId, newStatus) {
     const token = localStorage.getItem("token");
 
     try {
-        const response = await fetch(`http://localhost:8080/api/v1/news/toggle/${newsId}`, {
+        const response = await fetch(`http://3.148.109.153/api/v1/news/toggle/${newsId}`, {
             method: "PUT",
             headers: {
                 Authorization: `Bearer ${token}`,

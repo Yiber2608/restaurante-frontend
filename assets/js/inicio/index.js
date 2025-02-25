@@ -1,6 +1,6 @@
 // URLs del backend
-const API_REVIEWS = 'http://localhost:8080/api/v1/reviews';
-const API_NEWS = 'http://localhost:8080/api/v1/news';
+const API_REVIEWS = 'http://3.148.109.153/api/v1/reviews';
+const API_NEWS = 'http://3.148.109.153/api/v1/news';
 
 // Generar estrellas HTML dinámicas
 const generateStars = (rating, editable = false, callback = null) => {
