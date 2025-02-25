@@ -4,6 +4,8 @@ const cloudName = 'dgabtcr2m';
 const uploadPreset = 'ml_default';
 
 let pond;
+let map; // Mapa Leaflet para agregar sede
+let marker; // Marcador en el mapa
 
 document.addEventListener("DOMContentLoaded", () => {
     FilePond.registerPlugin(FilePondPluginImagePreview);
@@ -39,7 +41,129 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
+
+    // Inicializar el mapa
+    initMap();
 });
+
+function initMap() {
+    map = L.map('map', { zoomControl: false }).setView([4.6871, -74.0451], 13); // Centrado inicial (Bogotá)
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    map.on('click', function (e) {
+        const { lat, lng } = e.latlng;
+        if (marker) {
+            marker.setLatLng(e.latlng);
+        } else {
+            marker = L.marker(e.latlng).addTo(map);
+        }
+        document.getElementById('latitude').value = lat.toFixed(6);
+        document.getElementById('longitude').value = lng.toFixed(6);
+    });
+
+    // Agregar funcionalidad de búsqueda
+    const searchButton = document.getElementById('searchButton');
+    if (searchButton) {
+        searchButton.addEventListener('click', handleSearch);
+    }
+
+    // Actualizar mapa al cambiar latitud y longitud manualmente
+    document.getElementById('latitude').addEventListener('input', updateMapFromCoordinates);
+    document.getElementById('longitude').addEventListener('input', updateMapFromCoordinates);
+
+    // Actualizar mapa al cambiar la dirección
+    document.getElementById('address').addEventListener('input', handleAddressInput);
+
+    // Asegurarse de que el mapa ocupe todo el área destinada
+    setTimeout(() => {
+        map.invalidateSize();
+    }, 0);
+
+    // Asegurarse de que el mapa se renderice correctamente al abrir el modal
+    $('#addBranch').on('shown.bs.modal', function () {
+        map.invalidateSize();
+    });
+}
+
+function handleSearch() {
+    const searchInput = document.getElementById('searchInput').value;
+
+    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchInput)}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.length > 0) {
+                const { lat, lon } = data[0];
+                map.setView([lat, lon], 13);
+
+                if (marker) {
+                    marker.setLatLng([lat, lon]);
+                } else {
+                    marker = L.marker([lat, lon]).addTo(map);
+                }
+
+                document.getElementById('latitude').value = parseFloat(lat).toFixed(6);
+                document.getElementById('longitude').value = parseFloat(lon).toFixed(6);
+            } else {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Ubicación no encontrada',
+                    text: 'No se encontró la ubicación. Por favor, intenta con otra búsqueda.'
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error en la búsqueda:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Hubo un error en la búsqueda. Por favor, intenta de nuevo.'
+            });
+        });
+}
+
+function updateMapFromCoordinates() {
+    const lat = parseFloat(document.getElementById('latitude').value);
+    const lon = parseFloat(document.getElementById('longitude').value);
+
+    if (!isNaN(lat) && !isNaN(lon)) {
+        map.setView([lat, lon], 13);
+
+        if (marker) {
+            marker.setLatLng([lat, lon]);
+        } else {
+            marker = L.marker([lat, lon]).addTo(map);
+        }
+    }
+}
+
+function handleAddressInput() {
+    const address = document.getElementById('address').value;
+
+    if (address.length > 3) {
+        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.length > 0) {
+                    const { lat, lon } = data[0];
+                    map.setView([lat, lon], 13);
+
+                    if (marker) {
+                        marker.setLatLng([lat, lon]);
+                    } else {
+                        marker = L.marker([lat, lon]).addTo(map);
+                    }
+
+                    document.getElementById('latitude').value = parseFloat(lat).toFixed(6);
+                    document.getElementById('longitude').value = parseFloat(lon).toFixed(6);
+                }
+            })
+            .catch(error => {
+                console.error('Error en la búsqueda de dirección:', error);
+            });
+    }
+}
 
 const form = document.querySelector('#addBranchForm');
 const saveButton = document.querySelector('#saveBranch');
@@ -83,8 +207,8 @@ function validarCamposFormulario(name, address, description, latitude, longitude
     console.log("Validando campos del formulario");
     if (
         !validateTextInput(name, 3, 50, 'Nombre') ||
-        !validateTextInput(address, 10, 100, 'Dirección') ||
-        !validateTextInput(description, 20, 150, 'Descripción') ||
+        !validateTextInput(address, 5, 100, 'Dirección') ||
+        !validateTextInput(description, 10, 150, 'Descripción') ||
         latitude.trim() === '' || isNaN(parseFloat(latitude)) ||
         longitude.trim() === '' || isNaN(parseFloat(longitude)) ||
         isNaN(capacity) || capacity <= 0

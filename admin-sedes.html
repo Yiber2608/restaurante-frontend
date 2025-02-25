@@ -19,6 +19,8 @@
     <link href="https://unpkg.com/filepond/dist/filepond.css" rel="stylesheet">
     <link href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css" rel="stylesheet">
     <link rel="stylesheet" href="./assets/css/components.css">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 </head>
 
 <body class="d-flex flex-column h-100">
@@ -241,7 +243,7 @@
 
     <!-- tab agregar sede -->
     <div class="modal fade" id="addBranch" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-dialog modal-lg-calendar modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalLabel">Crear Nueva Sede</h5>
@@ -250,60 +252,74 @@
                 <div class="modal-body">
                     <form id="addBranchForm" class="needs-validation" novalidate>
                         <div class="row">
-                            <div class="col-4">
-                                <div class="row">
-                                    <div class="col-12">
-                                        <input type="file" class="filepond" name="filepond" accept="image/*" />
-                                    </div>
-                                </div>
-                            </div>
+
                             <div class="col-7">
-                                <div class="row g-3">
-                                    <div class="col-md-12">
-                                        <label for="name" class="form-label">Nombre de la Sede <span
-                                                class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" id="name"
-                                            placeholder="Ingresa el nombre de la sede" required minlength="3">
-                                        <div class="invalid-feedback">Por favor, ingresa un nombre válido (mínimo 3
-                                            caracteres).</div>
-                                    </div>
-                                    <div class="col-md-12">
-                                        <label for="address" class="form-label">Dirección <span
-                                                class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" id="address"
-                                            placeholder="Ingresa la dirección de la sede" required minlength="5">
-                                        <div class="invalid-feedback">Por favor, ingresa una dirección válida (mínimo 5
-                                            caracteres).</div>
-                                    </div>
-                                    <div class="col-md-12">
-                                        <label for="capacity" class="form-label">Capacidad <span
-                                                class="text-danger">*</span></label>
-                                        <input type="number" class="form-control" id="capacity"
-                                            placeholder="Ingresa la capacidad de la sede" required min="1">
-                                        <div class="invalid-feedback">Por favor, ingresa una capacidad válida (mínimo 1).
+                                <div class="row">
+                                    <div class="col-4">
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <input type="file" class="filepond" name="filepond" accept="image/*" />
+                                            </div>
                                         </div>
                                     </div>
+                                    <div class="col-7">
+                                        <div class="row g-3">
+                                            <div class="col-md-12">
+                                                <label for="name" class="form-label">Nombre de la Sede <span
+                                                        class="text-danger">*</span></label>
+                                                <input type="text" class="form-control" id="name"
+                                                    placeholder="Ingresa el nombre de la sede" required minlength="3">
+                                                <div class="invalid-feedback">Por favor, ingresa un nombre válido (mínimo 3
+                                                    caracteres).</div>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <label for="address" class="form-label">Dirección <span
+                                                        class="text-danger">*</span></label>
+                                                <input type="text" class="form-control" id="address"
+                                                    placeholder="Ingresa la dirección de la sede" required minlength="5">
+                                                <div class="invalid-feedback">Por favor, ingresa una dirección válida (mínimo 5
+                                                    caracteres).</div>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <label for="capacity" class="form-label">Capacidad <span
+                                                        class="text-danger">*</span></label>
+                                                <input type="number" class="form-control" id="capacity"
+                                                    placeholder="Ingresa la capacidad de la sede" required min="1">
+                                                <div class="invalid-feedback">Por favor, ingresa una capacidad válida (mínimo 1).
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <label for="description" class="form-label">Descripción <span
+                                                class="text-danger">*</span></label>
+                                        <textarea class="form-control" id="description" rows="3"
+                                            placeholder="Ingresa la descripción de la sede" required minlength="10"></textarea>
+                                        <div class="invalid-feedback">La descripción debe tener al menos 10 caracteres.</div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-md-12">
-                                <label for="description" class="form-label">Descripción <span
-                                        class="text-danger">*</span></label>
-                                <textarea class="form-control" id="description" rows="3"
-                                    placeholder="Ingresa la descripción de la sede" required minlength="10"></textarea>
-                                <div class="invalid-feedback">La descripción debe tener al menos 10 caracteres.</div>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="latitude" class="form-label">Latitud <span class="text-danger">*</span></label>
-                                <input type="number" class="form-control" id="latitude" placeholder="Ingresa la latitud"
-                                    required step="0.000001">
-                                <div class="invalid-feedback">Por favor, ingresa una latitud válida.</div>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="longitude" class="form-label">Longitud <span
-                                        class="text-danger">*</span></label>
-                                <input type="number" class="form-control" id="longitude"
-                                    placeholder="Ingresa la longitud" required step="0.000001">
-                                <div class="invalid-feedback">Por favor, ingresa una longitud válida.</div>
+
+                            <div class="col-5">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label for="latitude" class="form-label">Latitud <span class="text-danger">*</span></label>
+                                        <input type="number" class="form-control" id="latitude" placeholder="Ingresa la latitud"
+                                            required step="0.000001">
+                                        <div class="invalid-feedback">Por favor, ingresa una latitud válida.</div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="longitude" class="form-label">Longitud <span
+                                                class="text-danger">*</span></label>
+                                        <input type="number" class="form-control" id="longitude"
+                                            placeholder="Ingresa la longitud" required step="0.000001">
+                                        <div class="invalid-feedback">Por favor, ingresa una longitud válida.</div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <label for="map" class="form-label">Mapa</label>
+                                        <div id="map" style="height: 300px;"></div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <!-- Botones -->
@@ -319,7 +335,7 @@
 
     <!-- tab actualizar sede -->
     <div class="modal fade" id="updateBranch" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-dialog modal-lg-calendar modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="updateModalLabel">Actualizar Sede</h5>
@@ -328,46 +344,74 @@
                 <div class="modal-body">
                     <form id="updateBranchForm" class="needs-validation" novalidate>
                         <div class="row">
-                            <div class="col-4">
-                                <div class="row">
-                                    <div class="col-12">
-                                        <input type="file" class="filepond" name="updateFilepond" accept="image/*" />
-                                    </div>
-                                </div>
-                            </div>
+
                             <div class="col-7">
-                                <div class="row g-3">
-                                    <div class="col-md-12">
-                                        <label for="updateName" class="form-label">Nombre de la Sede <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" id="updateName" placeholder="Ingresa el nombre de la sede" required minlength="3">
-                                        <div class="invalid-feedback">Por favor, ingresa un nombre válido (mínimo 3 caracteres).</div>
+                                <div class="row">
+                                    <div class="col-4">
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <input type="file" class="filepond" name="updateFilepond" accept="image/*" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-7">
+                                        <div class="row g-3">
+                                            <div class="col-md-12">
+                                                <label for="updateName" class="form-label">Nombre de la Sede <span
+                                                        class="text-danger">*</span></label>
+                                                <input type="text" class="form-control" id="updateName"
+                                                    placeholder="Ingresa el nombre de la sede" required minlength="3">
+                                                <div class="invalid-feedback">Por favor, ingresa un nombre válido (mínimo 3
+                                                    caracteres).</div>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <label for="updateAddress" class="form-label">Dirección <span
+                                                        class="text-danger">*</span></label>
+                                                <input type="text" class="form-control" id="updateAddress"
+                                                    placeholder="Ingresa la dirección de la sede" required minlength="5">
+                                                <div class="invalid-feedback">Por favor, ingresa una dirección válida (mínimo 5
+                                                    caracteres).</div>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <label for="updateCapacity" class="form-label">Capacidad <span
+                                                        class="text-danger">*</span></label>
+                                                <input type="number" class="form-control" id="updateCapacity"
+                                                    placeholder="Ingresa la capacidad de la sede" required min="1">
+                                                <div class="invalid-feedback">Por favor, ingresa una capacidad válida (mínimo 1).
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div class="col-md-12">
-                                        <label for="updateAddress" class="form-label">Dirección <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" id="updateAddress" placeholder="Ingresa la dirección de la sede" required minlength="5">
-                                        <div class="invalid-feedback">Por favor, ingresa una dirección válida (mínimo 5 caracteres).</div>
-                                    </div>
-                                    <div class="col-md-12">
-                                        <label for="updateCapacity" class="form-label">Capacidad <span class="text-danger">*</span></label>
-                                        <input type="number" class="form-control" id="updateCapacity" placeholder="Ingresa la capacidad de la sede" required min="1">
-                                        <div class="invalid-feedback">Por favor, ingresa una capacidad válida (mínimo 1).</div>
+                                        <label for="updateDescription" class="form-label">Descripción <span
+                                                class="text-danger">*</span></label>
+                                        <textarea class="form-control" id="updateDescription" rows="3"
+                                            placeholder="Ingresa la descripción de la sede" required minlength="10"></textarea>
+                                        <div class="invalid-feedback">La descripción debe tener al menos 10 caracteres.</div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-12">
-                                <label for="updateDescription" class="form-label">Descripción <span class="text-danger">*</span></label>
-                                <textarea class="form-control" id="updateDescription" rows="3" placeholder="Ingresa la descripción de la sede" required minlength="10"></textarea>
-                                <div class="invalid-feedback">La descripción debe tener al menos 10 caracteres.</div>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="updateLatitude" class="form-label">Latitud <span class="text-danger">*</span></label>
-                                <input type="number" class="form-control" id="updateLatitude" placeholder="Ingresa la latitud" required step="0.000001">
-                                <div class="invalid-feedback">Por favor, ingresa una latitud válida.</div>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="updateLongitude" class="form-label">Longitud <span class="text-danger">*</span></label>
-                                <input type="number" class="form-control" id="updateLongitude" placeholder="Ingresa la longitud" required step="0.000001">
-                                <div class="invalid-feedback">Por favor, ingresa una longitud válida.</div>
+
+                            <div class="col-5">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label for="updateLatitude" class="form-label">Latitud <span class="text-danger">*</span></label>
+                                        <input type="number" class="form-control" id="updateLatitude" placeholder="Ingresa la latitud"
+                                            required step="0.000001">
+                                        <div class="invalid-feedback">Por favor, ingresa una latitud válida.</div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="updateLongitude" class="form-label">Longitud <span
+                                                class="text-danger">*</span></label>
+                                        <input type="number" class="form-control" id="updateLongitude"
+                                            placeholder="Ingresa la longitud" required step="0.000001">
+                                        <div class="invalid-feedback">Por favor, ingresa una longitud válida.</div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <label for="updateMap" class="form-label">Mapa</label>
+                                        <div id="updateMap" style="height: 300px;"></div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <!-- Botones -->
@@ -405,6 +449,8 @@
     <script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.js"></script>
     <script src="https://unpkg.com/filepond/dist/filepond.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/luxon@2.3.0/build/global/luxon.min.js"></script>
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script src="./assets/js/admin/sedes/admin-sedes.js"></script>
     <script src="./assets/js/admin/sedes/admin-sedes-add.js"></script>
     <script src="./assets/js/admin/sedes/admin-sedes-put.js"></script>

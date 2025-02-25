@@ -1,4 +1,6 @@
 let pondUpdate;
+let updateMap; // Mapa Leaflet para actualizar sede
+let updateMarker; // Marcador en el mapa
 
 document.addEventListener("DOMContentLoaded", () => {
     FilePond.registerPlugin(FilePondPluginImagePreview);
@@ -21,7 +23,124 @@ document.addEventListener("DOMContentLoaded", () => {
         styleItemPanelAspectRatio: 1,
         stylePanelLayout: 'compact'
     });
+
+    // Inicializar el mapa
+    initUpdateMap();
 });
+
+function initUpdateMap() {
+    updateMap = L.map('updateMap', { zoomControl: false }).setView([4.6871, -74.0451], 13); // Centrado inicial (Bogotá)
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(updateMap);
+
+    updateMap.on('click', function (e) {
+        const { lat, lng } = e.latlng;
+        if (updateMarker) {
+            updateMarker.setLatLng(e.latlng);
+        } else {
+            updateMarker = L.marker(e.latlng).addTo(updateMap);
+        }
+        document.getElementById('updateLatitude').value = lat.toFixed(6);
+        document.getElementById('updateLongitude').value = lng.toFixed(6);
+    });
+
+    // Agregar funcionalidad de búsqueda
+    const searchButton = document.getElementById('updateSearchButton');
+    if (searchButton) {
+        searchButton.addEventListener('click', handleSearch);
+    }
+
+    // Actualizar mapa al cambiar latitud y longitud manualmente
+    document.getElementById('updateLatitude').addEventListener('input', updateMapFromCoordinates);
+    document.getElementById('updateLongitude').addEventListener('input', updateMapFromCoordinates);
+
+    // Actualizar mapa al cambiar la dirección
+    document.getElementById('updateAddress').addEventListener('input', handleAddressInput);
+
+    // Asegurarse de que el mapa ocupe todo el área destinada
+    setTimeout(() => {
+        updateMap.invalidateSize();
+    }, 0);
+}
+
+function handleSearch() {
+    const searchInput = document.getElementById('updateSearchInput').value;
+
+    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchInput)}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.length > 0) {
+                const { lat, lon } = data[0];
+                updateMap.setView([lat, lon], 13);
+
+                if (updateMarker) {
+                    updateMarker.setLatLng([lat, lon]);
+                } else {
+                    updateMarker = L.marker([lat, lon]).addTo(updateMap);
+                }
+
+                document.getElementById('updateLatitude').value = parseFloat(lat).toFixed(6);
+                document.getElementById('updateLongitude').value = parseFloat(lon).toFixed(6);
+            } else {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Ubicación no encontrada',
+                    text: 'No se encontró la ubicación. Por favor, intenta con otra búsqueda.'
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error en la búsqueda:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Hubo un error en la búsqueda. Por favor, intenta de nuevo.'
+            });
+        });
+}
+
+function updateMapFromCoordinates() {
+    const lat = parseFloat(document.getElementById('updateLatitude').value);
+    const lon = parseFloat(document.getElementById('updateLongitude').value);
+
+    if (!isNaN(lat) && !isNaN(lon)) {
+        updateMap.setView([lat, lon], 13);
+
+        if (updateMarker) {
+            updateMarker.setLatLng([lat, lon]);
+        } else {
+            updateMarker = L.marker([lat, lon]).addTo(updateMap);
+        }
+    }
+}
+
+function handleAddressInput() {
+    const address = document.getElementById('updateAddress').value;
+
+    if (address.length > 3) {
+        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.length > 0) {
+                    const { lat, lon } = data[0];
+                    updateMap.setView([lat, lon], 13);
+
+                    if (updateMarker) {
+                        updateMarker.setLatLng([lat, lon]);
+                    } else {
+                        updateMarker = L.marker([lat, lon]).addTo(updateMap);
+                    }
+
+                    document.getElementById('updateLatitude').value = parseFloat(lat).toFixed(6);
+                    document.getElementById('updateLongitude').value = parseFloat(lon).toFixed(6);
+                }
+            })
+            .catch(error => {
+                console.error('Error en la búsqueda de dirección:', error);
+            });
+    }
+}
 
 function loadBranchById(branchId) {
     const branch = branchesGlobal.find(branch => branch.id === branchId);
@@ -58,6 +177,13 @@ function loadBranchById(branchId) {
     } else {
         pondUpdate.removeFile();
     }
+
+    if (updateMarker) {
+        updateMarker.setLatLng([branch.latitude, branch.longitude]);
+    } else {
+        updateMarker = L.marker([branch.latitude, branch.longitude]).addTo(updateMap);
+    }
+    updateMap.setView([branch.latitude, branch.longitude], 13);
 
     const updateBranchForm = document.getElementById("updateBranchForm");
     updateBranchForm.dataset.branchId = branchId;
