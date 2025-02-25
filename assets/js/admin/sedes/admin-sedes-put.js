@@ -62,10 +62,15 @@ function initUpdateMap() {
     setTimeout(() => {
         updateMap.invalidateSize();
     }, 0);
+
+    // Asegurarse de que el mapa se renderice correctamente al abrir el modal
+    $('#updateBranch').on('shown.bs.modal', function () {
+        updateMap.invalidateSize();
+    });
 }
 
 function handleSearch() {
-    const searchInput = document.getElementById('updateSearchInput').value;
+    const searchInput = document.getElementById('updateAddress').value; // Cambiado de updateSearchInput a updateAddress
 
     fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchInput)}`)
         .then(response => response.json())

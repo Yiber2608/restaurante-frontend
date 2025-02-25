@@ -265,25 +265,28 @@
                                     <div class="col-7">
                                         <div class="row g-3">
                                             <div class="col-md-12">
-                                                <label for="name" class="form-label">Nombre de la Sede <span
+                                                <label for="addName" class="form-label">Nombre de la Sede <span
                                                         class="text-danger">*</span></label>
-                                                <input type="text" class="form-control" id="name"
+                                                <input type="text" class="form-control" id="addName"
                                                     placeholder="Ingresa el nombre de la sede" required minlength="3">
                                                 <div class="invalid-feedback">Por favor, ingresa un nombre válido (mínimo 3
                                                     caracteres).</div>
                                             </div>
                                             <div class="col-md-12">
-                                                <label for="address" class="form-label">Dirección <span
-                                                        class="text-danger">*</span></label>
-                                                <input type="text" class="form-control" id="address"
-                                                    placeholder="Ingresa la dirección de la sede" required minlength="5">
-                                                <div class="invalid-feedback">Por favor, ingresa una dirección válida (mínimo 5
-                                                    caracteres).</div>
+                                                <label for="addAddress" class="form-label">Dirección <span class="text-danger">*</span></label>
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control" id="addAddress"
+                                                        placeholder="Ingresa la dirección de la sede" required minlength="5">
+                                                    <button class="btn btn-outline-secondary" type="button" id="addSearchButton">
+                                                        <i class="bi bi-search"></i>
+                                                    </button>
+                                                </div>
+                                                <div class="invalid-feedback">Por favor, ingresa una dirección válida (mínimo 5 caracteres).</div>
                                             </div>
                                             <div class="col-md-12">
-                                                <label for="capacity" class="form-label">Capacidad <span
+                                                <label for="addCapacity" class="form-label">Capacidad <span
                                                         class="text-danger">*</span></label>
-                                                <input type="number" class="form-control" id="capacity"
+                                                <input type="number" class="form-control" id="addCapacity"
                                                     placeholder="Ingresa la capacidad de la sede" required min="1">
                                                 <div class="invalid-feedback">Por favor, ingresa una capacidad válida (mínimo 1).
                                                 </div>
@@ -291,9 +294,9 @@
                                         </div>
                                     </div>
                                     <div class="col-md-12">
-                                        <label for="description" class="form-label">Descripción <span
+                                        <label for="addDescription" class="form-label">Descripción <span
                                                 class="text-danger">*</span></label>
-                                        <textarea class="form-control" id="description" rows="3"
+                                        <textarea class="form-control" id="addDescription" rows="3"
                                             placeholder="Ingresa la descripción de la sede" required minlength="10"></textarea>
                                         <div class="invalid-feedback">La descripción debe tener al menos 10 caracteres.</div>
                                     </div>
@@ -303,21 +306,21 @@
                             <div class="col-5">
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <label for="latitude" class="form-label">Latitud <span class="text-danger">*</span></label>
-                                        <input type="number" class="form-control" id="latitude" placeholder="Ingresa la latitud"
+                                        <label for="addLatitude" class="form-label">Latitud <span class="text-danger">*</span></label>
+                                        <input type="number" class="form-control" id="addLatitude" placeholder="Ingresa la latitud"
                                             required step="0.000001">
                                         <div class="invalid-feedback">Por favor, ingresa una latitud válida.</div>
                                     </div>
                                     <div class="col-md-6">
-                                        <label for="longitude" class="form-label">Longitud <span
+                                        <label for="addLongitude" class="form-label">Longitud <span
                                                 class="text-danger">*</span></label>
-                                        <input type="number" class="form-control" id="longitude"
+                                        <input type="number" class="form-control" id="addLongitude"
                                             placeholder="Ingresa la longitud" required step="0.000001">
                                         <div class="invalid-feedback">Por favor, ingresa una longitud válida.</div>
                                     </div>
                                     <div class="col-md-12">
-                                        <label for="map" class="form-label">Mapa</label>
-                                        <div id="map" style="height: 300px;"></div>
+                                        <label for="addMap" class="form-label">Mapa</label>
+                                        <div id="addMap" style="height: 300px;"></div>
                                     </div>
                                 </div>
                             </div>
@@ -365,12 +368,15 @@
                                                     caracteres).</div>
                                             </div>
                                             <div class="col-md-12">
-                                                <label for="updateAddress" class="form-label">Dirección <span
-                                                        class="text-danger">*</span></label>
-                                                <input type="text" class="form-control" id="updateAddress"
-                                                    placeholder="Ingresa la dirección de la sede" required minlength="5">
-                                                <div class="invalid-feedback">Por favor, ingresa una dirección válida (mínimo 5
-                                                    caracteres).</div>
+                                                <label for="updateAddress" class="form-label">Dirección <span class="text-danger">*</span></label>
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control" id="updateAddress"
+                                                        placeholder="Ingresa la dirección de la sede" required minlength="5">
+                                                    <button class="btn btn-outline-secondary" type="button" id="updateSearchButton">
+                                                        <i class="bi bi-search"></i>
+                                                    </button>
+                                                </div>
+                                                <div class="invalid-feedback">Por favor, ingresa una dirección válida (mínimo 5 caracteres).</div>
                                             </div>
                                             <div class="col-md-12">
                                                 <label for="updateCapacity" class="form-label">Capacidad <span
