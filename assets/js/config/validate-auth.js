@@ -17,7 +17,7 @@ class AuthValidator {
 
         try {
             const payload = jwt_decode(token);
-            return payload.role === requiredRole;
+            return payload.role === requiredRole || payload.role === 'superadmin';
         } catch (error) {
             console.error('Error decodificando token:', error);
             return false;
@@ -33,10 +33,10 @@ class AuthValidator {
 
         try {
             const payload = jwt_decode(token);
-            if (payload.role === 'admin') {
-                window.location.href = '/admin-menu.html';
+            if (payload.role === 'admin' || payload.role === 'superadmin') {
+                window.location.href = '/admin-dashboard.html';
             } else {
-                window.location.href = '/user_dashboard.html';
+                window.location.href = '/user-dashboard.html';
             }
         } catch (error) {
             console.error('Error redirigiendo:', error);
