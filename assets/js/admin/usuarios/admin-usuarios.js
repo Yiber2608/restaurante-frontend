@@ -1,15 +1,23 @@
-// Primero validamos que solo los admins puedan acceder
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+    // Primero validamos la sesión
     if (!AuthValidator.validateSession()) {
         window.location.href = '/index.html';
         return;
     }
 
-    if (!AuthValidator.validateRole('admin')) {
-        window.location.href = '/index.html';
+    // Si no es superadmin pero es admin, mostrar mensaje y regresar
+    if (!AuthValidator.validateRole('superadmin') && AuthValidator.validateRole('admin')) {
+        await Swal.fire({
+            title: 'Acceso restringido',
+            text: 'Solo los superadministradores pueden acceder a este módulo.',
+            icon: 'warning',
+            confirmButtonText: 'Entendido'
+        });
+        window.history.back();
         return;
     }
 
+    // Si llegó aquí, es superadmin
     initializeAdminDashboard();
 });
 
@@ -29,21 +37,42 @@ async function loadUsers() {
                 'Content-Type': 'application/json'
             }
         });
+
+        if (response.status === 403) {
+            await Swal.fire({
+                title: 'Acceso denegado',
+                text: 'No tienes permisos para ver esta información.',
+                icon: 'warning',
+                confirmButtonText: 'Entendido'
+            });
+            window.history.back();
+            return;
+        }
+
+        if (response.status === 401) {
+            localStorage.removeItem('token');
+            window.location.href = '/index.html';
+            return;
+        }
+
         const data = await response.json();
 
         if (response.ok && data.success) {
             usersGlobal = data.data;
             buildTable(usersGlobal);
             conteoUsuariosTarjetas();
-        } else if (response.status === 401 || response.status === 403) {
-            localStorage.removeItem('token');
-            window.location.href = '/index.html';
         } else {
-            handleError(`Error en la respuesta: ${data.message || 'Error desconocido'}`);
+            throw new Error(data.message || 'Error desconocido');
         }
     } catch (error) {
         console.error('Error al cargar los usuarios:', error);
-        handleError('Error al cargar los usuarios. Por favor, intente nuevamente.');
+        await Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Error al cargar los usuarios. Por favor, intente nuevamente.',
+            confirmButtonText: 'Entendido'
+        });
+        window.history.back();
     }
 }
 

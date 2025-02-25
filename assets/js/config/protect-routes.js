@@ -16,29 +16,39 @@ document.addEventListener('DOMContentLoaded', () => {
     if (protectedRoutes[currentPath]) {
         const requiredRole = protectedRoutes[currentPath];
         
-        // Validar sesión y rol
+        // Validar sesión primero
         if (!AuthValidator.validateSession()) {
             window.location.href = '/index.html';
             return;
         }
 
-        if (!AuthValidator.validateRole(requiredRole)) {
-            if (currentPath === '/admin-usuarios.html' && AuthValidator.validateRole('admin')) {
-                Swal.fire({
-                    title: 'Acceso denegado',
-                    text: 'No tienes acceso a este módulo.',
-                    icon: 'error',
-                    confirmButtonText: 'Aceptar'
-                }).then(() => {
-                    window.history.back();
-                });
-            } else {
+        // Manejo especial para admin-usuarios.html
+        if (currentPath === '/admin-usuarios.html') {
+            if (!AuthValidator.validateRole('superadmin')) {
+                if (AuthValidator.validateRole('admin')) {
+                    // Si es admin pero no superadmin, mostrar mensaje y regresar
+                    Swal.fire({
+                        title: 'Acceso restringido',
+                        text: 'Solo los superadministradores pueden acceder a este módulo.',
+                        icon: 'warning',
+                        confirmButtonText: 'Entendido'
+                    });
+                    return false;
+                } else {
+                    // Si no es ni admin ni superadmin, redirigir al inicio
+                    window.location.href = '/index.html';
+                }
+                return;
+            }
+        } else {
+            // Para las demás rutas, validar el rol normalmente
+            if (!AuthValidator.validateRole(requiredRole)) {
                 window.location.href = '/index.html';
+                return;
             }
         }
     }
 });
-
 
 // Toggle Sidebar
 document.querySelector('.toggle-btn').addEventListener('click', function () {
