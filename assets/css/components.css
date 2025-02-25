@@ -225,6 +225,30 @@ input:checked+.slider::before {
     border-color: #A7D65B;
 }
 
+/* Colores de texto */
+.text-amarillo {
+    color: #F2C12E;
+}
+
+.text-verde {
+    color: #A7D65B;
+}
+
+.text-rojo {
+    color: #FF5460;
+}
+
+.text-verde-agua {
+    color: #72F2EB;
+}
+
+.text-naranja {
+    color: #FF8B00;
+}
+
+.text-azul {
+    color: #7EC8E3;
+}
 
 .card-clickeable{
         cursor: pointer; /* Cambia el cursor para indicar que es clickeable */

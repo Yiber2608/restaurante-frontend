@@ -345,6 +345,10 @@ class AuthenticationSystem {
 
             if (data.token) {
                 localStorage.setItem('token', data.token);
+                // Decodificar el token para obtener el userId
+                const payload = jwt_decode(data.token);
+                const userId = payload.userId;
+                localStorage.setItem('userId', userId);
                 // Usar el AuthValidator para la redirección basada en rol
                 AuthValidator.redirectBasedOnRole();
             } else {

@@ -16,13 +16,6 @@ async function fetchMenuItems() {
             const items = result.data;
             menuData = groupItemsByCategory(items); // Agrupar ítems por categoría
             createMenuItems(); // Crear los elementos del menú en la UI
-            Swal.fire({
-                icon: 'success',
-                title: '¡Éxito!',
-                text: result.message,
-                timer: 2000,
-                showConfirmButton: false,
-            });
         } else {
             // Mostrar el mensaje de error del servidor
             Swal.fire({

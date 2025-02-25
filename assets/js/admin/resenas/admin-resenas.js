@@ -111,10 +111,6 @@ function buildTable(data) {
                 formatter: (cell) => {
                     const isActive = cell.getRow().getData().active;
                     return `
-                        <button class='btn fondo-azul btn-sm status-btn'>
-                            <i class="bi bi-toggle-${isActive ? 'on' : 'off'} text-white"></i>
-                        </button>
-                        <button class='btn fondo-rojo btn-sm delete-btn'>
                             <i class="bi bi-trash-fill text-white"></i>
                         </button>
                     `;
