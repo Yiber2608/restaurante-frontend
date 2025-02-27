@@ -1,4 +1,3 @@
-
 let itemsGlobal = []
 
 
@@ -6,7 +5,7 @@ async function loadData() {
     const token = localStorage.getItem('token');
 
     try {
-        const response = await fetch('https://grupouno.click/api/v1/items', {
+        const response = await fetch('https://grupouno.click/api/v1/items/all', {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`,

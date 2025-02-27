@@ -1,9 +1,9 @@
 let API_BASE_URL = 'https://grupouno.click';
 let API_ENDPOINTS = {
-    LOGIN: `${API_BASE_URL}/user/login`,
-    SIGNUP: `${API_BASE_URL}/user/signup`,
-    SEND_RESET_CODE: `${API_BASE_URL}/user/sendResetCode`,
-    RESET_PASSWORD: `${API_BASE_URL}/user/resetPassword`
+    LOGIN: `${API_BASE_URL}/api/v1/users/login`, // Actualizado el endpoint
+    SIGNUP: `${API_BASE_URL}/api/v1/users/signup`, // Actualizado el endpoint
+    SEND_RESET_CODE: `${API_BASE_URL}/api/v1/users/sendResetCode`, // Actualizado el endpoint
+    RESET_PASSWORD: `${API_BASE_URL}/api/v1/users/resetPassword` // Actualizado el endpoint
 };
 
 // Utility functions for validation
@@ -364,7 +364,7 @@ class AuthenticationSystem {
         event.preventDefault();
         const form = event.target;
         form.classList.add('was-validated');
-            const formData = this.getRegisterFormData();
+        const formData = this.getRegisterFormData();
         const validationErrors = this.validateRegisterData(formData);
         if (validationErrors.length > 0) {
             this.showAlert('Error', validationErrors.join('<br>'), 'error');

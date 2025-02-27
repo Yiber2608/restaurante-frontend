@@ -38,7 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             try {
                 const token = localStorage.getItem("token");
-                const response = await fetch("https://grupouno.click/api/v1/news", {
+                const response = await fetch("https://grupouno.click/api/v1/news/private", {
                     method: "PUT",
                     headers: {
                         "Content-Type": "application/json",

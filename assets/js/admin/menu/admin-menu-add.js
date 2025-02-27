@@ -199,7 +199,7 @@ async function enviarDatosAlServidor(itemData) {
     }
 
     try {
-        const response = await fetch('https://grupouno.click/api/v1/item', {
+        const response = await fetch('https://grupouno.click/api/v1/items/private', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,

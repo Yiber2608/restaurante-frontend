@@ -30,7 +30,7 @@ let usersGlobal = [];
 async function loadUsers() {
     const token = localStorage.getItem('token');
     try {
-        const response = await fetch('https://grupouno.click/user/all', {
+        const response = await fetch('https://grupouno.click/api/v1/users/superus/all', { // Actualizado el endpoint
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -216,7 +216,7 @@ async function toggleUserStatus(userId, newStatus, cell) {
     const token = localStorage.getItem("token");
 
     try {
-        const response = await fetch(`https://grupouno.click/user/status/${userId}`, {
+        const response = await fetch(`https://grupouno.click/api/v1/users/superus/status/${userId}`, { // Actualizado el endpoint
             method: "PUT",
             headers: {
                 Authorization: `Bearer ${token}`,

@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const token = localStorage.getItem('token');
 
         try {
-            const response = await fetch('https://grupouno.click/user/admin/register', {
+            const response = await fetch('https://grupouno.click/api/v1/users/superus/admin/register', { // Actualizado el endpoint
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

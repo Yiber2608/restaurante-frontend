@@ -175,7 +175,7 @@ async function deletePreviousImage(publicId) {
     }
     try {
         const dataToSend = { publicId: publicId };
-        const response = await fetch('https://grupouno.click/api/v2/delete', {
+        const response = await fetch('https://grupouno.click/api/v2/private/delete', {
             method: 'DELETE',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -207,8 +207,6 @@ async function deletePreviousImage(publicId) {
     }
 }
 
-
-
 // Función para enviar la solicitud de actualización al servidor
 function updateItem(itemId, name, status, typeItem, unitPrice, description, imageUrl, imageName) {
     const token = localStorage.getItem('token'); // Obtener el token de autenticación
@@ -236,7 +234,7 @@ function updateItem(itemId, name, status, typeItem, unitPrice, description, imag
     console.log('JSON generado para actualizar:', updatedData);
 
     $.ajax({
-        url: `https://grupouno.click/api/v1/item`,
+        url: `https://grupouno.click/api/v1/items/private`,
         type: 'PUT',
         contentType: 'application/json',
         headers: {

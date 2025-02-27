@@ -23,7 +23,7 @@ async function deleteBranch(branchId, row) {
 
     if (result.isConfirmed) {
         try {
-            const response = await fetch(`https://grupouno.click/api/v1/branches/${branchId}`, {
+            const response = await fetch(`https://grupouno.click/api/v1/branches/private/${branchId}`, {
                 method: "DELETE",
                 headers: {
                     Authorization: `Bearer ${token}`,

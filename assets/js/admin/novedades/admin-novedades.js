@@ -191,7 +191,7 @@ async function toggleNewsStatus(newsId, newStatus) {
     const token = localStorage.getItem("token");
 
     try {
-        const response = await fetch(`https://grupouno.click/api/v1/news/toggle/${newsId}`, {
+        const response = await fetch(`https://grupouno.click/api/v1/news/private/toggle/${newsId}`, {
             method: "PUT",
             headers: {
                 Authorization: `Bearer ${token}`,

@@ -285,7 +285,7 @@ async function toggleReviewStatus(reviewId, currentStatus, cell) {
 
     if (result.isConfirmed) {
         try {
-            const response = await fetch(`https://grupouno.click/api/v1/reviews/${reviewId}/status`, {
+            const response = await fetch(`https://grupouno.click/api/v1/reviews/private/${reviewId}/status`, {
                 method: "PATCH",
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -359,7 +359,7 @@ async function deleteResena(reviewId, row) {
     if (result.isConfirmed) {
         try {
             // Realizar la petición de eliminación al backend
-            const response = await fetch(`https://grupouno.click/api/v1/reviews/${reviewId}`, {
+            const response = await fetch(`https://grupouno.click/api/v1/reviews/private/${reviewId}`, {
                 method: "DELETE",
                 headers: {
                     Authorization: `Bearer ${token}`, // Añadir el token al encabezado Authorization

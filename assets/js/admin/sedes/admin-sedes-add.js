@@ -289,22 +289,59 @@ function obtenerDatosFormulario() {
 
 function validarCamposFormulario(name, address, description, latitude, longitude, capacity) {
     console.log("Validando campos del formulario");
-    if (
-        !validateTextInput(name, 3, 50, 'Nombre') ||
-        !validateTextInput(address, 5, 100, 'Dirección') ||
-        !validateTextInput(description, 10, 150, 'Descripción') ||
-        latitude.trim() === '' || isNaN(parseFloat(latitude)) ||
-        longitude.trim() === '' || isNaN(parseFloat(longitude)) ||
-        isNaN(capacity) || capacity <= 0
-    ) {
+    let isValid = true;
+
+    if (!validateTextInput(name, 3, 50, 'Nombre')) {
+        isValid = false;
+        document.getElementById('addName').classList.add('is-invalid');
+    } else {
+        document.getElementById('addName').classList.remove('is-invalid');
+    }
+
+    if (!validateTextInput(address, 5, 100, 'Dirección')) {
+        isValid = false;
+        document.getElementById('addAddress').classList.add('is-invalid');
+    } else {
+        document.getElementById('addAddress').classList.remove('is-invalid');
+    }
+
+    if (!validateTextInput(description, 10, 150, 'Descripción')) {
+        isValid = false;
+        document.getElementById('addDescription').classList.add('is-invalid');
+    } else {
+        document.getElementById('addDescription').classList.remove('is-invalid');
+    }
+
+    if (latitude.trim() === '' || isNaN(parseFloat(latitude))) {
+        isValid = false;
+        document.getElementById('addLatitude').classList.add('is-invalid');
+    } else {
+        document.getElementById('addLatitude').classList.remove('is-invalid');
+    }
+
+    if (longitude.trim() === '' || isNaN(parseFloat(longitude))) {
+        isValid = false;
+        document.getElementById('addLongitude').classList.add('is-invalid');
+    } else {
+        document.getElementById('addLongitude').classList.remove('is-invalid');
+    }
+
+    if (isNaN(capacity) || capacity <= 0) {
+        isValid = false;
+        document.getElementById('addCapacity').classList.add('is-invalid');
+    } else {
+        document.getElementById('addCapacity').classList.remove('is-invalid');
+    }
+
+    if (!isValid) {
         Swal.fire({
             icon: 'error',
             title: 'Error en la validación',
             text: 'Por favor, completa todos los campos correctamente.',
         });
-        return false;
     }
-    return true;
+
+    return isValid;
 }
 
 function uploadImage(file) {
@@ -446,7 +483,7 @@ async function enviarDatosAlServidor(sedeData) {
     }
 
     try {
-        const response = await fetch('https://grupouno.click/api/v1/branches', {
+        const response = await fetch('https://grupouno.click/api/v1/branches/private', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
