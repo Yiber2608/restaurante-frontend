@@ -326,7 +326,7 @@ async function deletePreviousImage(publicId) {
     }
     try {
         const dataToSend = { publicId: publicId };
-        const response = await fetch('http://3.148.109.153/api/v2/delete', {
+        const response = await fetch('https://grupouno.click/api/v2/delete', {
             method: 'DELETE',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -385,7 +385,7 @@ function updateBranch(branchId, name, address, capacity, description, latitude, 
     console.log('JSON generado para actualizar:', updatedData);
 
     $.ajax({
-        url: `http://3.148.109.153/api/v1/branches`,
+        url: `https://grupouno.click/api/v1/branches`,
         type: 'PUT',
         contentType: 'application/json',
         headers: {

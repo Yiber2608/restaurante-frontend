@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const token = localStorage.getItem('token');
 
         try {
-            const response = await fetch(`http://3.148.109.153/user/admin/update/${userId}`, {
+            const response = await fetch(`https://grupouno.click/user/admin/update/${userId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

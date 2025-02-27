@@ -6,7 +6,7 @@ async function loadData() {
     const token = localStorage.getItem('token');
 
     try {
-        const response = await fetch('http://localhost:8080/api/v1/items', {
+        const response = await fetch('https://grupouno.click/api/v1/items', {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`,

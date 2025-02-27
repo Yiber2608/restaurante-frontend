@@ -446,7 +446,7 @@ async function enviarDatosAlServidor(sedeData) {
     }
 
     try {
-        const response = await fetch('http://3.148.109.153/api/v1/branches', {
+        const response = await fetch('https://grupouno.click/api/v1/branches', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -489,7 +489,7 @@ async function addBranch() {
     const formData = new FormData(document.getElementById("addBranchForm"));
 
     try {
-        const response = await fetch('http://3.148.109.153/api/v1/branches', {
+        const response = await fetch('https://grupouno.click/api/v1/branches', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`

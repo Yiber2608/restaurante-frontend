@@ -46,7 +46,7 @@ async function loadBranches() {
         return;
     }
     try {
-        const response = await fetch('http://3.148.109.153/api/v1/branches', {
+        const response = await fetch('https://grupouno.click/api/v1/branches', {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -111,7 +111,7 @@ async function loadBranchCalendar(branchId) {
         return;
     }
     try {
-        const response = await fetch(`http://3.148.109.153/api/v1/schedules/branch/${branchId}`, {
+        const response = await fetch(`https://grupouno.click/api/v1/schedules/branch/${branchId}`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -221,7 +221,7 @@ async function loadDaySchedule(date) {
         return;
     }
     try {
-        const response = await fetch(`http://3.148.109.153/api/v1/schedules/branch/${selectedBranchId}/date/${date}`, {
+        const response = await fetch(`https://grupouno.click/api/v1/schedules/branch/${selectedBranchId}/date/${date}`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -317,7 +317,7 @@ function renderReservations(schedule, date) {
 async function deleteSchedule(scheduleId, scheduleDate) {
     const token = localStorage.getItem('token');
     try {
-        const response = await fetch(`http://3.148.109.153/api/v1/schedules/${scheduleId}`, {
+        const response = await fetch(`https://grupouno.click/api/v1/schedules/${scheduleId}`, {
             method: 'DELETE',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -354,7 +354,7 @@ async function deleteSchedule(scheduleId, scheduleDate) {
 async function approveReservation(reservationId) {
     const token = localStorage.getItem('token');
     try {
-        const response = await fetch(`http://3.148.109.153/api/v1/reservations/${reservationId}/approve`, {
+        const response = await fetch(`https://grupouno.click/api/v1/reservations/${reservationId}/approve`, {
             method: 'PUT',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -382,7 +382,7 @@ async function approveReservation(reservationId) {
 async function cancelReservation(reservationId) {
     const token = localStorage.getItem('token');
     try {
-        const response = await fetch(`http://3.148.109.153/api/v1/reservations/${reservationId}/cancel`, {
+        const response = await fetch(`https://grupouno.click/api/v1/reservations/${reservationId}/cancel`, {
             method: 'PUT',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -416,7 +416,7 @@ async function saveSchedules(dates) {
     console.log('Datos a enviar:', scheduleData);
 
     try {
-        const response = await fetch('http://3.148.109.153/api/v1/schedules/bulk', {
+        const response = await fetch('https://grupouno.click/api/v1/schedules/bulk', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,

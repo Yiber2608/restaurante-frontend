@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const token = localStorage.getItem('token');
 
         try {
-            const response = await fetch('http://3.148.109.153/user/admin/register', {
+            const response = await fetch('https://grupouno.click/user/admin/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

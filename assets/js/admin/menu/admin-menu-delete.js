@@ -26,7 +26,7 @@ async function deleteResena(reviewId, row) {
     if (result.isConfirmed) {
         try {
             // Realizar la petición de eliminación al backend
-            const response = await fetch(`http://localhost:8080/api/v1/reviews/${reviewId}`, {
+            const response = await fetch(`https://grupouno.click/api/v1/reviews/${reviewId}`, {
                 method: "DELETE",
                 headers: {
                     Authorization: `Bearer ${token}`, // Añadir el token al encabezado Authorization

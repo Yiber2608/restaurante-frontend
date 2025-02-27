@@ -19,7 +19,7 @@ function initMap() {
 // Cargar sucursales desde el backend
 async function loadBranches() {
     try {
-        const response = await fetch('http://3.148.109.153/api/v1/branches', {
+        const response = await fetch('https://grupouno.click/api/v1/branches', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
