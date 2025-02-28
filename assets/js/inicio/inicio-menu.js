@@ -4,7 +4,7 @@ let menuData = {};
 // Función para obtener los ítems del menú desde el servidor
 async function fetchMenuItems() {
     try {
-        const response = await fetch('https://grupouno.click/api/v1/items', {
+        const response = await fetch('https://grupouno.click/api/v1/items/all', {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
         });

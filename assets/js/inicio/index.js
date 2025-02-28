@@ -1,6 +1,6 @@
 // URLs del backend
 const API_REVIEWS = 'https://grupouno.click/api/v1/reviews';
-const API_NEWS = 'http://grupouno.click/api/v1/news/public';
+const API_NEWS = 'https://grupouno.click/api/v1/news';
 
 // Generar estrellas HTML dinámicas
 const generateStars = (rating, editable = false, callback = null) => {
