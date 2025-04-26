@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="Restaurante con auténtica gastronomía caribeña" />
+    <meta name="author" content="TechSysDesign" />
+    <title>BurguerBoom</title>
+    <link rel="icon" href="/assets/img/hamburguesa.png" type="image/x-icon">
+    <!-- core bootstrap icons-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" rel="stylesheet" />
+    <!-- core  bootstrap-->
+    <link href="./assets/css/Bootstrap.css" rel="stylesheet" />
+    <!-- core styles -->
+    <link rel="stylesheet" href="./assets/css/additional.css">
+    <!-- core swiper -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <!-- core sweetalert2 css -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.14.5/dist/sweetalert2.min.css"
+        integrity="sha256-qWVM38RAVYHA4W8TAlDdszO1hRaAq0ME7y2e9aab354=" crossorigin="anonymous">
+    <!-- core AOS css  -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" />
+    <!-- core css  -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+
+
+</head>
+
+<body class="d-flex flex-column h-100">
+    <!-- Navigation-->
+    <nav class="navbar navbar-expand-lg navbar-light bg-dark shadow-sm py-3 fixed-top">
+        <div class="container px-2">
+            <a class="navbar-brand fs-3 fw-bold text-primary" href="index.html">BurguerBoom</a>
+            <button class="navbar-toggler bg-white" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+                aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    
+                    <li class="nav-item"><a class="nav-link fw-bold text-white" href="inicio-menu.html">Menú</a></li>
+
+                    <li class="nav-item"><a class="nav-link fw-bold text-white" href="inicio-empleos.html">Empleos</a></li>
+
+                    <li class="nav-item"><a class="nav-link fw-bold text-white" href="inicio-nosotros.html">Nosotros</a></li>
+
+                    <li class="nav-item"><a class="nav-link fw-bold text-white" href="index.html#contacto">Contacto</a></li>
+
+                    <li class="nav-item ms-2"><button id="authButton" class="btn btn-primary fw-bold ">Iniciar Sesión</button></li>
+
+
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header-->
+    <header id="home" class="banner-image-mesas " >
+        <div class="d-flex align-items-center min-vh-100-custom banner-overlay "  >
+            <div class="container">
+                <div class="row align-items-center" >
+                    <div class="col-12 text-center mb-5 mb-lg-0">
+                        <h1 class="display-1 fw-bolder text-white mb-4" data-aos="flip-up" data-aos-duration="2000" >¡Postulate a los empleos que tenemos reservados para ti!</h1>
+                        <p class="fs-2 mb-5 text-white-50"  data-aos="flip-up" data-aos-duration="3000"  >En BurguerBoom nos encataria que formaras parte de nuestro equipo de trabajo, mas que un empleo somos una familia ❤️ .</p>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </header>
+
+    <!-- contenidos -->
+    <main class="flex-shrink-0 bg-gradient-primary-to-success-opaco">
+        <div class="container my-5">
+            <div class="row mb-4">
+                <div class="col-md-6 mx-auto">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        <input type="text" id="searchInput" class="form-control" placeholder="Buscar por nombre, ciudad o cargo">
+                    </div>
+                </div>
+            </div>
+            <div id="jobs" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                <!-- Los empleos se cargarán aquí dinámicamente -->
+            </div>
+        </div>
+    
+        <!-- Modal para ver detalles del empleo -->
+        <div class="modal fade" id="jobDetailsModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Detalles del Empleo</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" id="jobDetailsBody">
+                        <!-- Los detalles del empleo se cargarán aquí dinámicamente -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+        <!-- Modal para el formulario de postulación -->
+        <div class="modal fade" id="applyModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Postular al Empleo</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="applyForm">
+                            <input type="hidden" id="jobId" name="jobId">
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Nombre completo</label>
+                                <input type="text" class="form-control" id="name" name="name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Correo electrónico</label>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="phone" class="form-label">Teléfono</label>
+                                <input type="tel" class="form-control" id="phone" name="phone" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="experience" class="form-label">Años de experiencia</label>
+                                <input type="number" class="form-control" id="experience" name="experience" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="cv" class="form-label">Sube tu CV (PDF)</label>
+                                <input type="file" class="form-control" id="cv" name="cv" accept=".pdf" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Enviar Postulación</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4 mt-auto">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-4 mb-lg-0">
+                    <h5>BurguerBoom</h5>
+                    <p>Descubre la auténtica gastronomía caribeña en cada bocado.</p>
+                    <div class="social-icons">
+                        <a href="#" class="text-white me-3"><i class="bi bi-facebook"></i></a>
+                        <a href="#" class="text-white me-3"><i class="bi bi-instagram"></i></a>
+                        <a href="#" class="text-white me-3"><i class="bi bi-twitter"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-4 mb-4 mb-lg-0">
+                    <h5>Enlaces Rápidos</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#home" class="text-white">Inicio</a></li>
+                        <li><a href="#menu" class="text-white">Menú</a></li>
+                        <li><a href="#servicios" class="text-white">Servicios</a></li>
+                        <li><a href="#contacto" class="text-white">Contacto</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4">
+                    <h5>Contacto</h5>
+                    <address>
+                        <p><i class="bi bi-geo-alt-fill me-2"></i>123 Calle Principal, Ciudad, País</p>
+                        <p><i class="bi bi-telephone-fill me-2"></i>(123) 456-7890</p>
+                        <p><i class="bi bi-envelope-fill me-2"></i>info@burguerboom.com</p>
+                    </address>
+                </div>
+            </div>
+            <hr class="my-4">
+            <div class="row align-items-center">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="mb-0">&copy; 2024 BurguerBoom. Todos los derechos reservados.</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <a href="#" class="text-white-50 me-2">Política de privacidad</a>
+                    <a href="#" class="text-white-50">Términos y condiciones</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+
+    <!-- Swiper core JS -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+    <!-- Bootstrap core JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Core theme JS -->
+    <script src="./assets/js/config/config.js"></script>
+
+    <script src="./assets/js/inicio/inicio-empleos.js"></script>
+    <!-- Core theme JS -->
+    <script src="./assets/js/config/jwt-decode.js"></script>
+    <script src="./assets/js/config/validate-auth.js"></script>
+    <script src="./assets/js/config/protect-routes.js"></script>
+    <script src="./assets/js/auth.js"></script>
+    <script src="./assets/js/config/logout.js"></script>
+
+    <!-- core sweetalert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.14.5/dist/sweetalert2.all.min.js"
+        integrity="sha256-1m4qVbsdcSU19tulVTbeQReg0BjZiW6yGffnlr/NJu4=" crossorigin="anonymous"></script>
+    <!--  core AOS -->
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    <script>
+        AOS.init();
+    </script>
+
+
+</body>
+
+</html>

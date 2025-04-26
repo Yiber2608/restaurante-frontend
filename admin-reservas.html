@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="Restaurante con auténtica gastronomía caribeña" />
+    <meta name="author" content="TechSysDesign" />
+    <title>Admin Reservas</title>
+    <!-- core  bootstrap-->
+    <link href="./assets/css/Bootstrap.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link href="https://unpkg.com/tabulator-tables@5.5.0/dist/css/tabulator_bootstrap5.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.14.5/sweetalert2.css"
+        integrity="sha512-6qScZESleBziOBqJwOPurSy6lhLqHGjHNALOOFX0mzRVPiE5SZQvepRzeSO1OB475fcZywuMjxtkrFaO93aq9g=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/virtual-select-plugin@1.0.46/dist/virtual-select.min.css">
+    <link href="https://unpkg.com/filepond/dist/filepond.css" rel="stylesheet">
+    <link href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css"
+        rel="stylesheet">
+    <link href="https://unpkg.com/fullcalendar@5.10.1/main.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="./assets/css/components.css">
+    <style>
+        .fc-daygrid-day {
+            border: 1px solid #ddd;
+        }
+
+        .fc-daygrid-day:hover {
+            background-color: #f0f8ff;
+        }
+
+        .card {
+            border-radius: 10px;
+        }
+
+        .card-body {
+            padding: 15px;
+        }
+
+        .btn-success {
+            margin-right: 5px;
+        }
+
+        .no-selection {
+            text-align: center;
+            padding: 50px;
+            color: #888;
+        }
+
+        .no-selection h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .no-selection p {
+            font-size: 18px;
+        }
+
+        .calendar-container {
+            height: 100%;
+            max-height: 500px;
+            overflow-y: auto;
+            margin: 20px 0;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 10px;
+            background-color: #fff;
+        }
+
+        @media (max-width: 768px) {
+            .calendar-container {
+                margin: 10px 0;
+                max-height: 300px;
+            }
+        }
+    </style>
+</head>
+
+<body class="d-flex flex-column h-100">
+    <div class="wrapper">
+        <!-- Sidebar -->
+        <div class="sidebar bg-primary ">
+            <div class="text-center p-2">
+                <!-- Logo -->
+                <i class='bx bxs-cube-alt bx-lg text-whithe'></i>
+            </div>
+            <ul class="sidebar-nav mt-1">
+
+                <li class="sidebar-item">
+                    <a href="admin-dashboard.html" class="sidebar-link ">
+                        <i class='bx bxs-dashboard'></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-item">
+                    <a href="admin-usuarios.html" class="sidebar-link">
+                        <i class='bx bxs-user'></i>
+                        <span>Usuarios</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-item">
+                    <a href="admin-menu.html" class="sidebar-link ">
+                        <i class='bx bxs-food-menu'></i>
+                        <span>Menu</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-item">
+                    <a href="admin-resenas.html" class="sidebar-link">
+                        <i class='bx bx bx-receipt'></i>
+                        <span>Reseñas</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-item">
+                    <a href="admin-reservas.html" class="sidebar-link active">
+                        <i class='bx bxs-message-dots'></i>
+                        <span>Reservas</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-item">
+                    <a href="admin-novedades.html" class="sidebar-link">
+                        <i class='bx bxs-edit-alt'></i>
+                        <span>Novedades</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-item">
+                    <a href="admin-sedes.html" class="sidebar-link ">
+                        <i class='bx bxs-building-house'></i>
+                        <span>Sedes</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-item">
+                    <a href="admin-configuracion.html" class="sidebar-link">
+                        <i class='bx bx-cog'></i>
+                        <span>Configuración</span>
+                    </a>
+                </li>
+
+            </ul>
+        </div>
+
+        <!-- Main content -->
+        <div class="main">
+            <!-- Navbar -->
+            <nav class="navbar navbar-expand-lg navbar-light bg-whithe shadow p-0 ">
+                <div class="container-fluid">
+                    <!-- Sidebar Toggle Button -->
+                    <div class="toggle-btn" type="button">
+                        <i class='bx bx-menu fs-1'></i>
+                    </div>
+                    <div class="collapse navbar-collapse justify-content-end">
+                        <!-- Dropdown de Administrador -->
+                        <div class="dropdown">
+                            <a class="btn dropdown-toggle d-flex align-items-center" href="#" role="button"
+                                id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+                                <span class="me-2">Administrador</span>
+                                <i class='bx bxs-user-circle fs-1'></i></a>
+
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink">
+                                <li><a class="dropdown-item" id="logoutButton" href="#">Cerrar Sesión</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="container-fluid p-4">
+                <!-- Header -->
+                <div class="row">
+                    <div
+                        class="col-12 bg-primary shadow py-2 px-4 rounded-5 d-flex justify-content-end align-content-center text-white fw-bold">
+                        <h1>Gestión de Reservas y Horarios</h1>
+                    </div>
+                </div>
+                <!-- Search and Filter -->
+                <div class="row my-3">
+                    <div class="col-3 ms-auto">
+                        <div class="input-group">
+                            <input type="text" id="searchInput" class="form-control rounded"
+                                placeholder="Escribe para buscar... " aria-label="Buscar " />
+                            <span class="input-group-text">
+                                <i class="bi bi-search"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Filter Cards -->
+                <div class="row row-cols-1 row-cols-md-5 g-3 mb-4">
+                    <!-- All Reservations -->
+                    <div class="col">
+                        <div class="card card-clickeable h-100 border-0 shadow" id="cardTodos">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="card-subtitle mb-1 text-muted">Todos</h6>
+                                        <h2 id="totalItems" class="card-title mb-0">0</h2>
+                                    </div>
+                                    <div class="icon-shape fondo-naranja text-white rounded-circle shadow">
+                                        <i class="bi bi-box"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- High Capacity -->
+                    <div class="col">
+                        <div class="card card-clickeable h-100 border-0 shadow" id="cardCapacidadAlta">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="card-subtitle mb-1 text-muted">Capacidad Alta</h6>
+                                        <h2 id="totalCapacidadAlta" class="card-title mb-0">0</h2>
+                                    </div>
+                                    <div class="icon-shape fondo-verde text-white rounded-circle shadow">
+                                        <i class="bi bi-people"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Medium Capacity -->
+                    <div class="col">
+                        <div class="card card-clickeable h-100 border-0 shadow" id="cardCapacidadMedia">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="card-subtitle mb-1 text-muted">Capacidad Media</h6>
+                                        <h2 id="totalCapacidadMedia" class="card-title mb-0">0</h2>
+                                    </div>
+                                    <div class="icon-shape fondo-amarillo text-white rounded-circle shadow">
+                                        <i class="bi bi-people"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Low Capacity -->
+                    <div class="col">
+                        <div class="card card-clickeable h-100 border-0 shadow" id="cardCapacidadBaja">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="card-subtitle mb-1 text-muted">Capacidad Baja</h6>
+                                        <h2 id="totalCapacidadBaja" class="card-title mb-0">0</h2>
+                                    </div>
+                                    <div class="icon-shape fondo-rojo text-white rounded-circle shadow">
+                                        <i class="bi bi-people"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Recent Reservations -->
+                    <div class="col">
+                        <div class="card card-clickeable h-100 border-0 shadow" id="cardRecientes">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="card-subtitle mb-1 text-muted">Recientes</h6>
+                                        <h2 id="totalRecientes" class="card-title mb-0">0</h2>
+                                    </div>
+                                    <div class="icon-shape fondo-verde-agua text-white rounded-circle shadow">
+                                        <i class="bi bi-clock"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Branch Cards -->
+                <div class="row row-cols-1 row-cols-md-4 g-3" id="branchCardsContainer">
+                    <!-- Cards will be dynamically inserted here -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal for Branch Details and Schedule -->
+    <div class="modal fade " id="branchDetailsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg-calendar modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="branchModalLabel">Detalles de la Sede</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 id="branchDescription"></h6>
+                            <div id="branchCalendar" class="calendar-container"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <div id="dayScheduleCalendar" class="reservations-container">
+                                <div class="no-selection">
+                                    <h2>Seleccione una fecha para ver las reservas</h2>
+                                    <p>Por favor, seleccione una fecha en el calendario para ver las reservas
+                                        correspondientes.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- modal imagen -->
+    <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-md border border-0 modal-dialog-centered">
+            <div class="modal-content">
+                <div class="ratio ratio-16x9">
+                    <img id="modalImage" src="" alt="Imagen de la Sede" class="img-fluid" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Core theme JS -->
+    <script src="./assets/js/config/config.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://unpkg.com/tabulator-tables/dist/js/tabulator.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.14.5/sweetalert2.all.js"
+        integrity="sha512-AbjPD2rIZFzBugvnJKl8IZmGWWmjmZrYysHZaryYg0+XkoqDpmuKKRxDfVPCaHzf1SB3cwSKkgeEd7xLOmBusQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/virtual-select-plugin@1.0.46/dist/virtual-select.min.js"></script>
+    <script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.js"></script>
+    <script src="https://unpkg.com/filepond/dist/filepond.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/luxon@2.3.0/build/global/luxon.min.js"></script>
+    <script src="https://unpkg.com/fullcalendar@5.10.1/main.min.js"></script>
+    <script src="./assets/js/admin/reservas/admin-reservas.js"></script>
+    <script src="./assets/js/admin/reservas/admin-reservas-schedule.js"></script>
+    <script src="./assets/js/config/jwt-decode.js"></script>
+    <script src="./assets/js/config/validate-auth.js"></script>
+    <script src="./assets/js/config/protect-routes.js"></script>
+    <script src="./assets/js/auth.js"></script>
+    <script src="./assets/js/config/logout.js"></script>
+</body>
+
+</html>

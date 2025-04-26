@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="Restaurante con auténtica gastronomía caribeña" />
+    <meta name="author" content="TechSysDesign" />
+    <title>Admin Menu</title>
+    <!-- core  bootstrap-->
+    <link href="./assets/css/Bootstrap.css" rel="stylesheet" /><!-- Bootstrap Icons (última versión disponible) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link href="https://unpkg.com/tabulator-tables@5.5.0/dist/css/tabulator_bootstrap5.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.14.5/sweetalert2.css"
+        integrity="sha512-6qScZESleBziOBqJwOPurSy6lhLqHGjHNALOOFX0mzRVPiE5SZQvepRzeSO1OB475fcZywuMjxtkrFaO93aq9g=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/virtual-select-plugin@1.0.46/dist/virtual-select.min.css">
+    <link rel="stylesheet" href="./assets/css/components.css">
+
+
+</head>
+
+<body class="d-flex flex-column h-100">
+    <div class="wrapper">
+        <!-- Sidebar -->
+        <div class="sidebar bg-primary ">
+            <div class="text-center p-2">
+                <!-- Logo -->
+                <i class='bx bxs-cube-alt bx-lg text-whithe'></i>
+            </div>
+            <ul class="sidebar-nav mt-1">
+
+                <li class="sidebar-item">
+                    <a href="admin-dashboard.html" class="sidebar-link ">
+                        <i class='bx bxs-dashboard'></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-item">
+                    <a href="admin-usuarios.html" class="sidebar-link active">
+                        <i class='bx bxs-user'></i>
+                        <span>Usuarios</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-item">
+                    <a href="admin-menu.html" class="sidebar-link ">
+                        <i class='bx bxs-food-menu'></i>
+                        <span>Menu</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-item">
+                    <a href="admin-resenas.html" class="sidebar-link">
+                        <i class='bx bx bx-receipt'></i>
+                        <span>Reseñas</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-item">
+                    <a href="admin-reservas.html" class="sidebar-link">
+                        <i class='bx bxs-message-dots'></i>
+                        <span>Reservas</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-item">
+                    <a href="admin-novedades.html" class="sidebar-link">
+                        <i class='bx bxs-edit-alt'></i>
+                        <span>Novedades</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-item">
+                    <a href="admin-sedes.html" class="sidebar-link ">
+                        <i class='bx bxs-building-house'></i>
+                        <span>sedes</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-item">
+                    <a href="admin-configuracion.html" class="sidebar-link">
+                        <i class='bx bx-cog'></i>
+                        <span>Configuración</span>
+                    </a>
+                </li>
+
+            </ul>
+        </div>
+
+        <!-- Main content -->
+        <div class="main">
+            <!-- Navbar -->
+            <nav class="navbar navbar-expand-lg navbar-light bg-whithe shadow p-0 ">
+                <div class="container-fluid">
+                    <!-- Sidebar Toggle Button -->
+                    <div class="toggle-btn" type="button">
+                        <i class='bx bx-menu fs-1'></i>
+                    </div>
+                    <div class="collapse navbar-collapse justify-content-end">
+                        <!-- Dropdown de Administrador -->
+                        <div class="dropdown">
+                            <a class="btn dropdown-toggle d-flex align-items-center" href="#" role="button"
+                                id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+                                <span class="me-2">Administrador</span>
+                                <i class='bx bxs-user-circle fs-1'></i></a>
+
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink">
+                                <li><a class="dropdown-item" id="logoutButton" href="#">Cerrar Sesión</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="container-fluid p-4">
+                <!-- tab cabecera  -->
+                <div class="row">
+                    <div
+                        class="col-12 bg-primary shadow py-2 px-4 rounded-5 d-flex justify-content-end align-content-center text-white fw-bold">
+                        <h1>Gestión de Usuarios</h1>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- tab botones  -->
+                    <div class="col-9">
+                        <button class="btn btn-outline-dark my-3" id="addUserButton" data-bs-toggle="modal"
+                            data-bs-target="#addUser">Crear Nuevo Usuario</button>
+                    </div>
+
+                    <div class="col-3">
+                        <div class="d-flex justify-content-center align-items-center h-100">
+                            <div class="input-group">
+                                <input type="text" id="searchInput" class="form-control rounded"
+                                    placeholder="Escribe para buscar..." aria-label="Buscar" />
+                                <span class="input-group-text">
+                                    <i class="bi bi-search"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- tab cantidades usuarios -->
+                    <div class="col-12">
+                        <div class="row row-cols-1 row-cols-md-5 g-3 mb-4">
+                            <!-- tab Todos -->
+                            <div class="col">
+                                <div class="card card-clickeable h-100 border-0 shadow" id="cardTodos">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="card-subtitle mb-1 text-muted">Todos</h6>
+                                                <h2 id="totalUsers" class="card-title mb-0">0</h2>
+                                            </div>
+                                            <div class="icon-shape fondo-naranja text-white rounded-circle shadow">
+                                                <i class="bi bi-people"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- tab Administradores -->
+                            <div class="col">
+                                <div class="card card-clickeable h-100 border-0 shadow" id="cardAdmins">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="card-subtitle mb-1 text-muted">Administradores</h6>
+                                                <h2 id="totalAdmins" class="card-title mb-0">0</h2>
+                                            </div>
+                                            <div class="icon-shape fondo-verde text-white rounded-circle shadow">
+                                                <i class="bi bi-person-badge"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- tab Usuarios -->
+                            <div class="col">
+                                <div class="card card-clickeable h-100 border-0 shadow" id="cardUsers">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="card-subtitle mb-1 text-muted">Usuarios</h6>
+                                                <h2 id="totalUser" class="card-title mb-0">0</h2>
+                                            </div>
+                                            <div class="icon-shape fondo-azul text-white rounded-circle shadow">
+                                                <i class="bi bi-person"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- tab Activos -->
+                            <div class="col">
+                                <div class="card card-clickeable h-100 border-0 shadow" id="cardActivos">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="card-subtitle mb-1 text-muted">Activos</h6>
+                                                <h2 id="totalActivos" class="card-title mb-0">0</h2>
+                                            </div>
+                                            <div class="icon-shape fondo-verde text-white rounded-circle shadow">
+                                                <i class="bi bi-check-circle"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- tab Inactivos -->
+                            <div class="col">
+                                <div class="card card-clickeable h-100 border-0 shadow" id="cardInactivos">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="card-subtitle mb-1 text-muted">Inactivos</h6>
+                                                <h2 id="totalInactivos" class="card-title mb-0">0</h2>
+                                            </div>
+                                            <div class="icon-shape fondo-rojo text-white rounded-circle shadow">
+                                                <i class="bi bi-x-circle"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- tab tabla de usuarios -->
+                        <div class="col-12">
+                            <div id="table-container"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para agregar usuarios -->
+    <div class="modal fade" id="addUser" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addUserModalLabel">Crear Nuevo Usuario</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addUserForm" class="needs-validation" novalidate>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="name" class="form-label">Nombre <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="name" required minlength="3">
+                                <div class="invalid-feedback">Por favor, ingresa un nombre válido (mínimo 3 caracteres).</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="surname" class="form-label">Apellido <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="surname" required minlength="3">
+                                <div class="invalid-feedback">Por favor, ingresa un apellido válido (mínimo 3 caracteres).</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="email" class="form-label">Correo Electrónico <span class="text-danger">*</span></label>
+                                <input type="email" class="form-control" id="email" required>
+                                <div class="invalid-feedback">Por favor, ingresa un correo electrónico válido.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="password" class="form-label">Contraseña <span class="text-danger">*</span></label>
+                                <input type="password" class="form-control" id="password" required minlength="6">
+                                <div class="invalid-feedback">Por favor, ingresa una contraseña válida (mínimo 6 caracteres).</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="phone" class="form-label">Teléfono <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="phone" required>
+                                <div class="invalid-feedback">Por favor, ingresa un número de teléfono válido.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="address" class="form-label">Dirección <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="address" required>
+                                <div class="invalid-feedback">Por favor, ingresa una dirección válida.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="city" class="form-label">Ciudad <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="city" required>
+                                <div class="invalid-feedback">Por favor, ingresa una ciudad válida.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="birthdate" class="form-label">Fecha de Nacimiento <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" id="birthdate" required>
+                                <div class="invalid-feedback">Por favor, ingresa una fecha de nacimiento válida.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="role" class="form-label">Rol <span class="text-danger">*</span></label>
+                                <select id="role" class="form-select" required>
+                                    <option value="user">Usuario</option>
+                                    <option value="admin">Administrador</option>
+                                </select>
+                                <div class="invalid-feedback">Por favor, selecciona un rol.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="status" class="form-label">Estado <span class="text-danger">*</span></label>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="status">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                        <!-- Botones -->
+                        <div class="d-flex justify-content-end mt-3">
+                            <button type="button" class="btn btn-dark me-3" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" id="saveUser" class="btn btn-primary">Guardar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para actualizar usuarios -->
+    <div class="modal fade" id="updateUserModal" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="updateUserModalLabel">Actualizar Usuario</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="updateUserForm" class="needs-validation" novalidate>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="updateName" class="form-label">Nombre <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="updateName" required minlength="3">
+                                <div class="invalid-feedback">Por favor, ingresa un nombre válido (mínimo 3 caracteres).</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="updateSurname" class="form-label">Apellido <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="updateSurname" required minlength="3">
+                                <div class="invalid-feedback">Por favor, ingresa un apellido válido (mínimo 3 caracteres).</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="updatePhone" class="form-label">Teléfono <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="updatePhone" required>
+                                <div class="invalid-feedback">Por favor, ingresa un número de teléfono válido.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="updateAddress" class="form-label">Dirección <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="updateAddress" required>
+                                <div class="invalid-feedback">Por favor, ingresa una dirección válida.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="updateCity" class="form-label">Ciudad <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="updateCity" required>
+                                <div class="invalid-feedback">Por favor, ingresa una ciudad válida.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="updateBirthdate" class="form-label">Fecha de Nacimiento <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" id="updateBirthdate" required>
+                                <div class="invalid-feedback">Por favor, ingresa una fecha de nacimiento válida.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="updateRole" class="form-label">Rol <span class="text-danger">*</span></label>
+                                <select id="updateRole" class="form-select" required>
+                                    <option value="user">Usuario</option>
+                                    <option value="admin">Administrador</option>
+                                </select>
+                                <div class="invalid-feedback">Por favor, selecciona un rol.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="updateStatus" class="form-label">Estado <span class="text-danger">*</span></label>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="updateStatus">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                        <!-- Botones -->
+                        <div class="d-flex justify-content-end mt-3">
+                            <button type="button" class="btn btn-dark me-3" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" id="saveUpdatedUser" class="btn btn-primary">Guardar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- tab agregar items -->
+    <div class="modal fade" id="addItems" data-bs-backdrop="static">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel">Crear Nuevo Item</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addItemForm" class="needs-validation" novalidate>
+                        <div class="row">
+
+                            <div class="col-5">
+                                <div class="row">
+                                    <!-- Imagen con previsualización -->
+                                    <div class="col-12">
+                                        <label for="name" class="form-label">Imagen del Producto <span
+                                                class="text-danger">*</span></label>
+                                        <div class="d-flex flex-column align-items-center">
+                                            <div id="imagePreview" class="border border-secondary mb-2 image-preview">
+                                                <span id="imagePlaceholder" class="text-muted">Previsualizar</span>
+                                                <img id="previewImage" src="" alt="Previsualización"
+                                                    class="preview-image">
+                                            </div>
+                                            <input type="file" id="itemImage" class="form-control d-none"
+                                                accept="image/*">
+                                            <button type="button" id="removeImage"
+                                                class="btn btn-sm btn-danger d-none">Eliminar Imagen</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-7">
+                                <div class="row g-3">
+                                    <div class="col-md-9">
+                                        <label for="name" class="form-label">Nombre del Producto <span
+                                                class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="name"
+                                            placeholder="Ingresa el nombre del producto" required minlength="3">
+                                        <div class="invalid-feedback">Por favor, ingresa un nombre válido (mínimo 3
+                                            caracteres).
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <div class="row p-0">
+                                            <div class="col-12"><label for="status" class="form-label">Estado <span
+                                                        class="text-danger">*</span></label></div>
+                                            <div class="col-12 d-flex justify-content-start align-content-center">
+                                                <label class="toggle-switch">
+                                                    <input type="checkbox" id="status">
+                                                    <span class="slider"></span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-12">
+                                        <label for="typeItem" class="form-label">Tipo de Item <span
+                                                class="text-danger">*</span></label>
+                                        <select id="typeItem" class="form-select" required></select>
+                                            <option value="">Selecciona el tipo</option>
+                                            <option value="Entradas">Entradas</option>
+                                            <option value="Platos Principales">Platos Principales</option>
+                                            <option value="Postres">Postres</option>
+                                            <option value="Bebidas Calientes">Bebidas Calientes</option>
+                                            <option value="Otras Bebidas">Otras Bebidas</option>
+                                        </select>
+                                        <div class="invalid-feedback">Por favor, selecciona un tipo de item.</div>
+                                    </div>
+
+                                    <div class="col-md-12">
+                                        <label for="unitPrice" class="form-label">Precio Unitario <span
+                                                class="text-danger">*</span></label>
+                                        <input type="number" class="form-control" id="unitPrice"
+                                            placeholder="Ingresa el precio unitario" required step="0.01" min="0">
+                                        <div class="invalid-feedback">Por favor, ingresa un precio válido mayor o igual
+                                            a 0.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <label for="itemDescription" class="form-label">Descripción <span
+                                        class="text-danger">*</span></label>
+                                <textarea class="form-control" id="itemDescription" rows="3"
+                                    placeholder="Ingresa la descripción del producto" required
+                                    minlength="10"></textarea>
+                                <div class="invalid-feedback">La descripción debe tener al menos 10 caracteres.</div>
+                            </div>
+                        </div>
+
+
+                        <!-- Botones -->
+                        <div class="d-flex justify-content-end mt-3">
+                            <button type="button" class="btn btn-dark me-3" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" id="saveItems" class="btn btn-primary">Guardar</button>
+                        </div>
+
+
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- tab Actualizar Items -->
+    <div class="modal fade" id="updateItems" data-bs-backdrop="static">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="updateModalLabel">Actualizar Item</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="updateItemForm" class="needs-validation" novalidate>
+                        <div class="row">
+                            <!-- Fechas -->
+                            <div class="col-md-12 mb-3">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label id="createdDate" class="form-label">Fecha de Creación</label>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label   id="updatedDate" class="form-label">Fecha de Última
+                                            Actualización</label>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Imagen -->
+                            <div class="col-5">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <label for="updateItemImage" class="form-label">Imagen del Producto</label>
+                                        <div class="d-flex flex-column align-items-center">
+                                            <div id="updateImagePreview"
+                                                class="border border-secondary mb-2 image-preview">
+                                                <span id="updateImagePlaceholder"
+                                                    class="text-muted">Previsualizar</span>
+                                                <img id="updatePreviewImage" src="" alt="Previsualización"
+                                                    class="preview-image">
+                                            </div>
+                                            <input type="file" id="updateItemImage" class="form-control d-none"
+                                                accept="image/*">
+                                            <button type="button" id="updateRemoveImage"
+                                                class="btn btn-sm btn-danger d-none">Eliminar Imagen</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Información -->
+                            <div class="col-7">
+                                <div class="row g-3">
+                                    <div class="col-md-9">
+                                        <label for="updateName" class="form-label">Nombre del Producto</label>
+                                        <input type="text" class="form-control" id="updateName" required minlength="3">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label for="updateStatus" class="form-label">Estado</label>
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" id="updateStatus">
+                                            <span class="slider"></span>
+                                        </label>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <label for="updateTypeItem" class="form-label">Tipo de Item</label>
+                                        <select id="updateTypeItem" class="form-select" required></select>
+                                            <option value="">Selecciona el tipo</option>
+                                            <option value="Entradas">Entradas</option>
+                                            <option value="Platos Principales">Platos Principales</option>
+                                            <option value="Postres">Postres</option>
+                                            <option value="Bebidas Calientes">Bebidas Calientes</option>
+                                            <option value="Otras Bebidas">Otras Bebidas</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <label for="updateUnitPrice" class="form-label">Precio Unitario</label>
+                                        <input type="number" class="form-control" id="updateUnitPrice" required
+                                            step="0.01" min="0">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <label for="updateItemDescription" class="form-label">Descripción</label>
+                                <textarea class="form-control" id="updateItemDescription" rows="3" required
+                                    minlength="10"></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Botones -->
+                        <div class="d-flex justify-content-end mt-3">
+                            <button type="button" class="btn btn-dark me-3" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" id="updateSaveItems" class="btn btn-primary">Guardar Cambios</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- modal imagen -->
+    <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-md border border-0 modal-dialog-centered">
+            <div class="modal-content bg-transparent border border-0">
+                <div class="ratio ratio-16x9 bg-transparent">
+                    <img id="modalImage" src="" alt="Imagen del Ítem" class="img-fluid" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Core theme JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://unpkg.com/tabulator-tables/dist/js/tabulator.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.14.5/sweetalert2.all.js"
+        integrity="sha512-AbjPD2rIZFzBugvnJKl8IZmGWWmjmZrYysHZaryYg0+XkoqDpmuKKRxDfVPCaHzf1SB3cwSKkgeEd7xLOmBusQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/virtual-select-plugin@1.0.46/dist/virtual-select.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
+        integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
+        crossorigin="anonymous"></script>
+
+        <script src="./assets/js/config/config.js"></script>
+
+    <script src="./assets/js/config/jwt-decode.js"></script>
+    <script src="./assets/js/config/validate-auth.js"></script>
+    <script src="./assets/js/config/protect-routes.js"></script>
+    <script src="./assets/js/auth.js"></script>
+    <script src="./assets/js/config/logout.js"></script>
+
+    <script src="./assets/js/admin/usuarios/admin-usuarios.js"></script>
+    <script src="./assets/js/admin/usuarios/admin-usuarios-add.js"></script>
+    <script src="./assets/js/admin/usuarios/admin-usuarios-update.js"></script>
+    <script src="https://widget.cloudinary.com/v2.0/global/all.js" type="text/javascript"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="Restaurante con auténtica gastronomía caribeña" />
+    <meta name="author" content="TechSysDesign" />
+    <title>Menu</title>
+    <link rel="icon" href="/assets/img/hamburguesa.png" type="image/x-icon">
+    <!-- core bootstrap icons css-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" rel="stylesheet" />
+    <!-- core bootstrap  css-->
+    <link href="./assets/css/Bootstrap.css" rel="stylesheet" />
+    <!-- core styles css-->
+    <link rel="stylesheet" href="./assets/css/additional.css">
+    <!-- core swiper css -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <!-- core sweetalert2 css -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.14.5/dist/sweetalert2.min.css"
+        integrity="sha256-qWVM38RAVYHA4W8TAlDdszO1hRaAq0ME7y2e9aab354=" crossorigin="anonymous">
+    <!-- core AOS css  -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" />
+</head>
+
+<body class="d-flex flex-column h-100 ">
+    <!-- Navigation-->
+    <nav class="navbar navbar-expand-lg navbar-light bg-dark shadow-sm py-3 fixed-top">
+        <div class="container px-2">
+            <a class="navbar-brand fs-3 fw-bold text-primary" href="index.html">BurguerBoom</a>
+            <button class="navbar-toggler bg-white" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+                aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+
+                    <li class="nav-item"><a class="nav-link fw-bold text-white" href="inicio-menu.html">Menú</a></li>
+
+                    <li class="nav-item"><a class="nav-link fw-bold text-white" href="inicio-empleos.html">Empleos</a>
+                    </li>
+
+                    <li class="nav-item"><a class="nav-link fw-bold text-white" href="inicio-nosotros.html">Nosotros</a>
+                    </li>
+
+                    <li class="nav-item"><a class="nav-link fw-bold text-white" href="index.html#contacto">Contacto</a></li>
+
+                    <li class="nav-item ms-2"><button id="authButton" class="btn btn-primary fw-bold ">Iniciar
+                            Sesión</button></li>
+
+
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header-->
+    <header class="banner-image-menu">
+        <div class="d-flex align-items-center justify-content-center min-vh-100-custom banner-overlay">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-12 text-center mb-5">
+                        <h1 class="display-1 fw-bold text-primary mb-5 mb-md-4" data-aos="fade-up"
+                            data-aos-duration="1000">MENU</h1>
+                        <nav class="menu-nav">
+                            <ul class="list-unstyled d-flex flex-wrap justify-content-center">
+                                <li class="m-2 " data-aos="fade-up" data-aos-duration="1200">
+                                    <a href="#containerEntradas" class="btn btn-outline-light btn-lg">
+                                        <span class="fs-4">🍤</span> Entradas
+                                    </a>
+                                </li>
+                                <li class="m-2" data-aos="fade-up" data-aos-duration="1400">
+                                    <a href="#containerPlatosPrincipales" class="btn btn-outline-light btn-lg">
+                                        <span class="fs-4">🍛</span> Platos Principales
+                                    </a>
+                                </li>
+                                <li class="m-2" data-aos="fade-up" data-aos-duration="1600">
+                                    <a href="#containerPostres" class="btn btn-outline-light btn-lg">
+                                        <span class="fs-4">🍰</span> Postres
+                                    </a>
+                                </li>
+                                <li class="m-2" data-aos="fade-up" data-aos-duration="1800">
+                                    <a href="#containerBebidasCalientes" class="btn btn-outline-light btn-lg">
+                                        <span class="fs-4">☕</span> Bebidas Calientes
+                                    </a>
+                                </li>
+                                <li class="m-2" data-aos="fade-up" data-aos-duration="2000">
+                                    <a href="#containerOtrasBebidas" class="btn btn-outline-light btn-lg">
+                                        <span class="fs-4">🥤</span> Otras Bebidas
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main -->
+    <main class="flex-shrink-0  bg-gradient-primary-to-success-opaco">
+
+        <!-- tab entradas -->
+        <section id="containerEntradas" class="py-5 shadow " data-aos="fade-up" data-aos-duration="1000">
+            <div class="container">
+                <h1 class="fw-bold text-center text-black ">🌮 Entradas</h1>
+                <div class="swiper mySwiper">
+                    <div class="swiper-wrapper pb-5 pt-3">
+                        <!-- Add more entrada items here -->
+                    </div>
+                    <div class="swiper-pagination"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- tab platos principales -->
+        <section id="containerPlatosPrincipales" class="py-5 shadow" data-aos="fade-up" data-aos-duration="1000">
+            <div class=" container  ">
+                <h1 class="fw-bold text-center "> 🍽️ Platos Principales</h1>
+                <div class="swiper mySwiper">
+                    <div class="swiper-wrapper pb-5 pt-3">
+                        <!-- Add more postres items here -->
+                    </div>
+                    <div class=" swiper-pagination "></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- tab postres -->
+        <section id="containerPostres" class="py-5 shadow" data-aos="fade-up" data-aos-duration="1000">
+            <div class=" container  ">
+                <h1 class="fw-bold text-center"> 🍨 Postres</h1>
+                <div class="swiper mySwiper">
+                    <div class="swiper-wrapper pb-5 pt-3">
+                        <!-- Add more postres items here -->
+                    </div>
+                    <div class="swiper-pagination"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- tab bebidas calientes -->
+        <section id="containerBebidasCalientes" class="py-5 shadow" data-aos="fade-up" data-aos-duration="1000">
+            <div class=" container  ">
+                <h1 class="fw-bold text-center "> ☕ Bebidas Calientes</h1>
+                <div class="swiper mySwiper">
+                    <div class="swiper-wrapper pb-5 pt-3">
+                        <!-- Add more postres items here -->
+                    </div>
+                    <div class="swiper-pagination"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- tab otras bebidas -->
+        <section id="containerOtrasBebidas" class="py-5 shadow" data-aos="fade-up" data-aos-duration="1000">
+            <div class=" container  ">
+                <h1 class="fw-bold text-center"> 🍹 Otras Bebidas</h1>
+                <div class="swiper mySwiper">
+                    <div class="swiper-wrapper pb-5 pt-3">
+                        <!-- Add more postres items here -->
+                    </div>
+                    <div class="swiper-pagination"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4 mt-auto">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-4 mb-lg-0">
+                    <h5>BurguerBoom</h5>
+                    <p>Descubre la auténtica gastronomía caribeña en cada bocado.</p>
+                    <div class="social-icons">
+                        <a href="#" class="text-white me-3"><i class="bi bi-facebook"></i></a>
+                        <a href="#" class="text-white me-3"><i class="bi bi-instagram"></i></a>
+                        <a href="#" class="text-white me-3"><i class="bi bi-twitter"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-4 mb-4 mb-lg-0">
+                    <h5>Enlaces Rápidos</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#home" class="text-white">Inicio</a></li>
+                        <li><a href="#menu" class="text-white">Menú</a></li>
+                        <li><a href="#servicios" class="text-white">Servicios</a></li>
+                        <li><a href="#contacto" class="text-white">Contacto</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4">
+                    <h5>Contacto</h5>
+                    <address>
+                        <p><i class="bi bi-geo-alt-fill me-2"></i>123 Calle Principal, Ciudad, País</p>
+                        <p><i class="bi bi-telephone-fill me-2"></i>(123) 456-7890</p>
+                        <p><i class="bi bi-envelope-fill me-2"></i>info@burguerboom.com</p>
+                    </address>
+                </div>
+            </div>
+            <hr class="my-4">
+            <div class="row align-items-center">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="mb-0">&copy; 2024 BurguerBoom. Todos los derechos reservados.</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <a href="#" class="text-white-50 me-2">Política de privacidad</a>
+                    <a href="#" class="text-white-50">Términos y condiciones</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="./assets/js/config/config.js"></script>
+
+
+    <!-- Swiper core JS -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <!-- Bootstrap core JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- core sweetalert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.14.5/dist/sweetalert2.all.min.js"
+        integrity="sha256-1m4qVbsdcSU19tulVTbeQReg0BjZiW6yGffnlr/NJu4=" crossorigin="anonymous"></script>
+    <!-- Core theme JS -->
+    <script src="./assets/js/inicio/inicio-menu.js"></script>
+    <!-- Core theme JS -->
+    <script src="./assets/js/config/jwt-decode.js"></script>
+    <script src="./assets/js/config/validate-auth.js"></script>
+    <script src="./assets/js/config/protect-routes.js"></script>
+    <script src="./assets/js/auth.js"></script>
+    <script src="./assets/js/config/logout.js"></script>
+    <!--  core AOS -->
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    <script>
+        AOS.init();
+    </script>
+</body>
+
+</html>

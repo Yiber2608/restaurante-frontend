@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="Restaurante con auténtica gastronomía caribeña" />
+    <meta name="author" content="TechSysDesign" />
+    <title>BurguerBoom</title>
+    <link rel="icon" href="/assets/img/hamburguesa.png" type="image/x-icon">
+    <!-- core bootstrap icons-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" rel="stylesheet" />
+    <!-- core  bootstrap-->
+    <link href="./assets/css/Bootstrap.css" rel="stylesheet" />
+    <!-- core styles -->
+    <link rel="stylesheet" href="./assets/css/additional.css">
+    <!-- core swiper -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10.2.0/swiper-bundle.min.css" />
+    <!-- core sweetalert2 css -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.14.5/dist/sweetalert2.min.css"
+        integrity="sha256-qWVM38RAVYHA4W8TAlDdszO1hRaAq0ME7y2e9aab354=" crossorigin="anonymous">
+    <!-- core AOS css  -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" />
+
+
+</head>
+
+<body class="d-flex flex-column h-100">
+    <!-- Navigation-->
+    <nav class="navbar navbar-expand-lg navbar-light bg-dark shadow-sm py-3 fixed-top">
+        <div class="container px-2">
+            <a class="navbar-brand fs-3 fw-bold text-primary" href="index.html">BurguerBoom</a>
+            <button class="navbar-toggler bg-white" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+                aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+
+                    <li class="nav-item"><a class="nav-link fw-bold text-white" href="inicio-menu.html">Menú</a></li>
+
+                    <li class="nav-item"><a class="nav-link fw-bold text-white" href="inicio-empleos.html">Empleos</a>
+                    </li>
+
+                    <li class="nav-item"><a class="nav-link fw-bold text-white" href="inicio-nosotros.html">Nosotros</a>
+                    </li>
+
+                    <li class="nav-item"><a class="nav-link fw-bold text-white" href="index.html#contacto">Contacto</a></li>
+
+                    <li class="nav-item ms-2"><button id="authButton" class="btn btn-primary fw-bold ">Iniciar
+                            Sesión</button></li>
+
+
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header-->
+    <header id="home" class="banner-image">
+        <div class="d-flex align-items-center min-vh-100-custom banner-overlay ">
+            <div class="container">
+                <div class="row align-items-center" data-aos="zoom-in">
+                    <div class="col-12 text-center mb-5 mb-lg-0">
+                        <h1 class="display-1 fw-bolder text-white mb-4">Bienvenido a BurguerBoom</h1>
+                        <p class="fs-2 mb-5 text-white-50">Descubre la auténtica gastronomía caribeña en cada bocado.
+                        </p>
+                        <div>
+                            <a href="#novedades" class="btn btn-outline-secondary btn-lg m-2">
+                                <span class="fs-4">🪧</span> Novedades
+                            </a>
+                            <a href="#servicios" class="btn btn-outline-secondary btn-lg m-2">
+                                <span class="fs-4">🚹</span> Servicios
+                            </a>
+                            <a href="#reseñas" class="btn btn-outline-secondary btn-lg m-2">
+                                <span class="fs-4">☁️</span> Reseñas
+                            </a>
+                            <a href="#contactanos" class="btn btn-outline-secondary btn-lg m-2">
+                                <span class="fs-4">📧</span> Contactanos
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- contenidos -->
+    <main class="flex-shrink-0 ">
+
+        <section id="menu" class="py-5 bg-gradient-primary-to-success-opaco">
+            <div class="container">
+                <h2 class="text-center mb-5 fw-bold">Nuestras Especialidades</h2>
+                <div class="row g-4">
+                    <div class="col-md-4" data-aos="fade-up">
+                        <div class="card h-100 shadow-sm bg-gradient-primary-to-success">
+                            <img src="/assets/img/hamburguesa.png" class="card-img-top" alt="Hamburguesa Clásica">
+                            <div class="card-body">
+                                <h5 class="card-title">Hamburguesa Clásica</h5>
+                                <p class="card-text">Nuestra hamburguesa estrella con carne 100% de res, queso cheddar,
+                                    lechuga y tomate.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+                        <div class="card h-100 shadow-sm bg-gradient-primary-to-success">
+                            <img src="/assets/img/hamburguesa.png" class="card-img-top" alt="Hamburguesa Caribeña">
+                            <div class="card-body">
+                                <h5 class="card-title">Hamburguesa Caribeña</h5>
+                                <p class="card-text">Sabores tropicales con piña asada, salsa de mango y pollo a la
+                                    parrilla.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4" data-aos="fade-up" data-aos-delay="400">
+                        <div class="card h-100 shadow-sm bg-gradient-primary-to-success">
+                            <img src="/assets/img/hamburguesa.png" class="card-img-top" alt="Hamburguesa Vegana">
+                            <div class="card-body">
+                                <h5 class="card-title">Hamburguesa Vegana</h5>
+                                <p class="card-text">Deliciosa opción vegana con patty de frijoles negros y aguacate
+                                    fresco.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección de Novedades (mantenida como estaba) -->
+        <section id="novedades" class="bg-gradient-primary-to-success py-5">
+            <div class="container">
+                <h2 class="fw-bold text-center text-black mb-4">🪧 Novedades</h2>
+                <div class="swiper novedades-swiper">
+                    <div class="swiper-wrapper pb-5 pt-3" id="novedadesContainer" data-aos="fade-right">
+                        <!-- Las novedades se cargarán aquí dinámicamente -->
+                    </div>
+                    <div class="swiper-pagination"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Content Cards -->
+        <section id="servicios" class="py-5 bg-gradient-primary-to-success-opaco">
+            <h1 class="fw-bold text-center text-black ">🚹 Servicios</h1>
+            <div class="container my-5" id="contenido">
+                <div class="row g-4">
+                    <!-- Card 1 -->
+                    <div class="col-12 col-md-6">
+                        <div class="card h-100 shadow card-hover " data-aos="fade-up-right">
+                            <div class="row g-0 h-100">
+                                <div class="col-4 bg-dark d-flex align-items-center">
+                                    <img src="./assets/img/registrate.png"
+                                        class="img-fluid rounded-start w-100 object-fit-cover h-100" alt="Mesas">
+                                </div>
+                                <div class="col-8">
+                                    <div class="card-body d-flex flex-column h-100 bg-gradient-primary-to-success">
+                                        <h2 class="card-title">¡Registrate!</h2>
+                                        <p class="card-text flex-grow-1">¿Eres un amante de la buena comida? Únete a
+                                            nuestra familia y descubre un mundo de sabores exclusivos, eventos
+                                            especiales y beneficios para miembros. ¡Regístrate y forma parte de esta
+                                            experiencia gastronómica única!</p>
+                                        <div class="mt-auto">
+                                            <button id="registerButton"
+                                                class="btn btn bg-white fw-bold">Registrarse</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 2 -->
+                    <div class="col-12 col-md-6">
+                        <div class="card h-100 shadow card-hover" data-aos="fade-up-left">
+                            <div class="row g-0 h-100">
+                                <div class="col-4 bg-dark d-flex align-items-center">
+                                    <img src="./assets/img/vacante.png"
+                                        class="img-fluid rounded-start w-100 object-fit-cover h-100" alt="Menú">
+                                </div>
+                                <div class="col-8">
+                                    <div class="card-body d-flex flex-column h-100">
+                                        <h2 class="card-title">Trabaja con Nosotros</h2>
+                                        <p class="card-text flex-grow-1">¿Apasionado por la cocina y el servicio? Únete
+                                            a nuestro equipo y ayuda a crear momentos inolvidables para nuestros
+                                            clientes. Aquí no solo cocinamos, ¡creamos experiencias! Ven y crece junto a
+                                            nosotros.</p>
+                                        <div class="mt-auto">
+                                            <a class="btn btn-primary" href="#menu">Consultar Vacantes</a>
+                                            <p class="card-text mt-2"><small class="text-muted">Actualizado hace 3
+                                                    minutos</small></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 3 -->
+                    <div class="col-12 col-md-6">
+                        <div class="card h-100 shadow card-hover" data-aos="fade-up-right">
+                            <div class="row g-0 h-100">
+                                <div class="col-4 bg-dark d-flex align-items-center">
+                                    <img src="./assets/img/call-center.png"
+                                        class="img-fluid rounded-start w-100 object-fit-cover h-100"
+                                        alt="Servicio al Cliente">
+                                </div>
+                                <div class="col-8">
+                                    <div class="card-body d-flex flex-column h-100">
+                                        <h2 class="card-title">Servicio al Cliente</h2>
+                                        <p class="card-text flex-grow-1">Nuestro equipo de atención al cliente está
+                                            disponible para ayudarte con cualquier consulta o sugerencia. No dudes en
+                                            comunicarte con nosotros a través de nuestros canales de contacto, y te
+                                            atenderemos lo antes posible.</p>
+                                        <div class="mt-auto">
+                                            <a class="btn btn-primary" href="#contacto">Escríbenos</a>
+                                            <p class="card-text mt-2"><small class="text-muted">Actualizado hace 3
+                                                    minutos</small></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 4 -->
+                    <div class="col-12 col-md-6">
+                        <div class="card h-100 shadow card-hover" data-aos="fade-up-left">
+                            <div class="row g-0 h-100">
+                                <div class="col-4 bg-dark d-flex align-items-center">
+                                    <img src="./assets/img/chef.png"
+                                        class="img-fluid rounded-start w-100 object-fit-cover h-100" alt="Chef">
+                                </div>
+                                <div class="col-8">
+                                    <div class="card-body d-flex flex-column h-100 bg-gradient-primary-to-success">
+                                        <h2 class="card-title">Conócenos</h2>
+                                        <p class="card-text flex-grow-1">Nos apasiona crear experiencias inolvidables a
+                                            través de la gastronomía. Cada platillo es preparado con ingredientes
+                                            frescos y de alta calidad, cuidando cada detalle para que disfrutes de una
+                                            comida deliciosa en un ambiente acogedor.</p>
+                                        <div class="mt-auto">
+                                            <a class="btn bg-white" href="#nosotros">¡Vamos!</a>
+                                            <p class="card-text mt-2"><small class="text-white-50">Actualizado hace 3
+                                                    minutos</small></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 5 -->
+                    <div class="col-12 col-md-6">
+                        <div class="card h-100 shadow card-hover" data-aos="fade-up-right">
+                            <div class="row g-0 h-100">
+                                <div class="col-4 bg-dark d-flex align-items-center">
+                                    <img src="./assets/img/mesas.png"
+                                        class="img-fluid rounded-start w-100 object-fit-cover h-100" alt="Mesas">
+                                </div>
+                                <div class="col-8">
+                                    <div class="card-body d-flex flex-column h-100 bg-gradient-primary-to-success">
+                                        <h2 class="card-title">¡Encuentra tu Punto más Cercano!</h2>
+                                        <p class="card-text flex-grow-1">Nunca estarás lejos de una experiencia
+                                            culinaria excepcional. Contamos con numerosas sedes en todo el país para que
+                                            puedas disfrutar de nuestros sabores auténticos en la ubicación más
+                                            conveniente para ti.</p>
+                                        <div class="mt-auto">
+                                            <a class="btn bg-white" href="#ubicaciones">Consultar</a>
+                                            <p class="card-text mt-2"><small class="text-white-50">Actualizado hace 3
+                                                    minutos</small></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 6 -->
+                    <div class="col-12 col-md-6">
+                        <div class="card h-100 shadow card-hover" data-aos="fade-up-left">
+                            <div class="row g-0 h-100">
+                                <div class="col-4 bg-dark d-flex align-items-center">
+                                    <img src="./assets/img/menu.jpeg"
+                                        class="img-fluid rounded-start w-100 object-fit-cover h-100" alt="Menú">
+                                </div>
+                                <div class="col-8">
+                                    <div class="card-body d-flex flex-column h-100">
+                                        <h2 class="card-title">Nuestros Productos</h2>
+                                        <p class="card-text flex-grow-1">Sumérgete en los auténticos sabores del Caribe
+                                            colombiano, donde cada plato es una celebración de tradición, frescura y
+                                            pasión por la buena comida. ¡Ven y disfruta la experiencia caribeña en cada
+                                            bocado!</p>
+                                        <div class="mt-auto">
+                                            <a class="btn btn-primary" href="#menu">Ver Menú</a>
+                                            <p class="card-text mt-2"><small class="text-muted">Actualizado hace 3
+                                                    minutos</small></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección de Reseñas (mantenida como estaba) -->
+        <section id="reseñas" class="py-5 bg-gradient-primary-to-success">
+            <div class="container">
+                <h2 class="fw-bold text-center text-black mb-5">☁️ Reseñas</h2>
+                <div class="swiper reviews-swiper">
+                    <div class="swiper-wrapper pb-5 pt-3" id="reviewsContainer">
+                        <!-- Las reseñas se cargarán aquí dinámicamente -->
+                    </div>
+
+                    <a class="nav-link fw-bold text-white" id="addReviewButton">Menú</a>
+                    
+                    <div class="swiper-pagination"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección de Contacto Mejorada -->
+        <section id="contacto" class="py-5 bg-gradient-primary-to-success-opaco">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8" data-aos="fade-up">
+                        <h2 class="text-center mb-5 fw-bold">📧 Contáctanos</h2>
+                        <form id="contactForm">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="nombre" class="form-label">Nombre</label>
+                                    <input type="text" class="form-control" id="nombre" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="email" class="form-label">Correo electrónico</label>
+                                    <input type="email" class="form-control" id="email" required>
+                                </div>
+                                <div class="col-12">
+                                    <label for="asunto" class="form-label">Asunto</label>
+                                    <input type="text" class="form-control" id="asunto" required>
+                                </div>
+                                <div class="col-12">
+                                    <label for="mensaje" class="form-label">Mensaje</label>
+                                    <textarea class="form-control" id="mensaje" rows="4" required></textarea>
+                                </div>
+                                <div class="col-12">
+                                    <button type="submit" class="btn btn-primary w-100">Enviar mensaje</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4 mt-auto">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-4 mb-lg-0">
+                    <h5>BurguerBoom</h5>
+                    <p>Descubre la auténtica gastronomía caribeña en cada bocado.</p>
+                    <div class="social-icons">
+                        <a href="#" class="text-white me-3"><i class="bi bi-facebook"></i></a>
+                        <a href="#" class="text-white me-3"><i class="bi bi-instagram"></i></a>
+                        <a href="#" class="text-white me-3"><i class="bi bi-twitter"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-4 mb-4 mb-lg-0">
+                    <h5>Enlaces Rápidos</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#home" class="text-white">Inicio</a></li>
+                        <li><a href="#menu" class="text-white">Menú</a></li>
+                        <li><a href="#servicios" class="text-white">Servicios</a></li>
+                        <li><a href="#contacto" class="text-white">Contacto</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4">
+                    <h5>Contacto</h5>
+                    <address>
+                        <p><i class="bi bi-geo-alt-fill me-2"></i>123 Calle Principal, Ciudad, País</p>
+                        <p><i class="bi bi-telephone-fill me-2"></i>(123) 456-7890</p>
+                        <p><i class="bi bi-envelope-fill me-2"></i>info@burguerboom.com</p>
+                    </address>
+                </div>
+            </div>
+            <hr class="my-4">
+            <div class="row align-items-center">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="mb-0">&copy; 2024 BurguerBoom. Todos los derechos reservados.</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <a href="#" class="text-white-50 me-2">Política de privacidad</a>
+                    <a href="#" class="text-white-50">Términos y condiciones</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="./assets/js/config/config.js"></script>
+
+    <!-- Swiper core JS -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@10.2.0/swiper-bundle.min.js"></script>
+
+    <!-- Bootstrap core JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+
+
+    <script src="./assets/js/config/jwt-decode.js"></script>
+    <script src="./assets/js/config/validate-auth.js"></script>
+    <script src="./assets/js/config/protect-routes.js"></script>
+    <script src="./assets/js/auth.js"></script>
+    <script src="./assets/js/config/logout.js"></script>
+
+    <script src="./assets/js/inicio/index.js"></script>
+
+
+    <!-- core sweetalert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.14.5/dist/sweetalert2.all.min.js"
+        integrity="sha256-1m4qVbsdcSU19tulVTbeQReg0BjZiW6yGffnlr/NJu4=" crossorigin="anonymous"></script>
+    <!--  core AOS -->
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    <script>
+        AOS.init();
+    </script>
+
+
+</body>
+
+</html>

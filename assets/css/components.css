@@ -1,0 +1,471 @@
+/* Mantener el diseño del wrapper y main */
+.wrapper {
+    display: flex;
+    transition: all 0.35s ease-in-out;
+}
+
+.main {
+    min-height: 100vh;
+    width: calc(100% - 90px);
+    /* Ajustar cuando el sidebar está visible */
+    overflow: hidden;
+    transition: all 0.35s ease-in-out;
+}
+
+/* Sidebar */
+.sidebar {
+    z-index: 1000;
+    transition: max-width 0.4s ease-in-out, opacity 0.4s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    color: #fff;
+    max-width: 90px;
+    /* Control de tamaño en lugar de display */
+    opacity: 1;
+    /* El sidebar es visible */
+    overflow: hidden;
+}
+
+/* Sidebar oculto */
+.sidebar.hidden {
+    max-width: 0;
+    /* Ancho del sidebar reducido a 0 */
+    opacity: 0;
+    /* El sidebar se vuelve invisible */
+    pointer-events: none;
+    /* Para evitar interacciones cuando está oculto */
+}
+
+/* Ajustes adicionales */
+.sidebar-logo {
+    text-align: center;
+    padding: 1.5rem;
+}
+
+.sidebar-nav {
+    padding: 0;
+    flex: 1 1 auto;
+}
+
+a.sidebar-link {
+    padding: 1rem;
+    color: #FFF;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 0.65rem;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: all 0.1s ease-in-out;
+    border-left: 3px solid transparent;
+}
+
+/* Íconos */
+.sidebar-link i {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Hover Effect */
+a.sidebar-link:hover {
+    background-color: rgba(255, 255, 255, .075);
+    border-left: 3px solid #41D78C;
+}
+
+/* Hover Effect */
+a.sidebar-link>i:hover {
+    color: #41D78C;
+}
+
+/* Estilo activo */
+a.sidebar-link.active {
+    background-color: rgba(255, 255, 255, .075);
+    border-left: 3px solid #41D78C;
+}
+
+a.sidebar-link.active>i {
+    color: #41D78C;
+}
+
+/* Separador de la sección de usuarios */
+.sidebar-item+.sidebar-item {
+    margin-top: 0.5rem;
+}
+
+/* Ajuste del botón toggle */
+.toggle-btn {
+    color: #1a1a3d;
+    border: none;
+    padding: 0.2rem 0.5rem;
+    cursor: pointer;
+}
+
+.toggle-btn i {
+    font-size: 1.2rem;
+}
+
+
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 20px;
+}
+
+.toggle-switch input {
+    display: none;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #F54E41;
+    transition: 0.4s;
+    border-radius: 10px;
+}
+
+.slider::before {
+    position: absolute;
+    content: '';
+    height: 15px;
+    width: 15px;
+    left: 2px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.4s;
+
+    border-radius: 50%;
+}
+
+input:checked+.slider {
+    background-color: #41D78C;
+}
+
+input:checked+.slider::before {
+    transform: translateX(20px);
+}
+
+.icon-shape {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 3rem;
+    width: 3rem;
+    font-size: 1.25rem;
+}
+
+.tabulator-cell {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Amarillo Claro */
+.fondo-amarillo {
+    background-color: #F2C12E;
+}
+
+.btn.fondo-amarillo:hover {
+    background-color: #A7D65B; /* Verde Claro */
+    border-color: #A7D65B;
+}
+
+/* Verde Claro */
+.fondo-verde {
+    background-color: #A7D65B;
+}
+
+.btn.fondo-verde:hover {
+    background-color: #A7D65B; /* Verde Claro (sin cambio de color, ya está en verde claro) */
+    border-color: #A7D65B;
+}
+
+/* Rojo Brillante */
+.fondo-rojo {
+    background-color: #FF5460;
+}
+
+.btn.fondo-rojo:hover {
+    background-color: #A7D65B; /* Verde Claro */
+    border-color: #A7D65B;
+}
+
+/* Verde Agua */
+.fondo-verde-agua {
+    background-color: #72F2EB;
+}
+
+.btn.fondo-verde-agua:hover {
+    background-color: #A7D65B; /* Verde Claro */
+    border-color: #A7D65B;
+}
+
+/* Naranja */
+.fondo-naranja {
+    background-color: #FF8B00;
+}
+
+.btn.fondo-naranja:hover {
+    background-color: #A7D65B; /* Verde Claro */
+    border-color: #A7D65B;
+}
+
+/* Azul */
+.fondo-azul {
+    background-color: #7EC8E3; /* Azul cielo ajustado */
+    border-color: #7EC8E3; /* Asegura que el borde sea del mismo color */
+}
+
+.btn.fondo-azul:hover {
+    background-color: #A7D65B; /* Verde Claro */
+    border-color: #A7D65B;
+}
+
+/* Colores de texto */
+.text-amarillo {
+    color: #F2C12E;
+}
+
+/* Iconos de estado */
+.text-verde {
+    color: #28a745; /* Verde */
+}
+
+.text-rojo {
+    color: #dc3545; /* Rojo */
+}
+
+.text-naranja {
+    color: #fd7e14; /* Naranja */
+}
+
+.card-clickeable{
+        cursor: pointer; /* Cambia el cursor para indicar que es clickeable */
+        transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card-clickeable:hover {
+    transform: scale(1.05); /* Añade un efecto de zoom al pasar el mouse */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Añade sombra al hacer hover */
+  }
+
+  /* Estilo para el panel de FilePond */
+.filepond--panel-root {
+    background-color: #e3f2fd; /* Azul cielo claro */
+}
+
+/* Centrar el icono y darle color */
+.filepond--drop-label {
+    color: #1976d2 !important; /* Azul más oscuro para el ícono */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+/* Ajustar el espacio del panel */
+.filepond--panel {
+    min-height: 150px;
+}
+
+/* Efecto hover suave */
+.filepond--drip-blob {
+    background-color: #90caf9 !important; /* Azul medio para el efecto de hover */
+}
+
+/* Ajustes para el modal */
+.modal-xl {
+    max-width: 90%;
+}
+
+.modal-lg-calendar {
+    max-width: 80%;
+    width: 80%;
+    height: 80%;
+}
+
+.calendar-container {
+    height: 500px;
+    margin: 20px 0;
+    padding: 10px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+}
+
+/* Estilos específicos para FullCalendar */
+.fc {
+    height: 100% !important;
+    width: 100% !important;
+}
+
+.fc .fc-daygrid-body {
+    width: 100% !important;
+}
+
+.fc .fc-daygrid-body table {
+    width: 100% !important;
+}
+
+.fc .fc-scrollgrid {
+    border: none !important;
+}
+
+.fc .fc-scrollgrid-section table {
+    width: 100% !important;
+}
+
+.fc .fc-daygrid-day {
+    border: 1px solid #ddd !important;
+    min-height: 60px !important;
+    background-color: #fff;
+}
+
+.fc .fc-daygrid-day:hover {
+    background-color: #f8f9fa;
+}
+
+.fc .fc-daygrid-day.fc-day-today {
+    background-color: #e8f4ff !important;
+}
+
+.fc .fc-col-header-cell {
+    background-color: #f8f9fa;
+    padding: 8px !important;
+    font-weight: bold;
+}
+
+.fc-view {
+    height: auto !important;
+}
+
+.fc-scroller {
+    height: auto !important;
+    overflow: visible !important;
+}
+
+.fc table {
+    width: 100% !important;
+}
+
+.fc td, .fc th {
+    min-width: 40px; /* Ancho mínimo para las celdas */
+}
+
+/* Ajustes para el día seleccionado */
+.fc-highlight {
+    background: rgba(0, 255, 0, 0.1) !important;
+}
+
+#branchCalendar, #dayScheduleCalendar {
+    height: 500px;
+    overflow-y: auto;
+    margin: 0 auto;
+}
+
+/* Estilos para los modales */
+.modal-content {
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+    background-color: var(--bs-primary);
+    color: var(--bs-white);
+    border-bottom: none;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.modal-title {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: bold;
+}
+
+.modal-body {
+    padding: 2rem;
+}
+
+.modal-footer {
+    border-top: none;
+    padding: 1rem 2rem;
+}
+
+.btn-primary {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+}
+
+.btn-primary:hover {
+    background-color: var(--bs-primary-dark);
+    border-color: var(--bs-primary-dark);
+}
+
+.btn-close {
+    color: var(--bs-white);
+    opacity: 1;
+}
+
+.btn-close:hover {
+    color: var(--bs-light);
+}
+
+.form-control {
+    border-radius: 5px;
+    border: 1px solid var(--bs-gray-300);
+}
+
+.form-control:focus {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.25);
+}
+
+.code-input {
+    width: 3rem;
+    height: 3rem;
+    font-size: 1.5rem;
+    text-align: center;
+    margin: 0 0.25rem;
+    border-radius: 5px;
+    border: 1px solid var(--bs-gray-300);
+}
+
+.code-input:focus {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.25);
+}
+
+/* Estilos para el modal de registro */
+#registerModal .modal-body {
+    display: flex;
+    flex-direction: row;
+    padding: 0;
+}
+
+#registerModal .modal-body .col-md-6 {
+    padding: 2rem;
+}
+
+#registerModal .modal-body .bg-light {
+    background-color: var(--bs-light);
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+
+#registerModal .modal-body .form-control {
+    margin-bottom: 1rem;
+}
+
+#registerModal .modal-body .btn-primary {
+    background-color: var(--bs-secondary);
+    border-color: var(--bs-secondary);
+}
+
+#registerModal .modal-body .btn-primary:hover {
+    background-color: var(--bs-secondary-dark);
+    border-color: var(--bs-secondary-dark);
+}

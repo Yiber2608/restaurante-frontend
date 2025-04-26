@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="Restaurante con auténtica gastronomía caribeña" />
+    <meta name="author" content="TechSysDesign" />
+    <title>Admin Sedes</title>
+    <!-- core  bootstrap-->
+    <link href="./assets/css/Bootstrap.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link href="https://unpkg.com/tabulator-tables@5.5.0/dist/css/tabulator_bootstrap5.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.14.5/sweetalert2.css"
+        integrity="sha512-6qScZESleBziOBqJwOPurSy6lhLqHGjHNALOOFX0mzRVPiE5SZQvepRzeSO1OB475fcZywuMjxtkrFaO93aq9g=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/virtual-select-plugin@1.0.46/dist/virtual-select.min.css">
+    <link href="https://unpkg.com/filepond/dist/filepond.css" rel="stylesheet">
+    <link href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css" rel="stylesheet">
+    <link rel="stylesheet" href="./assets/css/components.css">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+</head>
+
+<body class="d-flex flex-column h-100">
+    <div class="wrapper">
+        <!-- Sidebar -->
+        <div class="sidebar bg-primary ">
+            <div class="text-center p-2">
+                <!-- Logo -->
+                <i class='bx bxs-cube-alt bx-lg text-whithe'></i>
+            </div>
+            <ul class="sidebar-nav mt-1">
+
+                <li class="sidebar-item">
+                    <a href="admin-dashboard.html" class="sidebar-link ">
+                        <i class='bx bxs-dashboard'></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-item">
+                    <a href="admin-usuarios.html" class="sidebar-link">
+                        <i class='bx bxs-user'></i>
+                        <span>Usuarios</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-item">
+                    <a href="admin-menu.html" class="sidebar-link ">
+                        <i class='bx bxs-food-menu'></i>
+                        <span>Menu</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-item">
+                    <a href="admin-resenas.html" class="sidebar-link">
+                        <i class='bx bx bx-receipt'></i>
+                        <span>Reseñas</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-item">
+                    <a href="admin-reservas.html" class="sidebar-link">
+                        <i class='bx bxs-message-dots'></i>
+                        <span>Reservas</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-item">
+                    <a href="admin-novedades.html" class="sidebar-link">
+                        <i class='bx bxs-edit-alt'></i>
+                        <span>Novedades</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-item">
+                    <a href="admin-sedes.html" class="sidebar-link active">
+                        <i class='bx bxs-building-house'></i>
+                        <span>Sedes</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-item">
+                    <a href="admin-configuracion.html" class="sidebar-link">
+                        <i class='bx bx-cog'></i>
+                        <span>Configuración</span>
+                    </a>
+                </li>
+
+            </ul>
+        </div>
+
+        <!-- Main content -->
+        <div class="main">
+            <!-- Navbar -->
+            <nav class="navbar navbar-expand-lg navbar-light bg-whithe shadow p-0 ">
+                <div class="container-fluid">
+                    <!-- Sidebar Toggle Button -->
+                    <div class="toggle-btn" type="button">
+                        <i class='bx bx-menu fs-1'></i>
+                    </div>
+                    <div class="collapse navbar-collapse justify-content-end">
+                        <!-- Dropdown de Administrador -->
+                        <div class="dropdown">
+                            <a class="btn dropdown-toggle d-flex align-items-center" href="#" role="button"
+                                id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+                                <span class="me-2">Administrador</span>
+                                <i class='bx bxs-user-circle fs-1'></i></a>
+
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink">
+                                <li><a class="dropdown-item" id="logoutButton" href="#">Cerrar Sesión</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="container-fluid p-4">
+                <!-- tab cabecera  -->
+                <div class="row">
+                    <div
+                        class="col-12 bg-primary shadow py-2 px-4 rounded-5 d-flex justify-content-end align-content-center text-white fw-bold">
+                        <h1>Gestión de Sedes</h1>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- tab botones  -->
+                    <div class="col-9">
+                        <button class="btn btn-outline-dark my-3" id="addBranchButton" data-bs-toggle="modal"
+                            data-bs-target="#addBranch">Crear Nueva Sede</button>
+                    </div>
+
+                    <div class="col-3">
+                        <div class="d-flex justify-content-center align-items-center h-100">
+                            <div class="input-group">
+                                <input type="text" id="searchInput" class="form-control rounded"
+                                    placeholder="Escribe para buscar... " aria-label="Buscar " />
+                                <span class="input-group-text">
+                                    <i class="bi bi-search"></i>
+                                </span>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- tab filtros -->
+                    <div class="col-12">
+                        <div class="row row-cols-1 row-cols-md-5 g-3 mb-4">
+
+                            <!-- tab Todos -->
+                            <div class="col">
+                                <div class="card card-clickeable h-100 border-0 shadow" id="cardTodos">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="card-subtitle mb-1 text-muted">Todos</h6>
+                                                <h2 id="totalItems" class="card-title mb-0">34</h2>
+                                            </div>
+                                            <div class="icon-shape fondo-naranja text-white rounded-circle shadow">
+                                                <i class="bi bi-box"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- tab Capacidad Alta -->
+                            <div class="col">
+                                <div class="card card-clickeable h-100 border-0 shadow" id="cardCapacidadAlta">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="card-subtitle mb-1 text-muted">Capacidad Alta</h6>
+                                                <h2 id="totalCapacidadAlta" class="card-title mb-0">0</h2>
+                                            </div>
+                                            <div class="icon-shape fondo-verde text-white rounded-circle shadow">
+                                                <i class="bi bi-people"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- tab Capacidad Media -->
+                            <div class="col">
+                                <div class="card card-clickeable h-100 border-0 shadow" id="cardCapacidadMedia">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="card-subtitle mb-1 text-muted">Capacidad Media</h6>
+                                                <h2 id="totalCapacidadMedia" class="card-title mb-0">0</h2>
+                                            </div>
+                                            <div class="icon-shape fondo-amarillo text-white rounded-circle shadow">
+                                                <i class="bi bi-people"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- tab Capacidad Baja -->
+                            <div class="col">
+                                <div class="card card-clickeable h-100 border-0 shadow" id="cardCapacidadBaja">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="card-subtitle mb-1 text-muted">Capacidad Baja</h6>
+                                                <h2 id="totalCapacidadBaja" class="card-title mb-0">0</h2>
+                                            </div>
+                                            <div class="icon-shape fondo-rojo text-white rounded-circle shadow">
+                                                <i class="bi bi-people"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- tab Recientes -->
+                            <div class="col">
+                                <div class="card card-clickeable h-100 border-0 shadow" id="cardRecientes">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="card-subtitle mb-1 text-muted">Recientes</h6>
+                                                <h2 id="totalRecientes" class="card-title mb-0">0</h2>
+                                            </div>
+                                            <div class="icon-shape fondo-verde-agua text-white rounded-circle shadow">
+                                                <i class="bi bi-clock"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- tab tabla de sedes -->
+                        <div class="col-12">
+                            <div id="table-container"></div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- tab agregar sede -->
+    <div class="modal fade" id="addBranch" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg-calendar modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel">Crear Nueva Sede</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addBranchForm" class="needs-validation" novalidate>
+                        <div class="row">
+
+                            <div class="col-7">
+                                <div class="row">
+                                    <div class="row">
+                                        <div class="col-5">
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <input type="file" class="filepond" name="filepond" accept="image/*" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-7">
+                                            <div class="row g-3">
+                                                <div class="col-md-12">
+                                                    <label for="addName" class="form-label">Nombre de la Sede <span
+                                                            class="text-danger">*</span></label>
+                                                    <input type="text" class="form-control" id="addName"
+                                                        placeholder="Ingresa el nombre de la sede" required minlength="3">
+                                                    <div class="invalid-feedback">Por favor, ingresa un nombre válido (mínimo 3
+                                                        caracteres).</div>
+                                                </div>
+                                                <div class="col-md-12">
+                                                    <label for="addAddress" class="form-label">Dirección <span class="text-danger">*</span></label>
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control" id="addAddress"
+                                                            placeholder="Ingresa la dirección de la sede" required minlength="5">
+                                                        <button class="btn btn-outline-secondary" type="button" id="addSearchButton">
+                                                            <i class="bi bi-search"></i>
+                                                        </button>
+                                                    </div>
+                                                    <div class="invalid-feedback">Por favor, ingresa una dirección válida (mínimo 5 caracteres).</div>
+                                                </div>
+                                                <div class="col-md-12">
+                                                    <label for="addCapacity" class="form-label">Capacidad <span
+                                                            class="text-danger">*</span></label>
+                                                    <input type="number" class="form-control" id="addCapacity"
+                                                        placeholder="Ingresa la capacidad de la sede" required min="1">
+                                                    <div class="invalid-feedback">Por favor, ingresa una capacidad válida (mínimo 1).
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="addPhone" class="form-label">Teléfono <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="addPhone" placeholder="Ingresa el teléfono" required>
+                                        <div class="invalid-feedback">Por favor, ingresa un teléfono válido.</div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="addEmail" class="form-label">Correo Electrónico <span class="text-danger">*</span></label>
+                                        <input type="email" class="form-control" id="addEmail" placeholder="Ingresa el correo electrónico" rows="3" required>
+                                        <div class="invalid-feedback">Por favor, ingresa un correo válido.</div>
+                                    </div>
+                                    
+                                    <div class="col-md-12">
+                                        <label for="addDescription" class="form-label">Descripción <span
+                                                class="text-danger">*</span></label>
+                                        <textarea class="form-control" id="addDescription" rows="3"
+                                            placeholder="Ingresa la descripción de la sede" required minlength="10"></textarea>
+                                        <div class="invalid-feedback">La descripción debe tener al menos 10 caracteres.</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-5">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label for="addOpeningTime" class="form-label">Hora de Apertura <span class="text-danger">*</span></label>
+                                        <input type="time" class="form-control" id="addOpeningTime" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="addClosingTime" class="form-label">Hora de Cierre <span class="text-danger">*</span></label>
+                                        <input type="time" class="form-control" id="addClosingTime" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="addLatitude" class="form-label">Latitud <span class="text-danger">*</span></label>
+                                        <input type="number" class="form-control" id="addLatitude" placeholder="Ingresa la latitud"
+                                            required step="0.000001">
+                                        <div class="invalid-feedback">Por favor, ingresa una latitud válida.</div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="addLongitude" class="form-label">Longitud <span
+                                                class="text-danger">*</span></label>
+                                        <input type="number" class="form-control" id="addLongitude"
+                                            placeholder="Ingresa la longitud" required step="0.000001">
+                                        <div class="invalid-feedback">Por favor, ingresa una longitud válida.</div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <label for="addMap" class="form-label">Mapa</label>
+                                        <div id="addMap" style="height: 300px;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Botones -->
+                        <div class="d-flex justify-content-end mt-3">
+                            <button type="button" class="btn btn-dark me-3" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" id="saveBranch" class="btn btn-primary">Guardar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- tab actualizar sede -->
+    <div class="modal fade" id="updateBranch" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg-calendar modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="updateModalLabel">Actualizar Sede</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="updateBranchForm" class="needs-validation" novalidate>
+                        <div class="row">
+
+                            <div class="col-7">
+                                <div class="row">
+                                    <div class="col-4">
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <input type="file" class="filepond" name="updateFilepond" accept="image/*" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-8">
+                                        <div class="row g-3">
+                                            <div class="col-md-12">
+                                                <label for="updateName" class="form-label">Nombre de la Sede <span
+                                                        class="text-danger">*</span></label>
+                                                <input type="text" class="form-control" id="updateName"
+                                                    placeholder="Ingresa el nombre de la sede" required minlength="3">
+                                                <div class="invalid-feedback">Por favor, ingresa un nombre válido (mínimo 3
+                                                    caracteres).</div>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <label for="updateAddress" class="form-label">Dirección <span class="text-danger">*</span></label>
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control" id="updateAddress"
+                                                        placeholder="Ingresa la dirección de la sede" required minlength="5">
+                                                    <button class="btn btn-outline-secondary" type="button" id="updateSearchButton">
+                                                        <i class="bi bi-search"></i>
+                                                    </button>
+                                                </div>
+                                                <div class="invalid-feedback">Por favor, ingresa una dirección válida (mínimo 5 caracteres).</div>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <label for="updateCapacity" class="form-label">Capacidad <span
+                                                        class="text-danger">*</span></label>
+                                                <input type="number" class="form-control" id="updateCapacity"
+                                                    placeholder="Ingresa la capacidad de la sede" required min="1">
+                                                <div class="invalid-feedback">Por favor, ingresa una capacidad válida (mínimo 1).
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <label for="updatePhone" class="form-label">Teléfono <span class="text-danger">*</span></label>
+                                                <input type="text" class="form-control" id="updatePhone" placeholder="Ingresa el teléfono" required>
+                                                <div class="invalid-feedback">Por favor, ingresa un teléfono válido.</div>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <label for="updateEmail" class="form-label">Correo Electrónico <span class="text-danger">*</span></label>
+                                                <input type="email" class="form-control" id="updateEmail" placeholder="Ingresa el correo electrónico" required>
+                                                <div class="invalid-feedback">Por favor, ingresa un correo válido.</div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="updateOpeningTime" class="form-label">Hora de Apertura <span class="text-danger">*</span></label>
+                                                <input type="time" class="form-control" id="updateOpeningTime" required>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="updateClosingTime" class="form-label">Hora de Cierre <span class="text-danger">*</span></label>
+                                                <input type="time" class="form-control" id="updateClosingTime" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <label for="updateDescription" class="form-label">Descripción <span
+                                                class="text-danger">*</span></label>
+                                        <textarea class="form-control" id="updateDescription" rows="3"
+                                            placeholder="Ingresa la descripción de la sede" required minlength="10"></textarea>
+                                        <div class="invalid-feedback">La descripción debe tener al menos 10 caracteres.</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-5">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label for="updateLatitude" class="form-label">Latitud <span class="text-danger">*</span></label>
+                                        <input type="number" class="form-control" id="updateLatitude" placeholder="Ingresa la latitud"
+                                            required step="0.000001">
+                                        <div class="invalid-feedback">Por favor, ingresa una latitud válida.</div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="updateLongitude" class="form-label">Longitud <span
+                                                class="text-danger">*</span></label>
+                                        <input type="number" class="form-control" id="updateLongitude"
+                                            placeholder="Ingresa la longitud" required step="0.000001">
+                                        <div class="invalid-feedback">Por favor, ingresa una longitud válida.</div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <label for="updateMap" class="form-label">Mapa</label>
+                                        <div id="updateMap" style="height: 300px;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Botones -->
+                        <div class="d-flex justify-content-end mt-3">
+                            <button type="button" class="btn btn-dark me-3" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" id="updateSaveBranch" class="btn btn-primary">Guardar Cambios</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- modal imagen -->
+    <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-md border border-0 modal-dialog-centered">
+            <div class="modal-content">
+                <div class="ratio ratio-16x9">
+                    <img id="modalImage" src="" alt="Imagen de la Sede" class="img-fluid" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de horarios -->
+<div class="modal fade" id="scheduleModal" tabindex="-1" aria-labelledby="scheduleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="scheduleModalLabel">Gestionar Horarios</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row" id="scheduleTimeline">
+                    <!-- Aquí se generarán dinámicamente las tarjetas de los días -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" id="saveScheduleButton">Guardar Cambios</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- Core theme JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://unpkg.com/tabulator-tables/dist/js/tabulator.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.14.5/sweetalert2.all.js"
+        integrity="sha512-AbjPD2rIZFzBugvnJKl8IZmGWWmjmZrYysHZaryYg0+XkoqDpmuKKRxDfVPCaHzf1SB3cwSKkgeEd7xLOmBusQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/virtual-select-plugin@1.0.46/dist/virtual-select.min.js"></script>
+    <script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.js"></script>
+    <script src="https://unpkg.com/filepond/dist/filepond.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/luxon@2.3.0/build/global/luxon.min.js"></script>
+    <!-- Leaflet JS -->
+    <script src="./assets/js/config/config.js"></script>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="./assets/js/admin/sedes/admin-sedes.js"></script>
+    <script src="./assets/js/admin/sedes/admin-sedes-add.js"></script>
+    <script src="./assets/js/admin/sedes/admin-sedes-put.js"></script>
+    <script src="./assets/js/admin/sedes/admin-sedes-delete.js"></script>
+    <script src="./assets/js/config/jwt-decode.js"></script>
+    <script src="./assets/js/config/validate-auth.js"></script>
+    <script src="./assets/js/config/protect-routes.js"></script>
+    <script src="./assets/js/auth.js"></script>
+    <script src="./assets/js/config/logout.js"></script>
+</body>
+
+</html>
