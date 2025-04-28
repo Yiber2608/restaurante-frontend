@@ -314,9 +314,25 @@ document.querySelectorAll('.card-clickeable').forEach(card => {
     });
 });
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener('DOMContentLoaded', function() {
     loadBranches();
     console.log("Tabla creada al cargar la página");
+
+    // Manejador para limpiar correctamente el backdrop cuando se cierra el modal de mesas
+    const tablesModal = document.getElementById('tablesModal');
+    if (tablesModal) {
+        tablesModal.addEventListener('hidden.bs.modal', function() {
+            // Eliminar cualquier backdrop que pueda haber quedado
+            const backdrops = document.getElementsByClassName('modal-backdrop');
+            while (backdrops[0]) {
+                backdrops[0].parentNode.removeChild(backdrops[0]);
+            }
+            // Asegurarse de que el body no tenga la clase 'modal-open'
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = '';
+            document.body.style.paddingRight = '';
+        });
+    }
 });
 
 async function openScheduleModal(branchId) {
@@ -347,30 +363,46 @@ function populateScheduleModal(branchId, businessHours) {
     scheduleTimeline.innerHTML = '';
 
     const daysOfWeek = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"];
+    const dayNames = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
+    const dayIcons = ["bi-calendar-check", "bi-calendar-date", "bi-calendar-day", "bi-calendar-event", "bi-calendar-heart", "bi-calendar-weekend", "bi-calendar-week"];
 
-    daysOfWeek.forEach(day => {
+    daysOfWeek.forEach((day, index) => {
         const existingHour = businessHours.find(hour => hour.dayOfWeek === day);
         const isOpen = existingHour ? existingHour.isOpen : false;
-        const openingTime = existingHour ? existingHour.openingTime : '11:00'; // Hora de apertura por defecto
-        const closingTime = existingHour ? existingHour.closingTime : '23:00'; // Hora de cierre por defecto
+        const openingTime = existingHour ? existingHour.openingTime : '11:00'; 
+        const closingTime = existingHour ? existingHour.closingTime : '23:00';
 
         const card = document.createElement('div');
-        card.className = `col-md-3 mb-3`;
+        card.className = 'col-md-6 col-lg-4';
         card.innerHTML = `
-            <div class="card ${isOpen ? 'bg-success text-white' : 'bg-light'}">
+            <div class="card schedule-card ${isOpen ? 'active' : 'inactive'} border-0 shadow-sm h-100">
                 <div class="card-body">
-                    <h5 class="card-title">${day}</h5>
-                    <div class="form-check form-switch">
-                        <input class="form-check-input toggle-day" type="checkbox" ${isOpen ? 'checked' : ''} data-day="${day}">
-                        <label class="form-check-label">Activar</label>
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="bi ${dayIcons[index]} fs-4 me-2 ${isOpen ? 'text-success' : 'text-secondary'}"></i>
+                        <h5 class="day-label m-0">${dayNames[index]}</h5>
+                        <div class="form-check form-switch ms-auto">
+                            <input class="form-check-input toggle-day" type="checkbox" ${isOpen ? 'checked' : ''} data-day="${day}">
+                        </div>
                     </div>
-                    <div class="mt-3">
-                        <label>Apertura</label>
-                        <input type="time" class="form-control opening-time" value="${openingTime}" ${isOpen ? '' : 'disabled'}>
-                    </div>
-                    <div class="mt-3">
-                        <label>Cierre</label>
-                        <input type="time" class="form-control closing-time" value="${closingTime}" ${isOpen ? '' : 'disabled'}>
+                    <div class="schedule-controls">
+                        <div class="mb-3">
+                            <label class="form-label small text-muted">Horario de apertura</label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text bg-light border-0">
+                                    <i class="bi bi-clock"></i>
+                                </span>
+                                <input type="time" class="form-control opening-time" value="${openingTime}" ${isOpen ? '' : 'disabled'}>
+                            </div>
+                        </div>
+                        <div class="mb-0">
+                            <label class="form-label small text-muted">Horario de cierre</label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text bg-light border-0">
+                                    <i class="bi bi-clock-history"></i>
+                                </span>
+                                <input type="time" class="form-control closing-time" value="${closingTime}" ${isOpen ? '' : 'disabled'}>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -379,13 +411,23 @@ function populateScheduleModal(branchId, businessHours) {
     });
 
     document.querySelectorAll('.toggle-day').forEach(toggle => {
-        toggle.addEventListener('change', function () {
-            const card = this.closest('.card');
+        toggle.addEventListener('change', function() {
+            const card = this.closest('.schedule-card');
             const isChecked = this.checked;
-            card.classList.toggle('bg-success', isChecked);
-            card.classList.toggle('text-white', isChecked);
-            card.querySelector('.opening-time').disabled = !isChecked;
-            card.querySelector('.closing-time').disabled = !isChecked;
+            
+            if (isChecked) {
+                card.classList.remove('inactive');
+                card.classList.add('active');
+                card.querySelectorAll('input[type="time"]').forEach(input => {
+                    input.disabled = false;
+                });
+            } else {
+                card.classList.remove('active');
+                card.classList.add('inactive');
+                card.querySelectorAll('input[type="time"]').forEach(input => {
+                    input.disabled = true;
+                });
+            }
         });
     });
 }
@@ -405,14 +447,16 @@ document.getElementById('saveScheduleButton').addEventListener('click', async ()
 
     const newHours = [];
 
-    document.querySelectorAll('.card').forEach(card => {
+    // Usar un selector más específico para obtener solo las tarjetas de horario
+    document.querySelectorAll('#scheduleTimeline .schedule-card').forEach(card => {
         const toggleDay = card.querySelector('.toggle-day');
         const openingTimeInput = card.querySelector('.opening-time');
         const closingTimeInput = card.querySelector('.closing-time');
 
         // Validar que los elementos existen antes de acceder a sus propiedades
         if (toggleDay && toggleDay.checked) {
-            const dayOfWeek = card.querySelector('.card-title').textContent;
+            // Usar el atributo data-day para obtener el día en lugar de buscar un elemento de texto
+            const dayOfWeek = toggleDay.getAttribute('data-day');
             const openingTime = openingTimeInput ? openingTimeInput.value : '';
             const closingTime = closingTimeInput ? closingTimeInput.value : '';
 
@@ -479,13 +523,15 @@ document.getElementById('saveScheduleButton').addEventListener('click', async ()
     }
 });
 
+// También necesitamos corregir la función para actualizar horarios
 document.querySelectorAll('.update-hour-btn').forEach(button => {
     button.addEventListener('click', async function () {
         const id = this.dataset.id;
-        const card = this.closest('.card');
+        const card = this.closest('.schedule-card');
         const openingTime = card.querySelector('.opening-time').value;
         const closingTime = card.querySelector('.closing-time').value;
         const isOpen = card.querySelector('.toggle-day').checked;
+        const dayOfWeek = card.querySelector('.toggle-day').getAttribute('data-day');
 
         try {
             const token = localStorage.getItem('token');
@@ -495,7 +541,7 @@ document.querySelectorAll('.update-hour-btn').forEach(button => {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ dayOfWeek: card.querySelector('.card-title').textContent, openingTime, closingTime, isOpen }),
+                body: JSON.stringify({ dayOfWeek, openingTime, closingTime, isOpen }),
             });
 
             if (response.ok) {
@@ -548,15 +594,35 @@ async function openTablesModal(branchId) {
         Swal.close(); // Cerrar indicador de carga
 
         if (response.ok && data.success) {
-            // Guardar el ID de la sede en el modal para usarlo en la creación de mesas
+            // Guardar el ID de la sede y datos de capacidad en el modal
             const tablesModal = document.getElementById('tablesModal');
             tablesModal.dataset.branchId = branchId;
+            tablesModal.dataset.currentCapacity = data.data.currentTablesCapacity || 0;
+            tablesModal.dataset.maxCapacity = data.data.maxBranchCapacity || 0;
             
             // Llenar el modal con las mesas
             populateTablesModal(branchId, data.data);
             
-            // Limpiar el formulario de creación
-            document.getElementById('createTableForm').reset();
+            // Limpiar el formulario de creación y añadir evento de validación
+            const createTableForm = document.getElementById('createTableForm');
+            createTableForm.reset();
+            document.getElementById('tableQuantity').value = "1";
+            
+            // Añadir elemento para mostrar feedback de capacidad
+            if (!document.getElementById('capacityFeedback')) {
+                const capacityField = document.getElementById('tableCapacity').parentNode.parentNode;
+                const feedbackDiv = document.createElement('div');
+                feedbackDiv.id = 'capacityFeedback';
+                feedbackDiv.className = 'form-text';
+                capacityField.appendChild(feedbackDiv);
+            }
+            
+            // Añadir eventos para validación en tiempo real
+            document.getElementById('tableCapacity').addEventListener('input', validateCapacity);
+            document.getElementById('tableQuantity').addEventListener('input', validateCapacity);
+            
+            // Validar capacidad inicial
+            validateCapacity();
             
             // Mostrar el modal
             const modal = new bootstrap.Modal(tablesModal);
@@ -578,66 +644,104 @@ async function openTablesModal(branchId) {
     }
 }
 
-function populateTablesModal(branchId, tables) {
+function populateTablesModal(branchId, branchData) {
     const tablesContainer = document.getElementById('tablesContainer');
     tablesContainer.innerHTML = '';
 
-    // Si no hay mesas, mostrar mensaje
-    if (!tables || tables.length === 0) {
-        tablesContainer.innerHTML = `
-            <div class="w-100 text-center p-5">
-                <img src="./assets/img/mesa.png" alt="Sin mesas" style="width: 80px; opacity: 0.3;">
-                <h5 class="mt-3 text-muted">No hay mesas creadas</h5>
-                <p class="text-muted">Utiliza el formulario de la izquierda para crear una nueva mesa.</p>
+    // Crear un indicador de capacidad
+    const currentCapacity = branchData.currentTablesCapacity || 0;
+    const maxCapacity = branchData.maxBranchCapacity || 0;
+    const remainingCapacity = maxCapacity - currentCapacity;
+    const capacityPercentage = Math.min(100, Math.round((currentCapacity / maxCapacity) * 100));
+    
+    let alertClass = "info";
+    if (capacityPercentage >= 90) {
+        alertClass = "danger";
+    } else if (capacityPercentage >= 70) {
+        alertClass = "warning";
+    }
+
+    // Crear el elemento de información de capacidad
+    const capacityInfo = document.createElement('div');
+    capacityInfo.className = `capacity-alert ${alertClass}`;
+    capacityInfo.innerHTML = `
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <strong>Capacidad actual:</strong> ${currentCapacity} de ${maxCapacity} personas 
+                (${capacityPercentage}%)
             </div>
+            <div>
+                <strong>Disponible:</strong> ${remainingCapacity} personas
+            </div>
+        </div>
+        <div class="capacity-meter">
+            <div class="capacity-progress ${alertClass}" style="width: ${capacityPercentage}%"></div>
+        </div>
+    `;
+    tablesContainer.appendChild(capacityInfo);
+
+    // Si no hay mesas o el array está vacío
+    if (!branchData.tables || branchData.tables.length === 0) {
+        const emptyState = document.createElement('div');
+        emptyState.className = 'w-100 text-center p-5';
+        emptyState.innerHTML = `
+            <img src="./assets/img/mesa.png" alt="Sin mesas" style="width: 80px; opacity: 0.3;">
+            <h5 class="mt-3 text-muted">No hay mesas registradas</h5>
+            <p class="text-muted">Utiliza el formulario para crear una nueva mesa.</p>
         `;
+        tablesContainer.appendChild(emptyState);
         return;
     }
 
+    // Crear contenedor de mesas
+    const tablesGrid = document.createElement('div');
+    tablesGrid.className = 'd-flex flex-wrap justify-content-start mt-3';
+    tablesContainer.appendChild(tablesGrid);
+
     // Crear tarjetas de mesa con animación
-    tables.forEach((table, index) => {
+    branchData.tables.forEach((table, index) => {
         const statusClass = getStatusClass(table.status);
         const statusText = getStatusText(table.status);
         
         const tableCard = document.createElement('div');
-        tableCard.className = 'table-card animate__animated animate__fadeIn';
+        tableCard.className = 'table-card animate__fadeIn';
         tableCard.style.animationDelay = `${index * 0.05}s`;
         
         tableCard.innerHTML = `
             <div class="table-card-header">
                 <h5>Mesa ${table.tableNumber}</h5>
-            </div>
-            <div class="table-card-content">
-                <img src="./assets/img/mesa.png" alt="Mesa" class="table-image">
-                <div class="table-info">
-                    <p><strong>Capacidad:</strong> ${table.capacity}</p>
-                    <p><strong>Ubicación:</strong> ${table.location}</p>
-                    <p><span class="badge-table-status ${statusClass}">${statusText}</span></p>
-                </div>
-                <div class="table-actions">
-                    <button class="btn btn-warning edit-table-btn" data-id="${table.id}" title="Editar mesa">
-                        <i class="bi bi-pencil"></i>
+                <div class="table-header-actions">
+                    <button class="btn btn-status-change" data-id="${table.id}" data-status="${table.status}" title="Cambiar estado">
+                        <i class="bi bi-arrow-repeat"></i>
                     </button>
-                    <button class="btn btn-danger delete-table-btn" data-id="${table.id}" title="Eliminar mesa">
+                    <button class="btn btn-table-delete" data-id="${table.id}" title="Eliminar mesa">
                         <i class="bi bi-trash"></i>
                     </button>
                 </div>
             </div>
+            <div class="table-card-content">
+                <img src="./assets/img/mesa.png" alt="Mesa" class="table-image">
+                <div class="table-info">
+                    <p><strong>Capacidad:</strong> ${table.capacity} personas</p>
+                    <p><strong>Ubicación:</strong> ${table.location}</p>
+                    <p><span class="badge-table-status ${statusClass}">${statusText}</span></p>
+                </div>
+            </div>
         `;
         
-        tablesContainer.appendChild(tableCard);
+        tablesGrid.appendChild(tableCard);
     });
 
     // Añadir eventos a los botones
-    document.querySelectorAll('.edit-table-btn').forEach(button => {
+    document.querySelectorAll('.btn-status-change').forEach(button => {
         button.addEventListener('click', () => {
             const tableId = button.dataset.id;
-            const table = tables.find(t => t.id == tableId);
-            openEditTableModal(branchId, table);
+            const currentStatus = button.dataset.status;
+            changeTableStatus(branchId, tableId, currentStatus);
         });
     });
 
-    document.querySelectorAll('.delete-table-btn').forEach(button => {
+    document.querySelectorAll('.btn-table-delete').forEach(button => {
         button.addEventListener('click', () => {
             const tableId = button.dataset.id;
             deleteTable(branchId, tableId);
@@ -680,69 +784,83 @@ function getStatusText(status) {
     }
 }
 
-// Manejar la creación de mesas desde el formulario integrado
-document.addEventListener('DOMContentLoaded', function() {
-    const createTableForm = document.getElementById('createTableForm');
+// Función para validar capacidad en tiempo real
+function validateCapacity() {
+    const tablesModal = document.getElementById('tablesModal');
+    const currentCapacity = parseInt(tablesModal.dataset.currentCapacity) || 0;
+    const maxCapacity = parseInt(tablesModal.dataset.maxCapacity) || 0;
+    const remainingCapacity = maxCapacity - currentCapacity;
     
-    createTableForm.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        
-        const branchId = document.getElementById('tablesModal').dataset.branchId;
-        const tableNumber = document.getElementById('tableNumber').value;
-        const capacity = document.getElementById('tableCapacity').value;
-        const location = document.getElementById('tableLocation').value;
-        const status = document.getElementById('tableStatus').value;
-        
-        if (!branchId) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'No se pudo identificar la sede.',
-            });
-            return;
-        }
-        
-        const tableData = {
-            tableNumber: parseInt(tableNumber),
-            capacity: parseInt(capacity),
-            location: location.trim(),
-            status: status,
-        };
-        
+    const capacity = parseInt(document.getElementById('tableCapacity').value) || 0;
+    const quantity = parseInt(document.getElementById('tableQuantity').value) || 1;
+    const totalNewCapacity = capacity * quantity;
+    
+    const capacityFeedback = document.getElementById('capacityFeedback');
+    const submitButton = document.querySelector('#createTableForm button[type="submit"]');
+    
+    if (!capacityFeedback || !submitButton) return;
+    
+    if (totalNewCapacity > remainingCapacity) {
+        capacityFeedback.textContent = `¡Excede la capacidad disponible! (${remainingCapacity} personas)`;
+        capacityFeedback.className = 'form-text text-danger';
+        submitButton.disabled = true;
+    } else if (totalNewCapacity > 0) {
+        capacityFeedback.textContent = `Capacidad total a agregar: ${totalNewCapacity} de ${remainingCapacity} disponibles`;
+        capacityFeedback.className = 'form-text text-success';
+        submitButton.disabled = false;
+    } else {
+        capacityFeedback.textContent = 'Por favor, ingresa valores válidos de capacidad y cantidad';
+        capacityFeedback.className = 'form-text text-muted';
+        submitButton.disabled = true;
+    }
+}
+
+// Función para cambiar el estado de una mesa
+async function changeTableStatus(branchId, tableId, currentStatus) {
+    // Determinar el siguiente estado en la rotación
+    let nextStatus;
+    switch(currentStatus) {
+        case 'AVAILABLE':
+            nextStatus = 'OCCUPIED';
+            break;
+        case 'OCCUPIED':
+            nextStatus = 'RESERVED';
+            break;
+        case 'RESERVED':
+        default:
+            nextStatus = 'AVAILABLE';
+            break;
+    }
+
+    const result = await Swal.fire({
+        title: 'Cambiar estado',
+        html: `¿Deseas cambiar el estado de la mesa de <b>${getStatusText(currentStatus)}</b> a <b>${getStatusText(nextStatus)}</b>?`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, cambiar',
+        cancelButtonText: 'Cancelar'
+    });
+
+    if (result.isConfirmed) {
         try {
-            // Mostrar indicador de carga
-            Swal.fire({
-                title: 'Creando mesa',
-                html: 'Procesando solicitud...',
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
-            });
-            
             const token = localStorage.getItem('token');
-            const response = await fetch(`http://localhost:8080/api/tables/branch/${branchId}`, {
-                method: 'POST',
+            const response = await fetch(`http://localhost:8080/api/tables/${tableId}/status`, {
+                method: 'PATCH',
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(tableData),
+                body: JSON.stringify({ status: nextStatus })
             });
-            
-            const responseData = await response.json();
-            
-            if (response.ok && responseData.success) {
+
+            if (response.ok) {
                 Swal.fire({
                     icon: 'success',
-                    title: 'Mesa creada',
-                    text: responseData.message || 'La mesa ha sido creada exitosamente.',
+                    title: 'Estado actualizado',
+                    text: `El estado de la mesa se cambió a ${getStatusText(nextStatus)}.`,
                     timer: 1500,
                     showConfirmButton: false
                 });
-                
-                // Limpiar el formulario
-                createTableForm.reset();
                 
                 // Recargar las mesas
                 openTablesModal(branchId);
@@ -750,16 +868,262 @@ document.addEventListener('DOMContentLoaded', function() {
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: responseData.message || 'No se pudo crear la mesa.',
+                    text: 'No se pudo actualizar el estado de la mesa.'
                 });
             }
         } catch (error) {
-            console.error('Error al crear la mesa:', error);
+            console.error('Error al cambiar el estado de la mesa:', error);
             Swal.fire({
                 icon: 'error',
                 title: 'Error',
-                text: 'Ocurrió un problema al intentar crear la mesa.',
+                text: 'Ocurrió un problema al intentar cambiar el estado de la mesa.'
             });
         }
+    }
+}
+
+// Función para eliminar una mesa
+async function deleteTable(branchId, tableId) {
+    const result = await Swal.fire({
+        title: '¿Eliminar mesa?',
+        text: 'Esta acción no se puede deshacer. ¿Estás seguro de eliminar esta mesa?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc3545',
+        cancelButtonText: 'Cancelar',
+        confirmButtonText: 'Sí, eliminar'
     });
+
+    if (result.isConfirmed) {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`http://localhost:8080/api/tables/${tableId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            if (response.ok) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Mesa eliminada',
+                    text: 'La mesa se ha eliminado correctamente.',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+                
+                // Recargar las mesas
+                openTablesModal(branchId);
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'No se pudo eliminar la mesa.'
+                });
+            }
+        } catch (error) {
+            console.error('Error al eliminar la mesa:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Ocurrió un problema al intentar eliminar la mesa.'
+            });
+        }
+    }
+}
+
+// Manejar la creación de mesas desde el formulario integrado
+document.addEventListener('DOMContentLoaded', function() {
+    const createTableForm = document.getElementById('createTableForm');
+    
+    if (createTableForm) {
+        createTableForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const branchId = document.getElementById('tablesModal').dataset.branchId;
+            const tableNumber = parseInt(document.getElementById('tableNumber').value);
+            const capacity = parseInt(document.getElementById('tableCapacity').value);
+            const location = document.getElementById('tableLocation').value.trim();
+            const status = document.getElementById('tableStatus').value;
+            const quantity = parseInt(document.getElementById('tableQuantity').value) || 1;
+            
+            // Validaciones básicas
+            if (!branchId) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'No se pudo identificar la sede.',
+                });
+                return;
+            }
+            
+            if (isNaN(tableNumber) || tableNumber < 1) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'El número de mesa debe ser mayor a cero.',
+                });
+                return;
+            }
+            
+            if (isNaN(capacity) || capacity < 1) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'La capacidad debe ser mayor a cero.',
+                });
+                return;
+            }
+            
+            if (!location || location.length < 3) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'La ubicación debe tener al menos 3 caracteres.',
+                });
+                return;
+            }
+            
+            // Validar cantidad
+            if (isNaN(quantity) || quantity < 1 || quantity > 20) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'La cantidad debe ser un número entre 1 y 20.',
+                });
+                return;
+            }
+            
+            // Validar capacidad disponible
+            const tablesModal = document.getElementById('tablesModal');
+            const currentCapacity = parseInt(tablesModal.dataset.currentCapacity) || 0;
+            const maxCapacity = parseInt(tablesModal.dataset.maxCapacity) || 0;
+            const remainingCapacity = maxCapacity - currentCapacity;
+            const totalNewCapacity = capacity * quantity;
+            
+            if (totalNewCapacity > remainingCapacity) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Capacidad excedida',
+                    html: `
+                        La capacidad total de las nuevas mesas (${totalNewCapacity} personas) 
+                        excede la capacidad disponible (${remainingCapacity} personas).<br><br>
+                        <ul>
+                            <li>Reduce la cantidad de mesas (${quantity})</li>
+                            <li>Reduce la capacidad por mesa (${capacity})</li>
+                            <li>O aumenta la capacidad máxima de la sede</li>
+                        </ul>
+                    `
+                });
+                return;
+            }
+            
+            try {
+                // Mostrar indicador de carga
+                Swal.fire({
+                    title: `Creando ${quantity} mesa(s)`,
+                    html: 'Procesando solicitud...',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+                
+                const token = localStorage.getItem('token');
+                let successCount = 0;
+                let errorCount = 0;
+                let errorMessages = [];
+                
+                // Crear array de promesas para cada mesa
+                const createPromises = [];
+                
+                for (let i = 0; i < quantity; i++) {
+                    // Incrementar el número de mesa si se crean múltiples
+                    const currentTableNumber = quantity > 1 ? tableNumber + i : tableNumber;
+                    
+                    const tableData = {
+                        tableNumber: currentTableNumber,
+                        capacity: capacity,
+                        location: location,
+                        status: status,
+                    };
+                    
+                    const promise = fetch(`http://localhost:8080/api/tables/branch/${branchId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(tableData),
+                    }).then(response => response.json())
+                      .then(data => {
+                          if (data.success) {
+                              successCount++;
+                              return { success: true };
+                          } else {
+                              errorCount++;
+                              errorMessages.push(`Mesa ${currentTableNumber}: ${data.message || 'Error desconocido'}`);
+                              return { success: false, message: data.message };
+                          }
+                      })
+                      .catch(error => {
+                          errorCount++;
+                          errorMessages.push(`Mesa ${currentTableNumber}: Error de conexión`);
+                          return { success: false, message: 'Error de conexión' };
+                      });
+                    
+                    createPromises.push(promise);
+                }
+                
+                // Ejecutar todas las creaciones
+                await Promise.all(createPromises);
+                
+                if (successCount > 0) {
+                    let message = `Se han creado ${successCount} de ${quantity} mesas exitosamente.`;
+                    
+                    if (errorCount > 0) {
+                        message += ` Hubo ${errorCount} errores.`;
+                        
+                        if (errorMessages.length > 0) {
+                            message += '<br><br><strong>Detalles de errores:</strong><br>';
+                            message += errorMessages.slice(0, 3).join('<br>');
+                            
+                            if (errorMessages.length > 3) {
+                                message += `<br>... y ${errorMessages.length - 3} más.`;
+                            }
+                        }
+                    }
+                    
+                    Swal.fire({
+                        icon: successCount === quantity ? 'success' : 'warning',
+                        title: successCount === quantity ? 'Mesas creadas' : 'Algunas mesas creadas',
+                        html: message,
+                        confirmButtonText: 'Entendido'
+                    });
+                    
+                    // Limpiar el formulario
+                    createTableForm.reset();
+                    document.getElementById('tableQuantity').value = "1";
+                    
+                    // Recargar las mesas
+                    openTablesModal(branchId);
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error al crear mesas',
+                        html: `No se pudo crear ninguna mesa.<br><br><strong>Errores:</strong><br>${errorMessages.join('<br>')}`,
+                    });
+                }
+            } catch (error) {
+                console.error('Error al crear las mesas:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Ocurrió un problema al intentar crear las mesas.',
+                });
+            }
+        });
+    }
 });

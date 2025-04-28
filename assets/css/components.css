@@ -473,117 +473,93 @@ input:checked+.slider::before {
 /* Estilos para el modal de mesas */
 #tablesModal .modal-content {
     border-radius: 15px;
-    background: linear-gradient(145deg, #fff8f8, #fff0f0);
-    border: none;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-}
-
-#tablesModal .modal-header {
-    border-bottom: 1px solid rgba(255, 192, 203, 0.3);
-    background: transparent;
-    padding: 1.5rem;
-}
-
-#tablesModal .modal-title {
-    color: #d15a7c;
-    font-weight: 600;
-    font-size: 1.5rem;
-}
-
-#tablesModal .modal-body {
-    padding: 1.5rem;
-}
-
-/* Tarjeta de creación */
-.table-creation-card {
-    background: white;
-    border-radius: 15px;
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05);
-    height: 100%;
-    border: 1px solid rgba(255, 192, 203, 0.3);
-}
-
-.table-creation-card .card-header {
-    background: linear-gradient(145deg, #ffc2d0, #ffb6c1);
-    color: white;
-    border-top-left-radius: 15px;
-    border-top-right-radius: 15px;
-    padding: 1rem;
-    text-align: center;
-}
-
-.table-creation-card .card-body {
-    padding: 1.5rem;
-}
-
-.table-creation-card .form-label {
-    color: #333;
-    font-weight: 500;
-}
-
-.table-creation-card .form-control,
-.table-creation-card .form-select {
-    border-radius: 10px;
-    border: 1px solid #ffe0e0;
-    padding: 0.6rem 1rem;
-    background-color: #fff;
-    transition: all 0.3s ease;
-}
-
-.table-creation-card .form-control:focus,
-.table-creation-card .form-select:focus {
-    border-color: #ff9eb5;
-    box-shadow: 0 0 0 0.2rem rgba(255, 158, 181, 0.25);
-}
-
-.table-creation-card .btn-primary {
-    background: linear-gradient(145deg, #ff9eb5, #ff7d9c);
-    border: none;
-    transition: all 0.3s ease;
-    border-radius: 10px;
-    padding: 0.6rem 1.5rem;
-    font-weight: 500;
-}
-
-.table-creation-card .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(255, 158, 181, 0.25);
-}
-
-/* Tarjetas de mesa */
-.table-card {
-    background: white;
-    border-radius: 15px;
-    padding: 0;
-    width: 150px;
-    min-height: 220px;
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05);
-    transition: all 0.3s ease;
-    position: relative;
     overflow: hidden;
-    margin: 8px;
-    border: 1px solid rgba(255, 192, 203, 0.3);
-    display: flex;
-    flex-direction: column;
+}
+
+#tablesModal .card-header {
+    padding: 1rem 1.25rem;
+}
+
+#tablesModal .form-control,
+#tablesModal .form-select,
+#tablesModal .input-group-text {
+    border-radius: 8px;
+    padding: 0.5rem 0.75rem;
+    transition: all 0.2s;
+}
+
+#tablesModal .form-control:focus,
+#tablesModal .form-select:focus {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+}
+
+#tablesModal small.form-text {
+    font-size: 0.75rem;
+    color: #6c757d;
+}
+
+.tables-container {
+    gap: 15px;
+    max-height: 480px;
+    overflow-y: auto;
+    padding: 10px 5px;
+}
+
+/* Tarjetas de mesas */
+.table-card {
+    width: 180px;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    margin: 5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    border: none;
+    background-color: #fff;
+    position: relative;
 }
 
 .table-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    z-index: 1;
 }
 
 .table-card-header {
-    background: linear-gradient(145deg, #ffccd6, #ffb6c1);
-    color: white;
-    text-align: center;
-    padding: 0.75rem 0;
-    border-top-left-radius: 15px;
-    border-top-right-radius: 15px;
+    background: var(--bs-primary-bg-subtle);
+    color: var(--bs-primary-text-emphasis);
+    padding: 0.75rem 0.5rem;
+    font-weight: 600;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.table-card-header h5 {
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.table-header-actions {
+    display: flex;
+    gap: 5px;
+}
+
+.table-header-actions .btn {
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: all 0.2s;
+    font-size: 0.7rem;
 }
 
 .table-card-content {
     padding: 1rem;
-    flex-grow: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -593,99 +569,126 @@ input:checked+.slider::before {
     width: 50px;
     height: 50px;
     margin-bottom: 10px;
+    object-fit: contain;
     transition: transform 0.3s ease;
 }
 
 .table-card:hover .table-image {
-    transform: rotate(10deg);
+    transform: scale(1.1);
 }
 
 .table-info {
+    width: 100%;
     text-align: center;
-    margin-top: 5px;
-}
-
-.table-info h5 {
-    color: #d15a7c;
-    font-size: 1.1rem;
-    margin-bottom: 8px;
 }
 
 .table-info p {
-    margin: 3px 0;
-    font-size: 0.8rem;
+    margin: 5px 0;
+    font-size: 0.85rem;
     color: #666;
 }
 
+/* Badges para estados de mesas */
 .badge-table-status {
-    padding: 4px 8px;
-    border-radius: 10px;
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 50rem;
     font-size: 0.75rem;
     font-weight: 500;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
 }
 
 .badge-available {
-    background-color: #4CAF50;
-    color: white;
+    background-color: rgba(25, 135, 84, 0.1);
+    color: #198754;
 }
 
 .badge-occupied {
-    background-color: #f44336;
-    color: white;
+    background-color: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
 }
 
 .badge-reserved {
-    background-color: #ff9800;
+    background-color: rgba(255, 193, 7, 0.1);
+    color: #ffc107;
+}
+
+/* Cambiar colores de los botones para que sean consistentes */
+.btn-status-change {
+    background-color: var(--bs-warning);
     color: white;
 }
 
-.table-actions {
+.btn-status-change:hover {
+    background-color: var(--bs-warning-dark);
+}
+
+.btn-table-delete {
+    background-color: var(--bs-danger);
+    color: white;
+}
+
+.btn-table-delete:hover {
+    background-color: var(--bs-danger-dark);
+}
+
+/* Personalización de la alerta de capacidad */
+.capacity-alert {
+    border-left: 4px solid var(--bs-info);
+    border-radius: 8px;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    background-color: var(--bs-info-bg-subtle);
+}
+
+.capacity-alert.warning {
+    border-left-color: var(--bs-warning);
+    background-color: var(--bs-warning-bg-subtle);
+}
+
+.capacity-alert.danger {
+    border-left-color: var(--bs-danger);
+    background-color: var(--bs-danger-bg-subtle);
+}
+
+.capacity-meter {
+    height: 6px;
     width: 100%;
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin-top: 10px;
-    opacity: 0;
-    transform: translateY(10px);
-    transition: all 0.3s ease;
+    background-color: #e9ecef;
+    border-radius: 3px;
+    margin-top: 8px;
+    overflow: hidden;
 }
 
-.table-card:hover .table-actions {
-    opacity: 1;
-    transform: translateY(0);
+.capacity-progress {
+    height: 100%;
+    background-color: var(--bs-info);
+    transition: width 0.3s ease;
 }
 
-.table-actions button {
-    border-radius: 50%;
-    width: 32px;
-    height: 32px;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.capacity-progress.warning {
+    background-color: var(--bs-warning);
 }
 
-.tables-header {
-    margin-bottom: 15px;
+.capacity-progress.danger {
+    background-color: var(--bs-danger);
 }
 
-.tables-header h5 {
-    color: #d15a7c;
-    font-weight: 600;
-    margin: 0;
+/* Animaciones */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
-#searchTableInput {
-    width: 200px;
-    border-radius: 20px;
-    border: 1px solid #ffe0e0;
-    padding: 0.4rem 1rem;
-}
-
-#tablesContainer {
-    max-height: 500px;
-    overflow-y: auto;
-    padding: 10px;
-    mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
+.animate__fadeIn {
+    animation: fadeInUp 0.4s ease-out forwards;
 }
