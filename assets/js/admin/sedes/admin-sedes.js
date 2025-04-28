@@ -151,13 +151,15 @@ function buildTable(data) {
                     <button class='btn fondo-rojo btn-sm delete-btn'><i class="bi bi-trash3-fill"></i></button>
                     <button class='btn fondo-naranja btn-sm maintenance-btn'><i class="bi bi-tools"></i></button>
                     <button class='btn fondo-azul btn-sm schedule-btn'><i class="bi bi-calendar-event"></i></button>
+                    <button class='btn fondo-verde btn-sm tables-btn'><i class="bi bi-table"></i></button>
                 `,
                 cellClick: async (e, cell) => {
                     const target = e.target.closest('button');
                     const branchId = cell.getRow().getData().id;
-                    const currentStatus = cell.getRow().getData().status; // Obtener el estado actual de la sede
 
-                    if (target && target.classList.contains('edit-btn')) {
+                    if (target && target.classList.contains('tables-btn')) {
+                        openTablesModal(branchId); // Abrir modal de mesas
+                    } else if (target && target.classList.contains('edit-btn')) {
                         loadBranchById(branchId);
                     } else if (target && target.classList.contains('delete-btn')) {
                         deleteBranch(branchId, cell.getRow());
@@ -519,4 +521,183 @@ document.querySelectorAll('.update-hour-btn').forEach(button => {
             });
         }
     });
+});
+
+async function openTablesModal(branchId) {
+    const response = await fetch(`http://localhost:8080/api/tables/branch/${branchId}`);
+    const data = await response.json();
+
+    if (response.ok && data.success) {
+        populateTablesModal(branchId, data.data); // Llenar el modal con las mesas
+        const tablesModal = new bootstrap.Modal(document.getElementById('tablesModal'));
+        tablesModal.show();
+    } else {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: data.message || 'No se pudieron cargar las mesas.',
+        });
+    }
+}
+
+function populateTablesModal(branchId, tables) {
+    const tablesContainer = document.getElementById('tablesContainer');
+    tablesContainer.innerHTML = '';
+
+    tables.forEach(table => {
+        const tableCard = document.createElement('div');
+        tableCard.className = 'table-card';
+        tableCard.innerHTML = `
+            <div class="table-card-content">
+                <img src="./assets/img/mesa.png" alt="Mesa" class="table-image">
+                <div class="table-info">
+                    <h5>Mesa ${table.tableNumber}</h5>
+                    <p><strong>Capacidad:</strong> ${table.capacity}</p>
+                    <p><strong>Ubicación:</strong> ${table.location}</p>
+                    <p><strong>Estado:</strong> ${table.status}</p>
+                </div>
+                <div class="table-actions">
+                    <button class="btn btn-warning edit-table-btn" data-id="${table.id}">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-danger delete-table-btn" data-id="${table.id}">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+        tablesContainer.appendChild(tableCard);
+    });
+
+    document.querySelectorAll('.edit-table-btn').forEach(button => {
+        button.addEventListener('click', () => {
+            const tableId = button.dataset.id;
+            openEditTableModal(branchId, tableId);
+        });
+    });
+
+    document.querySelectorAll('.delete-table-btn').forEach(button => {
+        button.addEventListener('click', () => {
+            const tableId = button.dataset.id;
+            deleteTable(branchId, tableId);
+        });
+    });
+}
+
+function openEditTableModal(branchId, tableId) {
+    // Lógica para abrir el modal de edición de mesas
+    const editTableModal = new bootstrap.Modal(document.getElementById('editTableModal'));
+    editTableModal.show();
+}
+
+function deleteTable(branchId, tableId) {
+    Swal.fire({
+        title: '¿Estás seguro?',
+        text: 'Esta acción eliminará la mesa seleccionada.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar',
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            const response = await fetch(`http://localhost:8080/api/tables/${tableId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                },
+            });
+
+            if (response.ok) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Mesa eliminada',
+                    text: 'La mesa ha sido eliminada correctamente.',
+                });
+                openTablesModal(branchId); // Recargar las mesas
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'No se pudo eliminar la mesa.',
+                });
+            }
+        }
+    });
+}
+
+document.getElementById('addTableButton').addEventListener('click', () => {
+    openCreateTableModal();
+});
+
+function openCreateTableModal() {
+    const createTableModal = document.getElementById('createTableModal');
+    createTableModal.style.display = 'flex'; // Mostrar el modal
+}
+
+document.getElementById('closeCreateTableModal').addEventListener('click', () => {
+    const createTableModal = document.getElementById('createTableModal');
+    createTableModal.style.display = 'none'; // Ocultar el modal
+});
+
+document.getElementById('saveTableButton').addEventListener('click', async () => {
+    const branchId = document.getElementById('tablesModal').dataset.branchId; // Obtener el branchId del modal de mesas
+    const tableNumber = document.getElementById('tableNumber').value;
+    const capacity = document.getElementById('tableCapacity').value;
+    const location = document.getElementById('tableLocation').value;
+    const status = document.getElementById('tableStatus').value;
+
+    if (!tableNumber || !capacity || !location || !status) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Campos incompletos',
+            text: 'Por favor, completa todos los campos antes de guardar.',
+        });
+        return;
+    }
+
+    const tableData = {
+        tableNumber: parseInt(tableNumber),
+        capacity: parseInt(capacity),
+        location: location.trim(),
+        status: status,
+    };
+
+    try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`http://localhost:8080/api/tables/branch/${branchId}`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(tableData),
+        });
+
+        const responseData = await response.json();
+
+        if (response.ok) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Mesa creada',
+                text: 'La mesa ha sido creada exitosamente.',
+            });
+            document.getElementById('createTableModal').style.display = 'none'; // Ocultar el modal
+            openTablesModal(branchId); // Recargar las mesas
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error al crear la mesa',
+                text: responseData.message || 'No se pudo crear la mesa.',
+            });
+        }
+    } catch (error) {
+        console.error('Error al crear la mesa:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Ocurrió un problema al intentar crear la mesa.',
+        });
+    }
 });

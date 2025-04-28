@@ -510,6 +510,94 @@
     </div>
 </div>
 
+    <!-- Modal de mesas -->
+<div class="modal fade" id="tablesModal" tabindex="-1" aria-labelledby="tablesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="tablesModalLabel">Gestión de Mesas</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <button class="btn btn-primary mb-3" id="addTableButton">Agregar Mesa</button>
+                <div id="tablesContainer" class="d-flex flex-wrap gap-3">
+                    <!-- Aquí se generarán dinámicamente las tarjetas de las mesas -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para editar mesa -->
+<div class="modal fade" id="editTableModal" tabindex="-1" aria-labelledby="editTableModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editTableModalLabel">Editar Mesa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editTableForm">
+                    <div class="mb-3">
+                        <label for="editTableNumber" class="form-label">Número de Mesa</label>
+                        <input type="number" class="form-control" id="editTableNumber" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editTableCapacity" class="form-label">Capacidad</label>
+                        <input type="number" class="form-control" id="editTableCapacity" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editTableLocation" class="form-label">Ubicación</label>
+                        <input type="text" class="form-control" id="editTableLocation" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editTableStatus" class="form-label">Estado</label>
+                        <select class="form-select" id="editTableStatus" required>
+                            <option value="AVAILABLE">Disponible</option>
+                            <option value="OCCUPIED">Ocupada</option>
+                            <option value="RESERVED">Reservada</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- Modal para crear mesa -->
+<div id="createTableModal" class="modal-transparent">
+    <div class="table-card create-table-card">
+        <div class="table-card-content">
+            <h5>Crear Mesa</h5>
+            <div class="mb-3">
+                <label for="tableNumber" class="form-label">Número de Mesa</label>
+                <input type="number" id="tableNumber" class="form-control" placeholder="Ej: 1">
+            </div>
+            <div class="mb-3">
+                <label for="tableCapacity" class="form-label">Capacidad</label>
+                <input type="number" id="tableCapacity" class="form-control" placeholder="Ej: 4">
+            </div>
+            <div class="mb-3">
+                <label for="tableLocation" class="form-label">Ubicación</label>
+                <input type="text" id="tableLocation" class="form-control" placeholder="Ej: Ventana">
+            </div>
+            <div class="mb-3">
+                <label for="tableStatus" class="form-label">Estado</label>
+                <select id="tableStatus" class="form-select">
+                    <option value="AVAILABLE">Disponible</option>
+                    <option value="OCCUPIED">Ocupada</option>
+                    <option value="RESERVED">Reservada</option>
+                </select>
+            </div>
+            <div class="table-actions">
+                <button id="saveTableButton" class="btn btn-primary">Guardar</button>
+                <button id="closeCreateTableModal" class="btn btn-secondary">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
     <!-- Core theme JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
