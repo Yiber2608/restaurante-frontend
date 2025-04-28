@@ -4,10 +4,10 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <meta name="description" content="Restaurante con auténtica gastronomía caribeña" />
+    <meta name="description" content="Gestión de reservas del restaurante" />
     <meta name="author" content="TechSysDesign" />
-    <title>Admin Reservas</title>
-    <!-- core  bootstrap-->
+    <title>Gestión de Reservas</title>
+    <!-- Core Bootstrap -->
     <link href="./assets/css/Bootstrap.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
@@ -15,64 +15,140 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.14.5/sweetalert2.css"
         integrity="sha512-6qScZESleBziOBqJwOPurSy6lhLqHGjHNALOOFX0mzRVPiE5SZQvepRzeSO1OB475fcZywuMjxtkrFaO93aq9g=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/virtual-select-plugin@1.0.46/dist/virtual-select.min.css">
-    <link href="https://unpkg.com/filepond/dist/filepond.css" rel="stylesheet">
-    <link href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css"
-        rel="stylesheet">
-    <link href="https://unpkg.com/fullcalendar@5.10.1/main.min.css" rel="stylesheet">
     <link rel="stylesheet" href="./assets/css/components.css">
+    <!-- FullCalendar CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <!-- Custom CSS para reservas -->
     <style>
-        .fc-daygrid-day {
-            border: 1px solid #ddd;
-        }
-
-        .fc-daygrid-day:hover {
-            background-color: #f0f8ff;
-        }
-
-        .card {
+        .reservation-card {
+            transition: all 0.3s ease;
             border-radius: 10px;
+            overflow: hidden;
         }
-
-        .card-body {
-            padding: 15px;
+        
+        .reservation-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
         }
-
-        .btn-success {
-            margin-right: 5px;
+        
+        .reservation-status {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
         }
-
-        .no-selection {
-            text-align: center;
-            padding: 50px;
-            color: #888;
+        
+        .status-pending {
+            background-color: #ffd166;
+            color: #333;
         }
-
-        .no-selection h2 {
-            font-size: 24px;
-            margin-bottom: 10px;
+        
+        .status-confirmed {
+            background-color: #06d6a0;
+            color: white;
         }
-
-        .no-selection p {
-            font-size: 18px;
+        
+        .status-cancelled {
+            background-color: #ef476f;
+            color: white;
         }
-
+        
+        .branch-card {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none !important;
+        }
+        
+        .branch-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .map-container {
+            height: 400px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
         .calendar-container {
-            height: 100%;
-            max-height: 500px;
-            overflow-y: auto;
-            margin: 20px 0;
-            border: 1px solid #ddd;
+            height: 500px;
+            overflow: auto;
             border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
             padding: 10px;
-            background-color: #fff;
         }
-
-        @media (max-width: 768px) {
-            .calendar-container {
-                margin: 10px 0;
-                max-height: 300px;
-            }
+        
+        .hour-slot {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .hour-slot:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .hour-slot.reserved {
+            background-color: rgba(239, 71, 111, 0.1);
+            border-left: 4px solid #ef476f;
+        }
+        
+        .hour-slot.available {
+            background-color: rgba(6, 214, 160, 0.1);
+            border-left: 4px solid #06d6a0;
+        }
+        
+        .statistics-card {
+            border-radius: 10px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .statistics-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .fc-event {
+            cursor: pointer;
+        }
+        
+        .fc-day:hover {
+            background-color: rgba(0, 123, 255, 0.1);
+        }
+        
+        .capacity-meter {
+            height: 8px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+        
+        .capacity-progress {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        
+        .capacity-progress.info {
+            background-color: #0dcaf0;
+        }
+        
+        .capacity-progress.warning {
+            background-color: #ffc107;
+        }
+        
+        .capacity-progress.danger {
+            background-color: #dc3545;
         }
     </style>
 </head>
@@ -80,15 +156,14 @@
 <body class="d-flex flex-column h-100">
     <div class="wrapper">
         <!-- Sidebar -->
-        <div class="sidebar bg-primary ">
+        <div class="sidebar bg-primary">
             <div class="text-center p-2">
                 <!-- Logo -->
                 <i class='bx bxs-cube-alt bx-lg text-whithe'></i>
             </div>
             <ul class="sidebar-nav mt-1">
-
                 <li class="sidebar-item">
-                    <a href="admin-dashboard.html" class="sidebar-link ">
+                    <a href="admin-dashboard.html" class="sidebar-link">
                         <i class='bx bxs-dashboard'></i>
                         <span>Dashboard</span>
                     </a>
@@ -102,7 +177,7 @@
                 </li>
 
                 <li class="sidebar-item">
-                    <a href="admin-menu.html" class="sidebar-link ">
+                    <a href="admin-menu.html" class="sidebar-link">
                         <i class='bx bxs-food-menu'></i>
                         <span>Menu</span>
                     </a>
@@ -110,14 +185,14 @@
 
                 <li class="sidebar-item">
                     <a href="admin-resenas.html" class="sidebar-link">
-                        <i class='bx bx bx-receipt'></i>
+                        <i class='bx bx-receipt'></i>
                         <span>Reseñas</span>
                     </a>
                 </li>
 
                 <li class="sidebar-item">
                     <a href="admin-reservas.html" class="sidebar-link active">
-                        <i class='bx bxs-message-dots'></i>
+                        <i class='bx bxs-calendar-check'></i>
                         <span>Reservas</span>
                     </a>
                 </li>
@@ -130,7 +205,7 @@
                 </li>
 
                 <li class="sidebar-item">
-                    <a href="admin-sedes.html" class="sidebar-link ">
+                    <a href="admin-sedes.html" class="sidebar-link">
                         <i class='bx bxs-building-house'></i>
                         <span>Sedes</span>
                     </a>
@@ -142,14 +217,13 @@
                         <span>Configuración</span>
                     </a>
                 </li>
-
             </ul>
         </div>
 
         <!-- Main content -->
         <div class="main">
             <!-- Navbar -->
-            <nav class="navbar navbar-expand-lg navbar-light bg-whithe shadow p-0 ">
+            <nav class="navbar navbar-expand-lg navbar-light bg-whithe shadow p-0">
                 <div class="container-fluid">
                     <!-- Sidebar Toggle Button -->
                     <div class="toggle-btn" type="button">
@@ -161,8 +235,8 @@
                             <a class="btn dropdown-toggle d-flex align-items-center" href="#" role="button"
                                 id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
                                 <span class="me-2">Administrador</span>
-                                <i class='bx bxs-user-circle fs-1'></i></a>
-
+                                <i class='bx bxs-user-circle fs-1'></i>
+                            </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink">
                                 <li><a class="dropdown-item" id="logoutButton" href="#">Cerrar Sesión</a></li>
                             </ul>
@@ -172,176 +246,369 @@
             </nav>
 
             <div class="container-fluid p-4">
-                <!-- Header -->
-                <div class="row">
-                    <div
-                        class="col-12 bg-primary shadow py-2 px-4 rounded-5 d-flex justify-content-end align-content-center text-white fw-bold">
-                        <h1>Gestión de Reservas y Horarios</h1>
+                <!-- Cabecera -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h2 class="mb-0">Gestión de Reservas</h2>
+                        <p class="text-muted">Sede seleccionada: <span id="selected-branch-name">Cargando...</span></p>
                     </div>
                 </div>
-                <!-- Search and Filter -->
-                <div class="row my-3">
-                    <div class="col-3 ms-auto">
-                        <div class="input-group">
-                            <input type="text" id="searchInput" class="form-control rounded"
-                                placeholder="Escribe para buscar... " aria-label="Buscar " />
-                            <span class="input-group-text">
-                                <i class="bi bi-search"></i>
-                            </span>
-                        </div>
-                    </div>
-                </div>
-                <!-- Filter Cards -->
-                <div class="row row-cols-1 row-cols-md-5 g-3 mb-4">
-                    <!-- All Reservations -->
+
+                <!-- Tarjetas de estadísticas -->
+                <div class="row row-cols-1 row-cols-md-4 g-4 mt-3">
                     <div class="col">
-                        <div class="card card-clickeable h-100 border-0 shadow" id="cardTodos">
+                        <div class="card h-100 statistics-card shadow-sm border-0" id="cardTodos">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
-                                        <h6 class="card-subtitle mb-1 text-muted">Todos</h6>
-                                        <h2 id="totalItems" class="card-title mb-0">0</h2>
+                                        <h6 class="card-subtitle mb-1 text-muted">Total Reservas</h6>
+                                        <h2 id="totalReservations" class="card-title mb-0">0</h2>
                                     </div>
-                                    <div class="icon-shape fondo-naranja text-white rounded-circle shadow">
-                                        <i class="bi bi-box"></i>
+                                    <div class="icon-shape fondo-primario text-white rounded-circle shadow">
+                                        <i class="bi bi-calendar2-check"></i>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <!-- High Capacity -->
                     <div class="col">
-                        <div class="card card-clickeable h-100 border-0 shadow" id="cardCapacidadAlta">
+                        <div class="card h-100 statistics-card shadow-sm border-0" id="cardConfirmadas">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
-                                        <h6 class="card-subtitle mb-1 text-muted">Capacidad Alta</h6>
-                                        <h2 id="totalCapacidadAlta" class="card-title mb-0">0</h2>
+                                        <h6 class="card-subtitle mb-1 text-muted">Confirmadas</h6>
+                                        <h2 id="confirmedReservations" class="card-title mb-0">0</h2>
                                     </div>
                                     <div class="icon-shape fondo-verde text-white rounded-circle shadow">
-                                        <i class="bi bi-people"></i>
+                                        <i class="bi bi-check-circle"></i>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <!-- Medium Capacity -->
                     <div class="col">
-                        <div class="card card-clickeable h-100 border-0 shadow" id="cardCapacidadMedia">
+                        <div class="card h-100 statistics-card shadow-sm border-0" id="cardPendientes">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
-                                        <h6 class="card-subtitle mb-1 text-muted">Capacidad Media</h6>
-                                        <h2 id="totalCapacidadMedia" class="card-title mb-0">0</h2>
+                                        <h6 class="card-subtitle mb-1 text-muted">Pendientes</h6>
+                                        <h2 id="pendingReservations" class="card-title mb-0">0</h2>
                                     </div>
                                     <div class="icon-shape fondo-amarillo text-white rounded-circle shadow">
-                                        <i class="bi bi-people"></i>
+                                        <i class="bi bi-hourglass-split"></i>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <!-- Low Capacity -->
                     <div class="col">
-                        <div class="card card-clickeable h-100 border-0 shadow" id="cardCapacidadBaja">
+                        <div class="card h-100 statistics-card shadow-sm border-0" id="cardCanceladas">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
-                                        <h6 class="card-subtitle mb-1 text-muted">Capacidad Baja</h6>
-                                        <h2 id="totalCapacidadBaja" class="card-title mb-0">0</h2>
+                                        <h6 class="card-subtitle mb-1 text-muted">Canceladas</h6>
+                                        <h2 id="cancelledReservations" class="card-title mb-0">0</h2>
                                     </div>
                                     <div class="icon-shape fondo-rojo text-white rounded-circle shadow">
-                                        <i class="bi bi-people"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Recent Reservations -->
-                    <div class="col">
-                        <div class="card card-clickeable h-100 border-0 shadow" id="cardRecientes">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h6 class="card-subtitle mb-1 text-muted">Recientes</h6>
-                                        <h2 id="totalRecientes" class="card-title mb-0">0</h2>
-                                    </div>
-                                    <div class="icon-shape fondo-verde-agua text-white rounded-circle shadow">
-                                        <i class="bi bi-clock"></i>
+                                        <i class="bi bi-x-circle"></i>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <!-- Branch Cards -->
-                <div class="row row-cols-1 row-cols-md-4 g-3" id="branchCardsContainer">
-                    <!-- Cards will be dynamically inserted here -->
+
+                <!-- Filtros y búsqueda -->
+                <div class="row mt-4">
+                    <div class="col-md-8">
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-outline-primary" id="btnTodayReservations">
+                                <i class="bi bi-calendar-event me-1"></i>Hoy
+                            </button>
+                            <button class="btn btn-outline-primary" id="btnWeekReservations">
+                                <i class="bi bi-calendar-week me-1"></i>Esta semana
+                            </button>
+                            <button class="btn btn-outline-primary" id="btnMonthReservations">
+                                <i class="bi bi-calendar3 me-1"></i>Este mes
+                            </button>
+                            <div class="input-group ms-2" style="max-width: 250px;">
+                                <input type="date" class="form-control" id="dateFilter">
+                                <button class="btn btn-primary" id="btnDateFilter">Filtrar</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <input type="text" id="searchInput" class="form-control" placeholder="Buscar reservas...">
+                            <button class="btn btn-primary" id="btnSearch">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contenido principal -->
+                <div class="row mt-4">
+                    <!-- Listado de sedes -->
+                    <div class="col-md-4">
+                        <!-- En la sección apropiada, asegúrate de tener este contenedor para la lista de sedes -->
+                        <div class="card shadow-sm border-0 mb-4">
+                            <div class="card-header bg-primary-subtle border-0">
+                                <h5 class="card-title m-0 text-primary">
+                                    <i class="bi bi-buildings me-2"></i>Sedes Disponibles
+                                </h5>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="list-group list-group-flush" id="branchList">
+                                    <!-- Las sedes se cargarán dinámicamente aquí -->
+                                    <div class="list-group-item d-flex justify-content-center p-5">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">Cargando...</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Mapa de sedes -->
+                        <div class="card shadow-sm border-0 mt-3">
+                            <div class="card-header bg-primary-subtle border-0">
+                                <h5 class="card-title m-0 text-primary">
+                                    <i class="bi bi-geo-alt me-2"></i>Ubicación de Sedes
+                                </h5>
+                            </div>
+                            <div class="card-body p-0">
+                                <div id="branchesMap" class="map-container"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Calendario de reservas -->
+                    <div class="col-md-8">
+                        <!-- También asegúrate de tener un elemento para el calendario -->
+                        <div class="card shadow-sm border-0">
+                            <div class="card-header bg-primary-subtle border-0">
+                                <h5 class="card-title m-0 text-primary">
+                                    <i class="bi bi-calendar-week me-2"></i>Calendario de Reservas
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="calendar"></div>
+                            </div>
+                        </div>
+
+                        <!-- Detalles del día seleccionado -->
+                        <div class="card shadow-sm border-0 mt-3" id="dayDetailsCard" style="display: none;">
+                            <div class="card-header bg-primary-subtle border-0">
+                                <h5 class="card-title m-0 text-primary" id="selectedDateTitle">
+                                    <i class="bi bi-clock me-2"></i>Detalles del día
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="capacity-info mb-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong>Capacidad disponible:</strong> <span id="remainingCapacity">0</span> de <span id="totalCapacity">0</span> personas
+                                        </div>
+                                        <div>
+                                            <strong>Ocupación:</strong> <span id="occupancyPercentage">0%</span>
+                                        </div>
+                                    </div>
+                                    <div class="capacity-meter">
+                                        <div class="capacity-progress info" id="capacityProgressBar" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                                
+                                <div id="hourSlots" class="hour-slots">
+                                    <!-- Los slots de hora se cargarán dinámicamente aquí -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Añadir este bloque para mostrar las sedes disponibles -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div id="branchSummary" class="card border-0 shadow-sm p-3">
+                            <!-- Aquí se cargarán dinámicamente las sedes disponibles -->
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    <!-- Modal for Branch Details and Schedule -->
-    <div class="modal fade " id="branchDetailsModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg-calendar modal-dialog-centered modal-dialog-scrollable">
+
+    <!-- Modal de configuración de horarios -->
+    <div class="modal fade" id="settingsModal" tabindex="-1" aria-labelledby="settingsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="branchModalLabel">Detalles de la Sede</h5>
+                    <h5 class="modal-title" id="settingsModalLabel">Configuración de Horarios</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-md-6">
-                            <h6 id="branchDescription"></h6>
-                            <div id="branchCalendar" class="calendar-container"></div>
+                            <div class="card shadow-sm border-0">
+                                <div class="card-header bg-primary-subtle border-0">
+                                    <h6 class="card-title mb-0 text-primary">Habilitar fechas</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div id="settingsCalendar" style="height: 400px;"></div>
+                                </div>
+                            </div>
                         </div>
                         <div class="col-md-6">
-                            <div id="dayScheduleCalendar" class="reservations-container">
-                                <div class="no-selection">
-                                    <h2>Seleccione una fecha para ver las reservas</h2>
-                                    <p>Por favor, seleccione una fecha en el calendario para ver las reservas
-                                        correspondientes.</p>
+                            <div class="card shadow-sm border-0 h-100">
+                                <div class="card-header bg-primary-subtle border-0">
+                                    <h6 class="card-title mb-0 text-primary">Horarios estándar</h6>
+                                </div>
+                                <div class="card-body">
+                                    <form id="defaultHoursForm">
+                                        <div class="mb-3">
+                                            <label class="form-label">Días de operación</label>
+                                            <div class="d-flex flex-wrap gap-2">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="mondayCheck" checked>
+                                                    <label class="form-check-label" for="mondayCheck">Lunes</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="tuesdayCheck" checked>
+                                                    <label class="form-check-label" for="tuesdayCheck">Martes</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="wednesdayCheck" checked>
+                                                    <label class="form-check-label" for="wednesdayCheck">Miércoles</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="thursdayCheck" checked>
+                                                    <label class="form-check-label" for="thursdayCheck">Jueves</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="fridayCheck" checked>
+                                                    <label class="form-check-label" for="fridayCheck">Viernes</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="saturdayCheck" checked>
+                                                    <label class="form-check-label" for="saturdayCheck">Sábado</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="sundayCheck" checked>
+                                                    <label class="form-check-label" for="sundayCheck">Domingo</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <label for="openingTime" class="form-label">Hora de apertura</label>
+                                                <input type="time" class="form-control" id="openingTime" value="11:00">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="closingTime" class="form-label">Hora de cierre</label>
+                                                <input type="time" class="form-control" id="closingTime" value="23:00">
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="reservationDuration" class="form-label">Duración de reserva (min)</label>
+                                            <input type="number" class="form-control" id="reservationDuration" value="60" min="30" step="30">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="capacityPerSlot" class="form-label">Capacidad por horario</label>
+                                            <input type="number" class="form-control" id="capacityPerSlot" value="20" min="1">
+                                        </div>
+                                    </form>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
-    <!-- modal imagen -->
-    <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-md border border-0 modal-dialog-centered">
-            <div class="modal-content">
-                <div class="ratio ratio-16x9">
-                    <img id="modalImage" src="" alt="Imagen de la Sede" class="img-fluid" />
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary" id="saveSettingsBtn">Guardar configuración</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Core theme JS -->
-    <script src="./assets/js/config/config.js"></script>
+    <!-- Modal de detalles de reserva -->
+    <div class="modal fade" id="reservationDetailsModal" tabindex="-1" aria-labelledby="reservationDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="reservationDetailsModalLabel">Detalles de la Reserva</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="reservation-details">
+                        <div class="mb-3 d-flex justify-content-between align-items-center">
+                            <h5 id="reservationId" class="mb-0">Reserva #1234</h5>
+                            <span id="reservationStatus" class="badge bg-success">Confirmada</span>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <p class="mb-1 text-muted">Cliente</p>
+                                <p id="customerName" class="mb-0 fw-bold">Juan Pérez</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-1 text-muted">Contacto</p>
+                                <p id="customerContact" class="mb-0">juan@example.com</p>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <p class="mb-1 text-muted">Fecha</p>
+                                <p id="reservationDate" class="mb-0">01/01/2023</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-1 text-muted">Hora</p>
+                                <p id="reservationTime" class="mb-0">19:00</p>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <p class="mb-1 text-muted">Sede</p>
+                                <p id="reservationBranch" class="mb-0">Centro</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-1 text-muted">Personas</p>
+                                <p id="reservationGuests" class="mb-0">4</p>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <p class="mb-1 text-muted">Comentarios</p>
+                            <p id="reservationComments" class="mb-0">Celebración de cumpleaños. Mesa cerca de la ventana por favor.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-success" id="confirmReservationBtn">Confirmar</button>
+                    <button type="button" class="btn btn-danger" id="cancelReservationBtn">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <!-- Core JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://unpkg.com/tabulator-tables/dist/js/tabulator.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.14.5/sweetalert2.all.js"
         integrity="sha512-AbjPD2rIZFzBugvnJKl8IZmGWWmjmZrYysHZaryYg0+XkoqDpmuKKRxDfVPCaHzf1SB3cwSKkgeEd7xLOmBusQ=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://cdn.jsdelivr.net/npm/virtual-select-plugin@1.0.46/dist/virtual-select.min.js"></script>
-    <script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.js"></script>
-    <script src="https://unpkg.com/filepond/dist/filepond.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/luxon@2.3.0/build/global/luxon.min.js"></script>
-    <script src="https://unpkg.com/fullcalendar@5.10.1/main.min.js"></script>
+    <!-- FullCalendar JS -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales-all.min.js"></script>
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <!-- Config and custom scripts -->
+    <script src="./assets/js/config/config.js"></script>
     <script src="./assets/js/admin/reservas/admin-reservas.js"></script>
-    <script src="./assets/js/admin/reservas/admin-reservas-schedule.js"></script>
     <script src="./assets/js/config/jwt-decode.js"></script>
     <script src="./assets/js/config/validate-auth.js"></script>
     <script src="./assets/js/config/protect-routes.js"></script>
-    <script src="./assets/js/auth.js"></script>
     <script src="./assets/js/config/logout.js"></script>
 </body>
 

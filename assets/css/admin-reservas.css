@@ -1,0 +1,157 @@
+/* Estilos para las tarjetas de sede */
+.branches-container {
+    max-height: 400px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #dee2e6 #f8f9fa;
+}
+
+.branches-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.branches-container::-webkit-scrollbar-track {
+    background: #f8f9fa;
+    border-radius: 10px;
+}
+
+.branches-container::-webkit-scrollbar-thumb {
+    background-color: #dee2e6;
+    border-radius: 10px;
+    border: 2px solid #f8f9fa;
+}
+
+.branch-card {
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.branch-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.branch-card.active {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.branch-img-container {
+    height: 120px;
+    position: relative;
+    overflow: hidden;
+}
+
+.branch-img-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.branch-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: rgba(13, 110, 253, 0.9);
+    color: white;
+    font-size: 0.75rem;
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+/* Eliminar los estilos del sidebar adicional ya que no lo vamos a usar */
+.sidebar-additional {
+    display: none;
+}
+
+/* Devolver el margen original al contenido principal */
+.main {
+    margin-left: 80px;
+}
+
+/* Estilos para la lista de sedes */
+.branch-item {
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
+}
+
+.branch-item:hover {
+    background-color: #f8f9fa;
+}
+
+.branch-item.active {
+    background-color: #e2f0ff;
+    border-left-color: #0d6efd;
+}
+
+.branch-icon {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Limitar altura y añadir scroll */
+#branchList {
+    max-height: 300px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0,0,0,0.2) transparent;
+}
+
+#branchList::-webkit-scrollbar {
+    width: 6px;
+}
+
+#branchList::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+#branchList::-webkit-scrollbar-thumb {
+    background-color: rgba(0,0,0,0.2);
+    border-radius: 10px;
+}
+
+/* Estilos para los eventos de calendario según el estado */
+.fc-event.bg-success {
+    background-color: #28a745 !important;
+    border-color: #28a745 !important;
+}
+
+.fc-event.bg-warning {
+    background-color: #ffc107 !important;
+    border-color: #ffc107 !important;
+}
+
+.fc-event.bg-danger {
+    background-color: #dc3545 !important;
+    border-color: #dc3545 !important;
+}
+
+.fc-event.bg-info {
+    background-color: #17a2b8 !important;
+    border-color: #17a2b8 !important;
+}
+
+/* Mejorar visibilidad del calendario */
+.fc-daygrid-event {
+    white-space: normal !important;
+    padding: 2px 4px;
+}
+
+.fc-daygrid-dot-event .fc-event-title {
+    font-weight: bold;
+}
+
+/* Hacer más visibles los días con eventos */
+.fc-day-today {
+    background-color: rgba(225, 240, 255, 0.5) !important;
+}
+
+.fc-daygrid-day.fc-day-has-events {
+    font-weight: bold;
+}

@@ -1,0 +1,126 @@
+/* Estilos para el contenedor de sedes con scroll */
+.branches-scroll-container {
+    max-height: 500px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #dee2e6 #f8f9fa;
+}
+
+.branches-scroll-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.branches-scroll-container::-webkit-scrollbar-track {
+    background: #f8f9fa;
+    border-radius: 10px;
+}
+
+.branches-scroll-container::-webkit-scrollbar-thumb {
+    background-color: #dee2e6;
+    border-radius: 10px;
+    border: 2px solid #f8f9fa;
+}
+
+/* Estilos para las tarjetas de sede */
+.location-card {
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.location-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+.location-card.border-primary {
+    border-color: var(--bs-primary) !important;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25) !important;
+}
+
+.branch-img-container {
+    height: 160px;
+    position: relative;
+}
+
+.branch-img-container img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+}
+
+.branch-details {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 15px;
+    background: linear-gradient(0deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%);
+}
+
+.reservation-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 4px 8px;
+    font-size: 0.75rem;
+    border-radius: 30px;
+}
+
+/* Estilos para filtros y búsqueda */
+.search-container {
+    margin-bottom: 1rem;
+}
+
+.filter-options {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    z-index: 100;
+    position: relative;
+}
+
+/* Estilos para indicadores de capacidad */
+.capacity-indicator {
+    margin-bottom: 1rem;
+}
+
+.capacity-indicator .progress {
+    height: 5px;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+/* Estilos para reservas en el calendario */
+.reservation-confirmed {
+    background-color: #28a745 !important;
+    border-color: #28a745 !important;
+}
+
+.reservation-pending {
+    background-color: #ffc107 !important;
+    border-color: #ffc107 !important;
+    color: #212529 !important;
+}
+
+.reservation-cancelled {
+    background-color: #dc3545 !important;
+    border-color: #dc3545 !important;
+}
+
+.reservation-completed {
+    background-color: #17a2b8 !important;
+    border-color: #17a2b8 !important;
+}
+
+/* Ícono para la tarjeta de sede */
+.icon-shape {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    vertical-align: middle;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
