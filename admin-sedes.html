@@ -512,87 +512,61 @@
 
     <!-- Modal de mesas -->
 <div class="modal fade" id="tablesModal" tabindex="-1" aria-labelledby="tablesModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="tablesModalLabel">Gestión de Mesas</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <button class="btn btn-primary mb-3" id="addTableButton">Agregar Mesa</button>
-                <div id="tablesContainer" class="d-flex flex-wrap gap-3">
-                    <!-- Aquí se generarán dinámicamente las tarjetas de las mesas -->
+                <div class="row">
+                    <!-- Columna izquierda: formulario de creación -->
+                    <div class="col-md-4">
+                        <div class="table-creation-card">
+                            <div class="card-header">
+                                <h5>Crear Nueva Mesa</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="createTableForm">
+                                    <div class="mb-3">
+                                        <label for="tableNumber" class="form-label">Número de Mesa</label>
+                                        <input type="number" class="form-control" id="tableNumber" required min="1" placeholder="Ej: 1">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="tableCapacity" class="form-label">Capacidad</label>
+                                        <input type="number" class="form-control" id="tableCapacity" required min="1" placeholder="Ej: 4">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="tableLocation" class="form-label">Ubicación</label>
+                                        <input type="text" class="form-control" id="tableLocation" required placeholder="Ej: Ventana">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="tableStatus" class="form-label">Estado</label>
+                                        <select class="form-select" id="tableStatus" required>
+                                            <option value="AVAILABLE">Disponible</option>
+                                            <option value="OCCUPIED">Ocupada</option>
+                                            <option value="RESERVED">Reservada</option>
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary w-100">Guardar Mesa</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Columna derecha: tarjetas de mesas -->
+                    <div class="col-md-8">
+                        <div class="tables-header d-flex justify-content-between align-items-center mb-3">
+                            <h5>Mesas Disponibles</h5>
+                            <div>
+                                <input type="text" id="searchTableInput" class="form-control form-control-sm" placeholder="Buscar mesa...">
+                            </div>
+                        </div>
+                        <div id="tablesContainer" class="d-flex flex-wrap gap-3">
+                            <!-- Aquí se generarán dinámicamente las tarjetas de las mesas -->
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal para editar mesa -->
-<div class="modal fade" id="editTableModal" tabindex="-1" aria-labelledby="editTableModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="editTableModalLabel">Editar Mesa</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="editTableForm">
-                    <div class="mb-3">
-                        <label for="editTableNumber" class="form-label">Número de Mesa</label>
-                        <input type="number" class="form-control" id="editTableNumber" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="editTableCapacity" class="form-label">Capacidad</label>
-                        <input type="number" class="form-control" id="editTableCapacity" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="editTableLocation" class="form-label">Ubicación</label>
-                        <input type="text" class="form-control" id="editTableLocation" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="editTableStatus" class="form-label">Estado</label>
-                        <select class="form-select" id="editTableStatus" required>
-                            <option value="AVAILABLE">Disponible</option>
-                            <option value="OCCUPIED">Ocupada</option>
-                            <option value="RESERVED">Reservada</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-    <!-- Modal para crear mesa -->
-<div id="createTableModal" class="modal-transparent">
-    <div class="table-card create-table-card">
-        <div class="table-card-content">
-            <h5>Crear Mesa</h5>
-            <div class="mb-3">
-                <label for="tableNumber" class="form-label">Número de Mesa</label>
-                <input type="number" id="tableNumber" class="form-control" placeholder="Ej: 1">
-            </div>
-            <div class="mb-3">
-                <label for="tableCapacity" class="form-label">Capacidad</label>
-                <input type="number" id="tableCapacity" class="form-control" placeholder="Ej: 4">
-            </div>
-            <div class="mb-3">
-                <label for="tableLocation" class="form-label">Ubicación</label>
-                <input type="text" id="tableLocation" class="form-control" placeholder="Ej: Ventana">
-            </div>
-            <div class="mb-3">
-                <label for="tableStatus" class="form-label">Estado</label>
-                <select id="tableStatus" class="form-select">
-                    <option value="AVAILABLE">Disponible</option>
-                    <option value="OCCUPIED">Ocupada</option>
-                    <option value="RESERVED">Reservada</option>
-                </select>
-            </div>
-            <div class="table-actions">
-                <button id="saveTableButton" class="btn btn-primary">Guardar</button>
-                <button id="closeCreateTableModal" class="btn btn-secondary">Cancelar</button>
             </div>
         </div>
     </div>

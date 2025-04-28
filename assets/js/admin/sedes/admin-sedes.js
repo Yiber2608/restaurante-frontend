@@ -524,18 +524,56 @@ document.querySelectorAll('.update-hour-btn').forEach(button => {
 });
 
 async function openTablesModal(branchId) {
-    const response = await fetch(`http://localhost:8080/api/tables/branch/${branchId}`);
-    const data = await response.json();
+    try {
+        // Mostrar indicador de carga
+        Swal.fire({
+            title: 'Cargando mesas',
+            html: 'Obteniendo información de mesas...',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
 
-    if (response.ok && data.success) {
-        populateTablesModal(branchId, data.data); // Llenar el modal con las mesas
-        const tablesModal = new bootstrap.Modal(document.getElementById('tablesModal'));
-        tablesModal.show();
-    } else {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`http://localhost:8080/api/tables/branch/${branchId}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            }
+        });
+        
+        const data = await response.json();
+        Swal.close(); // Cerrar indicador de carga
+
+        if (response.ok && data.success) {
+            // Guardar el ID de la sede en el modal para usarlo en la creación de mesas
+            const tablesModal = document.getElementById('tablesModal');
+            tablesModal.dataset.branchId = branchId;
+            
+            // Llenar el modal con las mesas
+            populateTablesModal(branchId, data.data);
+            
+            // Limpiar el formulario de creación
+            document.getElementById('createTableForm').reset();
+            
+            // Mostrar el modal
+            const modal = new bootstrap.Modal(tablesModal);
+            modal.show();
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: data.message || 'No se pudieron cargar las mesas.'
+            });
+        }
+    } catch (error) {
+        console.error('Error al cargar las mesas:', error);
         Swal.fire({
             icon: 'error',
-            title: 'Error',
-            text: data.message || 'No se pudieron cargar las mesas.',
+            title: 'Error de conexión',
+            text: 'Ocurrió un problema al cargar las mesas. Por favor, intenta de nuevo.'
         });
     }
 }
@@ -544,35 +582,58 @@ function populateTablesModal(branchId, tables) {
     const tablesContainer = document.getElementById('tablesContainer');
     tablesContainer.innerHTML = '';
 
-    tables.forEach(table => {
+    // Si no hay mesas, mostrar mensaje
+    if (!tables || tables.length === 0) {
+        tablesContainer.innerHTML = `
+            <div class="w-100 text-center p-5">
+                <img src="./assets/img/mesa.png" alt="Sin mesas" style="width: 80px; opacity: 0.3;">
+                <h5 class="mt-3 text-muted">No hay mesas creadas</h5>
+                <p class="text-muted">Utiliza el formulario de la izquierda para crear una nueva mesa.</p>
+            </div>
+        `;
+        return;
+    }
+
+    // Crear tarjetas de mesa con animación
+    tables.forEach((table, index) => {
+        const statusClass = getStatusClass(table.status);
+        const statusText = getStatusText(table.status);
+        
         const tableCard = document.createElement('div');
-        tableCard.className = 'table-card';
+        tableCard.className = 'table-card animate__animated animate__fadeIn';
+        tableCard.style.animationDelay = `${index * 0.05}s`;
+        
         tableCard.innerHTML = `
+            <div class="table-card-header">
+                <h5>Mesa ${table.tableNumber}</h5>
+            </div>
             <div class="table-card-content">
                 <img src="./assets/img/mesa.png" alt="Mesa" class="table-image">
                 <div class="table-info">
-                    <h5>Mesa ${table.tableNumber}</h5>
                     <p><strong>Capacidad:</strong> ${table.capacity}</p>
                     <p><strong>Ubicación:</strong> ${table.location}</p>
-                    <p><strong>Estado:</strong> ${table.status}</p>
+                    <p><span class="badge-table-status ${statusClass}">${statusText}</span></p>
                 </div>
                 <div class="table-actions">
-                    <button class="btn btn-warning edit-table-btn" data-id="${table.id}">
+                    <button class="btn btn-warning edit-table-btn" data-id="${table.id}" title="Editar mesa">
                         <i class="bi bi-pencil"></i>
                     </button>
-                    <button class="btn btn-danger delete-table-btn" data-id="${table.id}">
+                    <button class="btn btn-danger delete-table-btn" data-id="${table.id}" title="Eliminar mesa">
                         <i class="bi bi-trash"></i>
                     </button>
                 </div>
             </div>
         `;
+        
         tablesContainer.appendChild(tableCard);
     });
 
+    // Añadir eventos a los botones
     document.querySelectorAll('.edit-table-btn').forEach(button => {
         button.addEventListener('click', () => {
             const tableId = button.dataset.id;
-            openEditTableModal(branchId, tableId);
+            const table = tables.find(t => t.id == tableId);
+            openEditTableModal(branchId, table);
         });
     });
 
@@ -582,122 +643,123 @@ function populateTablesModal(branchId, tables) {
             deleteTable(branchId, tableId);
         });
     });
+
+    // Añadir evento de búsqueda
+    document.getElementById('searchTableInput').addEventListener('input', function() {
+        const searchText = this.value.toLowerCase();
+        document.querySelectorAll('.table-card').forEach(card => {
+            const tableNumber = card.querySelector('h5').textContent.toLowerCase();
+            const tableInfo = card.querySelector('.table-info').textContent.toLowerCase();
+            
+            if (tableNumber.includes(searchText) || tableInfo.includes(searchText)) {
+                card.style.display = '';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    });
 }
 
-function openEditTableModal(branchId, tableId) {
-    // Lógica para abrir el modal de edición de mesas
-    const editTableModal = new bootstrap.Modal(document.getElementById('editTableModal'));
-    editTableModal.show();
+// Función para obtener la clase CSS según el estado
+function getStatusClass(status) {
+    switch(status) {
+        case 'AVAILABLE': return 'badge-available';
+        case 'OCCUPIED': return 'badge-occupied';
+        case 'RESERVED': return 'badge-reserved';
+        default: return 'badge-secondary';
+    }
 }
 
-function deleteTable(branchId, tableId) {
-    Swal.fire({
-        title: '¿Estás seguro?',
-        text: 'Esta acción eliminará la mesa seleccionada.',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Sí, eliminar',
-        cancelButtonText: 'Cancelar',
-    }).then(async (result) => {
-        if (result.isConfirmed) {
-            const response = await fetch(`http://localhost:8080/api/tables/${tableId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                },
+// Función para obtener texto legible según el estado
+function getStatusText(status) {
+    switch(status) {
+        case 'AVAILABLE': return 'Disponible';
+        case 'OCCUPIED': return 'Ocupada';
+        case 'RESERVED': return 'Reservada';
+        default: return 'Desconocido';
+    }
+}
+
+// Manejar la creación de mesas desde el formulario integrado
+document.addEventListener('DOMContentLoaded', function() {
+    const createTableForm = document.getElementById('createTableForm');
+    
+    createTableForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const branchId = document.getElementById('tablesModal').dataset.branchId;
+        const tableNumber = document.getElementById('tableNumber').value;
+        const capacity = document.getElementById('tableCapacity').value;
+        const location = document.getElementById('tableLocation').value;
+        const status = document.getElementById('tableStatus').value;
+        
+        if (!branchId) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'No se pudo identificar la sede.',
             });
-
-            if (response.ok) {
+            return;
+        }
+        
+        const tableData = {
+            tableNumber: parseInt(tableNumber),
+            capacity: parseInt(capacity),
+            location: location.trim(),
+            status: status,
+        };
+        
+        try {
+            // Mostrar indicador de carga
+            Swal.fire({
+                title: 'Creando mesa',
+                html: 'Procesando solicitud...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+            
+            const token = localStorage.getItem('token');
+            const response = await fetch(`http://localhost:8080/api/tables/branch/${branchId}`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(tableData),
+            });
+            
+            const responseData = await response.json();
+            
+            if (response.ok && responseData.success) {
                 Swal.fire({
                     icon: 'success',
-                    title: 'Mesa eliminada',
-                    text: 'La mesa ha sido eliminada correctamente.',
+                    title: 'Mesa creada',
+                    text: responseData.message || 'La mesa ha sido creada exitosamente.',
+                    timer: 1500,
+                    showConfirmButton: false
                 });
-                openTablesModal(branchId); // Recargar las mesas
+                
+                // Limpiar el formulario
+                createTableForm.reset();
+                
+                // Recargar las mesas
+                openTablesModal(branchId);
             } else {
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: 'No se pudo eliminar la mesa.',
+                    text: responseData.message || 'No se pudo crear la mesa.',
                 });
             }
-        }
-    });
-}
-
-document.getElementById('addTableButton').addEventListener('click', () => {
-    openCreateTableModal();
-});
-
-function openCreateTableModal() {
-    const createTableModal = document.getElementById('createTableModal');
-    createTableModal.style.display = 'flex'; // Mostrar el modal
-}
-
-document.getElementById('closeCreateTableModal').addEventListener('click', () => {
-    const createTableModal = document.getElementById('createTableModal');
-    createTableModal.style.display = 'none'; // Ocultar el modal
-});
-
-document.getElementById('saveTableButton').addEventListener('click', async () => {
-    const branchId = document.getElementById('tablesModal').dataset.branchId; // Obtener el branchId del modal de mesas
-    const tableNumber = document.getElementById('tableNumber').value;
-    const capacity = document.getElementById('tableCapacity').value;
-    const location = document.getElementById('tableLocation').value;
-    const status = document.getElementById('tableStatus').value;
-
-    if (!tableNumber || !capacity || !location || !status) {
-        Swal.fire({
-            icon: 'warning',
-            title: 'Campos incompletos',
-            text: 'Por favor, completa todos los campos antes de guardar.',
-        });
-        return;
-    }
-
-    const tableData = {
-        tableNumber: parseInt(tableNumber),
-        capacity: parseInt(capacity),
-        location: location.trim(),
-        status: status,
-    };
-
-    try {
-        const token = localStorage.getItem('token');
-        const response = await fetch(`http://localhost:8080/api/tables/branch/${branchId}`, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(tableData),
-        });
-
-        const responseData = await response.json();
-
-        if (response.ok) {
-            Swal.fire({
-                icon: 'success',
-                title: 'Mesa creada',
-                text: 'La mesa ha sido creada exitosamente.',
-            });
-            document.getElementById('createTableModal').style.display = 'none'; // Ocultar el modal
-            openTablesModal(branchId); // Recargar las mesas
-        } else {
+        } catch (error) {
+            console.error('Error al crear la mesa:', error);
             Swal.fire({
                 icon: 'error',
-                title: 'Error al crear la mesa',
-                text: responseData.message || 'No se pudo crear la mesa.',
+                title: 'Error',
+                text: 'Ocurrió un problema al intentar crear la mesa.',
             });
         }
-    } catch (error) {
-        console.error('Error al crear la mesa:', error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'Ocurrió un problema al intentar crear la mesa.',
-        });
-    }
+    });
 });

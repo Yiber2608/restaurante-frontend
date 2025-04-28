@@ -470,76 +470,222 @@ input:checked+.slider::before {
     border-color: var(--bs-secondary-dark);
 }
 
+/* Estilos para el modal de mesas */
+#tablesModal .modal-content {
+    border-radius: 15px;
+    background: linear-gradient(145deg, #fff8f8, #fff0f0);
+    border: none;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+#tablesModal .modal-header {
+    border-bottom: 1px solid rgba(255, 192, 203, 0.3);
+    background: transparent;
+    padding: 1.5rem;
+}
+
+#tablesModal .modal-title {
+    color: #d15a7c;
+    font-weight: 600;
+    font-size: 1.5rem;
+}
+
+#tablesModal .modal-body {
+    padding: 1.5rem;
+}
+
+/* Tarjeta de creación */
+.table-creation-card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05);
+    height: 100%;
+    border: 1px solid rgba(255, 192, 203, 0.3);
+}
+
+.table-creation-card .card-header {
+    background: linear-gradient(145deg, #ffc2d0, #ffb6c1);
+    color: white;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    padding: 1rem;
+    text-align: center;
+}
+
+.table-creation-card .card-body {
+    padding: 1.5rem;
+}
+
+.table-creation-card .form-label {
+    color: #333;
+    font-weight: 500;
+}
+
+.table-creation-card .form-control,
+.table-creation-card .form-select {
+    border-radius: 10px;
+    border: 1px solid #ffe0e0;
+    padding: 0.6rem 1rem;
+    background-color: #fff;
+    transition: all 0.3s ease;
+}
+
+.table-creation-card .form-control:focus,
+.table-creation-card .form-select:focus {
+    border-color: #ff9eb5;
+    box-shadow: 0 0 0 0.2rem rgba(255, 158, 181, 0.25);
+}
+
+.table-creation-card .btn-primary {
+    background: linear-gradient(145deg, #ff9eb5, #ff7d9c);
+    border: none;
+    transition: all 0.3s ease;
+    border-radius: 10px;
+    padding: 0.6rem 1.5rem;
+    font-weight: 500;
+}
+
+.table-creation-card .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(255, 158, 181, 0.25);
+}
+
+/* Tarjetas de mesa */
 .table-card {
+    background: white;
+    border-radius: 15px;
+    padding: 0;
+    width: 150px;
+    min-height: 220px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    margin: 8px;
+    border: 1px solid rgba(255, 192, 203, 0.3);
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    background-color: #ffe4e1; /* Fondo rosado */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .table-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.table-card-header {
+    background: linear-gradient(145deg, #ffccd6, #ffb6c1);
+    color: white;
+    text-align: center;
+    padding: 0.75rem 0;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
 }
 
 .table-card-content {
-    text-align: center;
-    padding: 10px;
+    padding: 1rem;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .table-image {
-    width: 80px;
-    height: auto;
+    width: 50px;
+    height: 50px;
     margin-bottom: 10px;
+    transition: transform 0.3s ease;
+}
+
+.table-card:hover .table-image {
+    transform: rotate(10deg);
 }
 
 .table-info {
-    font-size: 14px;
-    margin-bottom: 10px;
-}
-
-.table-actions {
-    display: flex;
-    justify-content: center;
-    gap: 5px;
+    text-align: center;
     margin-top: 5px;
 }
 
-.modal-transparent {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* Fondo semitransparente */
-    justify-content: center;
-    align-items: center;
-    z-index: 1050;
+.table-info h5 {
+    color: #d15a7c;
+    font-size: 1.1rem;
+    margin-bottom: 8px;
 }
 
-.create-table-card {
-    background-color: #ffe4e1; /* Fondo rosado */
+.table-info p {
+    margin: 3px 0;
+    font-size: 0.8rem;
+    color: #666;
+}
+
+.badge-table-status {
+    padding: 4px 8px;
     border-radius: 10px;
-    padding: 20px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    width: 300px;
-    text-align: center;
+    font-size: 0.75rem;
+    font-weight: 500;
 }
 
-.create-table-card .form-control,
-.create-table-card .form-select {
-    margin-bottom: 10px;
+.badge-available {
+    background-color: #4CAF50;
+    color: white;
 }
 
-.create-table-card .table-actions {
+.badge-occupied {
+    background-color: #f44336;
+    color: white;
+}
+
+.badge-reserved {
+    background-color: #ff9800;
+    color: white;
+}
+
+.table-actions {
+    width: 100%;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     gap: 10px;
+    margin-top: 10px;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+}
+
+.table-card:hover .table-actions {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.table-actions button {
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tables-header {
+    margin-bottom: 15px;
+}
+
+.tables-header h5 {
+    color: #d15a7c;
+    font-weight: 600;
+    margin: 0;
+}
+
+#searchTableInput {
+    width: 200px;
+    border-radius: 20px;
+    border: 1px solid #ffe0e0;
+    padding: 0.4rem 1rem;
+}
+
+#tablesContainer {
+    max-height: 500px;
+    overflow-y: auto;
+    padding: 10px;
+    mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
 }
