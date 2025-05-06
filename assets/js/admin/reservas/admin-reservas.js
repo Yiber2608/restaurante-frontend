@@ -175,12 +175,8 @@ async function loadBranches() {
 
 // Renderizar la lista de sedes en el sidebar
 function renderBranchList(branches) {
-    console.log("Renderizando lista de sedes en el sidebar");
     const branchListContainer = document.getElementById('branchList');
-    if (!branchListContainer) {
-        console.error("No se encontró el contenedor de la lista de sedes (#branchList)");
-        return;
-    }
+    if (!branchListContainer) return;
     
     branchListContainer.innerHTML = '';
     
@@ -195,17 +191,25 @@ function renderBranchList(branches) {
     }
     
     branches.forEach(branch => {
-        // Asignar un valor predeterminado seguro para openingTime y closingTime
-        const openingTime = branch.openingTime || '09:00:00';
-        const closingTime = branch.closingTime || '22:00:00';
-        
         const listItem = document.createElement('div');
         listItem.className = `list-group-item branch-item d-flex align-items-center p-3 ${selectedBranchId === branch.id ? 'active' : ''}`;
         listItem.setAttribute('data-id', branch.id);
         
-        // Icono de ocupación basado en reservas (por ahora un valor por defecto)
+        // Icono de ocupación basado en reservas
         let statusIcon = 'bi-circle';
         let statusClass = 'text-success';
+        
+        // Filtrar reservas por sede (si ya están cargadas)
+        const branchReservations = reservations.filter(r => r.branchId == branch.id);
+        const reservationCount = branchReservations.length;
+        
+        if (reservationCount > 10) {
+            statusIcon = 'bi-circle-fill';
+            statusClass = 'text-danger';
+        } else if (reservationCount > 5) {
+            statusIcon = 'bi-circle-half';
+            statusClass = 'text-warning';
+        }
         
         listItem.innerHTML = `
             <div class="me-3 branch-icon">
@@ -214,17 +218,16 @@ function renderBranchList(branches) {
             <div class="flex-grow-1">
                 <div class="d-flex justify-content-between align-items-center">
                     <h6 class="mb-0">${branch.name}</h6>
-                    <span class="badge bg-primary rounded-pill">0</span>
+                    <span class="badge bg-primary rounded-pill">${reservationCount}</span>
                 </div>
                 <div class="small text-muted d-flex justify-content-between">
-                    <span>${branch.address.substring(0, 20)}${branch.address.length > 20 ? '...' : ''}</span>
-                    <span>${formatTime(openingTime)} - ${formatTime(closingTime)}</span>
+                    <span>${branch.address ? (branch.address.substring(0, 20) + (branch.address.length > 20 ? '...' : '')) : 'Sin dirección'}</span>
+                    <span>${formatTime(branch.openingTime || '09:00:00')} - ${formatTime(branch.closingTime || '22:00:00')}</span>
                 </div>
             </div>
         `;
         
         listItem.addEventListener('click', () => {
-            console.log("Sede seleccionada:", branch.id, branch.name);
             selectBranch(branch.id);
         });
         
@@ -232,85 +235,347 @@ function renderBranchList(branches) {
     });
 }
 
-// Seleccionar una sede
-function selectBranch(branchId) {
-    console.log("Seleccionando sede:", branchId);
-    // Actualizar la variable global de sede seleccionada
-    selectedBranchId = branchId;
-    
-    // Marcar visualmente la sede seleccionada en la lista
-    document.querySelectorAll('.branch-item').forEach(item => {
-        if (item.getAttribute('data-id') == branchId) {
-            item.classList.add('active');
-        } else {
-            item.classList.remove('active');
-        }
-    });
-    
-    // Limpiar el calendario
-    if (calendar) {
-        calendar.getEvents().forEach(event => event.remove());
+// Inicializar los filtros de fecha y búsqueda
+function initializeFilters() {
+    // Configurar filtro por fecha actual
+    const today = new Date();
+    const dateFilter = document.getElementById('dateFilter');
+    if (dateFilter) {
+        dateFilter.valueAsDate = today;
     }
     
-    // Centrar el mapa en la sede seleccionada
-    const branch = branches.find(b => b.id == branchId);
-    if (branch && branch.latitude && branch.longitude) {
-        console.log("Centrando mapa en sede:", branch.name);
-        centerMapOnBranch(branch);
+    // Botones de filtro
+    const btnToday = document.getElementById('btnTodayReservations');
+    const btnWeek = document.getElementById('btnWeekReservations');
+    const btnMonth = document.getElementById('btnMonthReservations');
+    const btnDateFilter = document.getElementById('btnDateFilter');
+    const btnSearch = document.getElementById('btnSearch');
+    const searchInput = document.getElementById('searchInput');
+    
+    if (btnToday) {
+        btnToday.addEventListener('click', () => {
+            filterReservationsToday();
+        });
     }
     
-    // Cargar las reservas para esta sede
-    loadReservationsForBranch(branchId);
+    if (btnWeek) {
+        btnWeek.addEventListener('click', () => {
+            filterReservationsThisWeek();
+        });
+    }
     
-    // Actualizar el título de la sección
-    const branchNameElement = document.getElementById('selected-branch-name');
-    if (branchNameElement && branch) {
-        branchNameElement.textContent = branch.name;
+    if (btnMonth) {
+        btnMonth.addEventListener('click', () => {
+            filterReservationsThisMonth();
+        });
+    }
+    
+    if (btnDateFilter && dateFilter) {
+        btnDateFilter.addEventListener('click', () => {
+            const selectedDate = dateFilter.value;
+            if (selectedDate) {
+                filterReservationsByDate(selectedDate);
+            }
+        });
+    }
+    
+    if (btnSearch && searchInput) {
+        btnSearch.addEventListener('click', () => {
+            const searchTerm = searchInput.value.trim();
+            if (searchTerm.length > 0) {
+                searchReservations(searchTerm);
+            }
+        });
+        
+        // También permitir búsqueda al presionar Enter
+        searchInput.addEventListener('keyup', (e) => {
+            if (e.key === 'Enter') {
+                const searchTerm = searchInput.value.trim();
+                if (searchTerm.length > 0) {
+                    searchReservations(searchTerm);
+                }
+            }
+        });
     }
 }
 
-// Inicializar el calendario FullCalendar
-function initializeCalendar() {
-    console.log("Inicializando calendario");
-    const calendarEl = document.getElementById('calendar');
-    
-    if (!calendarEl) {
-        console.error("No se encontró el elemento del calendario (#calendar)");
+// Filtrar reservas para hoy
+function filterReservationsToday() {
+    if (!selectedBranchId) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Selecciona una sede',
+            text: 'Por favor, selecciona una sede primero para ver sus reservas.'
+        });
         return;
     }
     
-    calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: 'dayGridMonth',
-        locale: 'es',
-        headerToolbar: {
-            left: 'prev,next today',
-            center: 'title',
-            right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
-        },
-        buttonText: {
-            today: 'Hoy',
-            month: 'Mes',
-            week: 'Semana',
-            day: 'Día',
-            list: 'Lista'
-        },
-        events: [],
-        selectable: true,
-        select: handleDateSelect,
-        eventClick: handleEventClick,
-        eventTimeFormat: {
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: true
-        },
-        slotLabelFormat: {
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: true
+    const today = new Date().toISOString().split('T')[0];
+    
+    // Llamar a la API para obtener las reservas del día actual
+    loadReservationsForDate(selectedBranchId, today);
+}
+
+// Filtrar reservas para esta semana
+function filterReservationsThisWeek() {
+    if (!selectedBranchId) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Selecciona una sede',
+            text: 'Por favor, selecciona una sede primero para ver sus reservas.'
+        });
+        return;
+    }
+    
+    // Obtener fecha de inicio (lunes) y fin (domingo) de la semana actual
+    const today = new Date();
+    const currentDay = today.getDay(); // 0 (domingo) a 6 (sábado)
+    const daysFromMonday = currentDay === 0 ? 6 : currentDay - 1;
+    
+    const monday = new Date(today);
+    monday.setDate(today.getDate() - daysFromMonday);
+    
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
+    
+    const startDate = monday.toISOString().split('T')[0];
+    const endDate = sunday.toISOString().split('T')[0];
+    
+    // Llamar a la API para obtener las reservas de la semana
+    loadReservationsForDateRange(selectedBranchId, startDate, endDate);
+}
+
+// Filtrar reservas para este mes
+function filterReservationsThisMonth() {
+    if (!selectedBranchId) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Selecciona una sede',
+            text: 'Por favor, selecciona una sede primero para ver sus reservas.'
+        });
+        return;
+    }
+    
+    const today = new Date();
+    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+    const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    
+    const startDate = firstDay.toISOString().split('T')[0];
+    const endDate = lastDay.toISOString().split('T')[0];
+    
+    // Llamar a la API para obtener las reservas del mes
+    loadReservationsForDateRange(selectedBranchId, startDate, endDate);
+}
+
+// Filtrar reservas por fecha específica
+function filterReservationsByDate(dateString) {
+    if (!selectedBranchId) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Selecciona una sede',
+            text: 'Por favor, selecciona una sede primero para ver sus reservas.'
+        });
+        return;
+    }
+    
+    // Llamar a la API para obtener las reservas de la fecha seleccionada
+    loadReservationsForDate(selectedBranchId, dateString);
+}
+
+// Cargar reservas para una fecha específica
+async function loadReservationsForDate(branchId, date) {
+    try {
+        const token = localStorage.getItem('token');
+        
+        Swal.fire({
+            title: 'Cargando reservas',
+            text: 'Por favor espera...',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+        
+        const response = await fetch(`${window.API_BASE_URL}/api/reservations/branch/${branchId}?date=${date}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const data = await response.json();
+        Swal.close();
+        
+        if (response.ok && data.success) {
+            // Adaptar al formato que espera la aplicación
+            reservations = data.data.map(reservation => ({
+                id: reservation.id,
+                date: reservation.reservationDate,
+                time: reservation.startTime,
+                endTime: reservation.endTime,
+                duration: calculateDuration(reservation.startTime, reservation.endTime),
+                people: reservation.numGuests,
+                customerName: reservation.userName,
+                customerEmail: reservation.userEmail || "",
+                comments: reservation.specialRequests || "",
+                status: reservation.status,
+                branchId: reservation.branchId,
+                branchName: reservation.branchName,
+                tableId: reservation.tableId,
+                tableNumber: reservation.tableNumber
+            }));
+            
+            // Actualizar eventos en el calendario
+            updateReservationEvents(reservations);
+            updateStatistics(reservations);
+            
+            // Mensaje de éxito
+            Swal.fire({
+                icon: 'success',
+                title: 'Reservas cargadas',
+                text: `Se encontraron ${reservations.length} reservas para el ${formatDate(date)}.`,
+                timer: 2000,
+                showConfirmButton: false
+            });
+            
+            // Actualizar la fecha seleccionada en el filtro visual
+            const dateFilter = document.getElementById('dateFilter');
+            if (dateFilter) {
+                dateFilter.value = date;
+            }
+        } else {
+            showError('Error al cargar las reservas:', data.message);
         }
+    } catch (error) {
+        Swal.close();
+        console.error('Error al cargar las reservas:', error);
+        showError('Error de conexión', 'No se pudieron cargar las reservas. Verifica tu conexión a internet.');
+    }
+}
+
+// Cargar reservas para un rango de fechas
+async function loadReservationsForDateRange(branchId, startDate, endDate) {
+    try {
+        const token = localStorage.getItem('token');
+        
+        Swal.fire({
+            title: 'Cargando reservas',
+            text: 'Por favor espera...',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+        
+        const response = await fetch(`${window.API_BASE_URL}/api/reservations/branch/${branchId}/range?startDate=${startDate}&endDate=${endDate}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const data = await response.json();
+        Swal.close();
+        
+        if (response.ok && data.success) {
+            // Adaptar al formato que espera la aplicación
+            reservations = data.data.map(reservation => ({
+                id: reservation.id,
+                date: reservation.reservationDate,
+                time: reservation.startTime,
+                endTime: reservation.endTime,
+                duration: calculateDuration(reservation.startTime, reservation.endTime),
+                people: reservation.numGuests,
+                customerName: reservation.userName,
+                customerEmail: reservation.userEmail || "",
+                comments: reservation.specialRequests || "",
+                status: reservation.status,
+                branchId: reservation.branchId,
+                branchName: reservation.branchName,
+                tableId: reservation.tableId,
+                tableNumber: reservation.tableNumber
+            }));
+            
+            // Actualizar eventos en el calendario
+            updateReservationEvents(reservations);
+            updateStatistics(reservations);
+            
+            // Mensaje de éxito
+            Swal.fire({
+                icon: 'success',
+                title: 'Reservas cargadas',
+                text: `Se encontraron ${reservations.length} reservas del ${formatDate(startDate)} al ${formatDate(endDate)}.`,
+                timer: 2000,
+                showConfirmButton: false
+            });
+        } else {
+            showError('Error al cargar las reservas:', data.message);
+        }
+    } catch (error) {
+        Swal.close();
+        console.error('Error al cargar las reservas:', error);
+        showError('Error de conexión', 'No se pudieron cargar las reservas. Verifica tu conexión a internet.');
+    }
+}
+
+// Función para buscar reservas
+function searchReservations(searchTerm) {
+    if (!selectedBranchId) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Selecciona una sede',
+            text: 'Por favor, selecciona una sede primero para buscar reservas.'
+        });
+        return;
+    }
+    
+    if (searchTerm.length < 3) {
+        Swal.fire({
+            icon: 'info',
+            title: 'Búsqueda demasiado corta',
+            text: 'Por favor, ingresa al menos 3 caracteres para buscar.'
+        });
+        return;
+    }
+    
+    // Filtrar las reservas ya cargadas
+    const filtered = reservations.filter(reservation => {
+        return reservation.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+               reservation.customerEmail.toLowerCase().includes(searchTerm.toLowerCase()) ||
+               (reservation.comments && reservation.comments.toLowerCase().includes(searchTerm.toLowerCase())) ||
+               (reservation.tableNumber && reservation.tableNumber.toString().includes(searchTerm));
     });
     
-    calendar.render();
+    if (filtered.length > 0) {
+        // Mostrar solo las reservas filtradas en el calendario
+        updateReservationEvents(filtered);
+        
+        Swal.fire({
+            icon: 'success',
+            title: 'Resultados de búsqueda',
+            text: `Se encontraron ${filtered.length} reservas que coinciden con "${searchTerm}".`,
+            timer: 2000,
+            showConfirmButton: false
+        });
+    } else {
+        Swal.fire({
+            icon: 'info',
+            title: 'Sin resultados',
+            text: `No se encontraron reservas que coincidan con "${searchTerm}".`,
+            timer: 2000,
+            showConfirmButton: false
+        });
+    }
+}
+
+// Formatear fecha
+function formatDate(dateString) {
+    if (!dateString) return '';
+    
+    const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
+    return new Date(dateString).toLocaleDateString('es-ES', options);
 }
 
 // Cargar reservas para una sede específica
@@ -871,6 +1136,8 @@ function getBranchName(branchId) {
 }
 
 function formatDate(dateString) {
+    if (!dateString) return '';
+    
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     const date = new Date(dateString);
     return date.toLocaleDateString('es-ES', options);
@@ -1074,4 +1341,85 @@ function centerMapOnBranch(branch) {
     } catch (error) {
         console.error("Error al centrar el mapa:", error);
     }
+}
+
+// Seleccionar una sede
+function selectBranch(branchId) {
+    console.log("Seleccionando sede:", branchId);
+    // Actualizar la variable global de sede seleccionada
+    selectedBranchId = branchId;
+    
+    // Marcar visualmente la sede seleccionada en la lista
+    document.querySelectorAll('.branch-item').forEach(item => {
+        if (item.getAttribute('data-id') == branchId) {
+            item.classList.add('active');
+        } else {
+            item.classList.remove('active');
+        }
+    });
+    
+    // Limpiar el calendario
+    if (calendar) {
+        calendar.getEvents().forEach(event => event.remove());
+    }
+    
+    // Centrar el mapa en la sede seleccionada
+    const branch = branches.find(b => b.id == branchId);
+    if (branch && branch.latitude && branch.longitude) {
+        console.log("Centrando mapa en sede:", branch.name);
+        centerMapOnBranch(branch);
+    }
+    
+    // Cargar las reservas para esta sede
+    loadReservationsForBranch(branchId);
+    
+    // Actualizar el título de la sección
+    const branchNameElement = document.getElementById('selected-branch-name');
+    if (branchNameElement && branch) {
+        branchNameElement.textContent = branch.name;
+    }
+}
+
+// Inicializar el calendario FullCalendar
+function initializeCalendar() {
+    console.log("Inicializando calendario");
+    const calendarEl = document.getElementById('calendar');
+    
+    if (!calendarEl) {
+        console.error("No se encontró el elemento del calendario (#calendar)");
+        return;
+    }
+    
+    calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        locale: 'es',
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+        },
+        buttonText: {
+            today: 'Hoy',
+            month: 'Mes',
+            week: 'Semana',
+            day: 'Día',
+            list: 'Lista'
+        },
+        events: [],
+        selectable: true,
+        select: handleDateSelect,
+        eventClick: handleEventClick,
+        eventTimeFormat: {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+        },
+        slotLabelFormat: {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+        }
+    });
+    
+    calendar.render();
 }

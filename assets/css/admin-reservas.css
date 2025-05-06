@@ -72,6 +72,26 @@
 }
 
 /* Estilos para la lista de sedes */
+#branchList {
+    max-height: 400px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0,0,0,0.2) transparent;
+}
+
+#branchList::-webkit-scrollbar {
+    width: 6px;
+}
+
+#branchList::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+#branchList::-webkit-scrollbar-thumb {
+    background-color: rgba(0,0,0,0.2);
+    border-radius: 10px;
+}
+
 .branch-item {
     cursor: pointer;
     transition: all 0.2s ease;
@@ -95,63 +115,54 @@
     justify-content: center;
 }
 
-/* Limitar altura y añadir scroll */
-#branchList {
-    max-height: 300px;
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(0,0,0,0.2) transparent;
+/* Mejorar los filtros de búsqueda */
+.filter-container {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
-#branchList::-webkit-scrollbar {
-    width: 6px;
+.filter-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 10px;
 }
 
-#branchList::-webkit-scrollbar-track {
-    background: transparent;
+/* Mejorar apariencia de los botones de filtro */
+.btn-filter {
+    transition: all 0.2s ease;
+    border-radius: 20px;
+    font-weight: 500;
 }
 
-#branchList::-webkit-scrollbar-thumb {
-    background-color: rgba(0,0,0,0.2);
-    border-radius: 10px;
+.btn-filter.active {
+    background-color: #0d6efd;
+    color: white;
 }
 
-/* Estilos para los eventos de calendario según el estado */
-.fc-event.bg-success {
-    background-color: #28a745 !important;
-    border-color: #28a745 !important;
+/* Mejorar el campo de búsqueda */
+.search-container {
+    position: relative;
 }
 
-.fc-event.bg-warning {
-    background-color: #ffc107 !important;
-    border-color: #ffc107 !important;
+.search-container .input-group-text {
+    background-color: white;
+    border-right: none;
 }
 
-.fc-event.bg-danger {
-    background-color: #dc3545 !important;
-    border-color: #dc3545 !important;
+.search-container input {
+    border-left: none;
 }
 
-.fc-event.bg-info {
-    background-color: #17a2b8 !important;
-    border-color: #17a2b8 !important;
+.search-container input:focus {
+    box-shadow: none;
+    border-color: #ced4da;
+    border-left: none;
 }
 
-/* Mejorar visibilidad del calendario */
-.fc-daygrid-event {
-    white-space: normal !important;
-    padding: 2px 4px;
-}
-
-.fc-daygrid-dot-event .fc-event-title {
-    font-weight: bold;
-}
-
-/* Hacer más visibles los días con eventos */
-.fc-day-today {
-    background-color: rgba(225, 240, 255, 0.5) !important;
-}
-
-.fc-daygrid-day.fc-day-has-events {
-    font-weight: bold;
+.search-container .input-group-text:focus-within {
+    border-color: #86b7fe;
 }
