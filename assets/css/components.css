@@ -2,12 +2,16 @@
 .wrapper {
     display: flex;
     transition: all 0.35s ease-in-out;
+    width: 100%;
+    margin: 0;
+    padding: 0;
 }
 
 .main {
     min-height: 100vh;
     width: calc(100% - 90px);
-    /* Ajustar cuando el sidebar está visible */
+    margin: 0;
+    padding: 0;
     overflow: hidden;
     transition: all 0.35s ease-in-out;
 }
@@ -20,20 +24,19 @@
     flex-direction: column;
     color: #fff;
     max-width: 90px;
-    /* Control de tamaño en lugar de display */
+    min-width: 90px;
+    margin: 0;
+    padding: 0;
     opacity: 1;
-    /* El sidebar es visible */
     overflow: hidden;
 }
 
 /* Sidebar oculto */
 .sidebar.hidden {
     max-width: 0;
-    /* Ancho del sidebar reducido a 0 */
+    min-width: 0;
     opacity: 0;
-    /* El sidebar se vuelve invisible */
     pointer-events: none;
-    /* Para evitar interacciones cuando está oculto */
 }
 
 /* Ajustes adicionales */

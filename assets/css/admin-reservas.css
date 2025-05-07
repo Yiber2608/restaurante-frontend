@@ -1,74 +1,84 @@
 /* Estilos para las tarjetas de sede */
-.branches-container {
+.branches-container, .branches-scroll-container {
     max-height: 400px;
     overflow-y: auto;
     scrollbar-width: thin;
     scrollbar-color: #dee2e6 #f8f9fa;
 }
 
-.branches-container::-webkit-scrollbar {
+.branches-container::-webkit-scrollbar,
+.branches-scroll-container::-webkit-scrollbar {
     width: 6px;
 }
 
-.branches-container::-webkit-scrollbar-track {
+.branches-container::-webkit-scrollbar-track,
+.branches-scroll-container::-webkit-scrollbar-track {
     background: #f8f9fa;
     border-radius: 10px;
 }
 
-.branches-container::-webkit-scrollbar-thumb {
+.branches-container::-webkit-scrollbar-thumb,
+.branches-scroll-container::-webkit-scrollbar-thumb {
     background-color: #dee2e6;
     border-radius: 10px;
     border: 2px solid #f8f9fa;
 }
 
-.branch-card {
-    transition: all 0.2s ease;
-    border: 2px solid transparent;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+.branch-card,
+.location-card {
+    transition: all 0.3s ease;
+    border: none !important;
+    cursor: pointer;
 }
 
-.branch-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+.branch-card:hover,
+.location-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
 }
 
-.branch-card.active {
-    border-color: #0d6efd;
-    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+.branch-card.active,
+.location-card.border-primary {
+    border-color: #0d6efd !important;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25) !important;
 }
 
 .branch-img-container {
-    height: 120px;
+    height: 160px;
     position: relative;
     overflow: hidden;
 }
 
 .branch-img-container img {
-    width: 100%;
     height: 100%;
+    width: 100%;
     object-fit: cover;
 }
 
-.branch-badge {
+.branch-details {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 15px;
+    background: linear-gradient(0deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%);
+}
+
+.branch-badge,
+.reservation-badge {
     position: absolute;
     top: 10px;
     right: 10px;
-    background-color: rgba(13, 110, 253, 0.9);
+    background-color: rgba(0, 0, 0, 0.7);
     color: white;
+    padding: 4px 8px;
     font-size: 0.75rem;
-    padding: 3px 8px;
-    border-radius: 20px;
-    font-weight: 600;
+    border-radius: 30px;
 }
 
 /* Eliminar los estilos del sidebar adicional ya que no lo vamos a usar */
 .sidebar-additional {
     display: none;
-}
-
-/* Devolver el margen original al contenido principal */
-.main {
-    margin-left: 80px;
 }
 
 /* Estilos para la lista de sedes */
@@ -115,39 +125,25 @@
     justify-content: center;
 }
 
-/* Mejorar los filtros de búsqueda */
-.filter-container {
-    background-color: #f8f9fa;
-    border-radius: 8px;
-    padding: 15px;
-    margin-bottom: 20px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+/* Estilos para filtros y búsqueda */
+.filter-container,
+.search-container {
+    position: relative;
+    margin-bottom: 1rem;
 }
 
-.filter-group {
+.filter-group,
+.filter-options {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
     margin-bottom: 10px;
-}
-
-/* Mejorar apariencia de los botones de filtro */
-.btn-filter {
-    transition: all 0.2s ease;
-    border-radius: 20px;
-    font-weight: 500;
-}
-
-.btn-filter.active {
-    background-color: #0d6efd;
-    color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    z-index: 100;
 }
 
 /* Mejorar el campo de búsqueda */
-.search-container {
-    position: relative;
-}
-
 .search-container .input-group-text {
     background-color: white;
     border-right: none;
@@ -165,4 +161,213 @@
 
 .search-container .input-group-text:focus-within {
     border-color: #86b7fe;
+}
+
+/* Estilos para tarjetas de reservas */
+.reservation-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Estilos para tarjetas de reserva - versión simplificada */
+.reservation-card {
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    position: relative;
+    overflow: hidden;
+    border: 1px solid #e9ecef;
+    transition: transform 0.2s ease;
+}
+
+.reservation-card:hover {
+    transform: translateY(-3px);
+}
+
+.reservation-card .status-indicator {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+}
+
+.reservation-card .card-header {
+    padding: 0.75rem 1rem;
+    background-color: #f8f9fa;
+}
+
+.reservation-card .card-body {
+    padding: 1rem;
+}
+
+/* Estilos específicos por estado - simplificados */
+.reservation-card.confirmed .status-indicator {
+    background-color: #198754;
+}
+
+.reservation-card.pending .status-indicator {
+    background-color: #ffc107;
+}
+
+.reservation-card.cancelled .status-indicator {
+    background-color: #dc3545;
+}
+
+.reservation-card.completed .status-indicator {
+    background-color: #0dcaf0;
+}
+
+/* Estilos para el mapa y contenedor */
+.map-container {
+    height: 300px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* Estilos para el calendario */
+.calendar-container {
+    height: 400px;
+    margin: 20px 0;
+    padding: 10px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    overflow: auto;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* Estilos para slots de hora */
+.hour-slot {
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.hour-slot:hover {
+    background-color: #f8f9fa;
+}
+
+.hour-slot.reserved {
+    background-color: rgba(239, 71, 111, 0.1);
+    border-left: 4px solid #ef476f;
+}
+
+.hour-slot.available {
+    background-color: rgba(6, 214, 160, 0.1);
+    border-left: 4px solid #06d6a0;
+}
+
+/* Estilos para tarjetas de estadísticas */
+.statistics-card {
+    border-radius: 10px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.statistics-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+/* Estilos para indicadores de capacidad */
+.capacity-indicator {
+    margin-bottom: 1rem;
+}
+
+.capacity-indicator .progress {
+    height: 5px;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+/* Estilos para medidores de capacidad */
+.capacity-meter {
+    height: 8px;
+    width: 100%;
+    background-color: #e9ecef;
+    border-radius: 4px;
+    margin-top: 5px;
+    overflow: hidden;
+}
+
+.capacity-progress {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+
+.capacity-progress.info {
+    background-color: #0d6efd;
+}
+
+.capacity-progress.warning {
+    background-color: #ffc107;
+}
+
+.capacity-progress.danger {
+    background-color: #dc3545;
+}
+
+/* Ícono para la tarjeta de sede */
+.icon-shape {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    vertical-align: middle;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+/* Estilos específicos para FullCalendar */
+.fc {
+    height: 100% !important;
+    width: 100% !important;
+}
+
+.fc-event {
+    cursor: pointer;
+}
+
+.fc-day:hover {
+    background-color: rgba(0, 123, 255, 0.1);
+}
+
+/* Estilos para animaciones */
+.reservation-card {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Estilos para filtros activos */
+.filter-btn.active {
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+/* Estilos para el filtro de horas */
+#hourFilter {
+    max-width: 120px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .reservation-cards {
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    }
+}
+
+@media (max-width: 576px) {
+    .reservation-cards {
+        grid-template-columns: 1fr;
+    }
 }

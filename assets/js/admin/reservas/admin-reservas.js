@@ -5,14 +5,19 @@ let markers = [];
 let branches = [];
 let selectedBranchId = null;
 let reservations = [];
+let dayDetailsModal;
+let selectedDate = null;
 
 // Inicializar la página cuando el DOM esté cargado
 document.addEventListener('DOMContentLoaded', function() {
-    initializeStatistics();
     loadBranches();
     initializeCalendar();
     initializeFilters();
     initializeMap();
+    setupEventListeners();
+    
+    // Inicializar modal de detalles del día
+    dayDetailsModal = new bootstrap.Modal(document.getElementById('dayDetailsModal'));
     
     // Eliminar cualquier backdrop modal que pueda haber quedado
     document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
@@ -23,31 +28,40 @@ document.addEventListener('DOMContentLoaded', function() {
     document.body.style.paddingRight = '';
 });
 
-// Inicializar contador de estadísticas
-function initializeStatistics() {
-    // Establecer valores iniciales para los contadores de estadísticas
-    document.getElementById('totalReservations').textContent = '0';
-    document.getElementById('confirmedReservations').textContent = '0';
-    document.getElementById('pendingReservations').textContent = '0';
-    document.getElementById('cancelledReservations').textContent = '0';
-}
-
-// Actualizar estadísticas de reservas
-function updateStatistics(reservations) {
-    if (!reservations || reservations.length === 0) {
-        initializeStatistics();
-        return;
+// Configurar listeners de eventos adicionales
+function setupEventListeners() {
+    // Añadir eventos para los botones de filtro en el modal de detalles
+    document.querySelectorAll('.filter-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const filterType = this.getAttribute('data-filter');
+            filterHourSlots(filterType);
+            
+            // Desactivar filtro activo anterior y activar el nuevo
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            this.classList.add('active');
+        });
+    });
+    
+    // Botón para añadir una reserva
+    const addReservationBtn = document.getElementById('addReservationBtn');
+    if (addReservationBtn) {
+        addReservationBtn.addEventListener('click', function() {
+            // Cerrar el modal actual
+            dayDetailsModal.hide();
+            
+            // Código para crear una nueva reserva
+            if (selectedBranchId && selectedDate) {
+                // Aquí se podría redirigir a la página de creación de reservas o mostrar un modal
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Crear reserva',
+                    text: `Implementación pendiente: crear reserva para la sede ${selectedBranchId} en la fecha ${selectedDate}`
+                });
+            }
+        });
     }
-
-    const totalReservations = reservations.length;
-    const confirmedReservations = reservations.filter(res => res.status === 'CONFIRMED').length;
-    const pendingReservations = reservations.filter(res => res.status === 'PENDING').length;
-    const cancelledReservations = reservations.filter(res => res.status === 'CANCELLED').length;
-
-    document.getElementById('totalReservations').textContent = totalReservations;
-    document.getElementById('confirmedReservations').textContent = confirmedReservations;
-    document.getElementById('pendingReservations').textContent = pendingReservations;
-    document.getElementById('cancelledReservations').textContent = cancelledReservations;
 }
 
 // Cargar las sedes desde la API
@@ -382,6 +396,565 @@ function filterReservationsByDate(dateString) {
     loadReservationsForDate(selectedBranchId, dateString);
 }
 
+// Filtrar slots de hora por tipo de reserva
+function filterHourSlots(filterType) {
+    const slots = document.querySelectorAll('.hour-slot');
+    
+    slots.forEach(slot => {
+        const hasConfirmed = slot.querySelector('.badge.bg-success');
+        const hasPending = slot.querySelector('.badge.bg-warning');
+        const hasCancelled = slot.querySelector('.badge.bg-danger');
+        
+        // Mostrar u ocultar según el filtro seleccionado
+        if (filterType === 'all') {
+            slot.style.display = 'block';
+        } else if (filterType === 'confirmed' && hasConfirmed) {
+            slot.style.display = 'block';
+        } else if (filterType === 'pending' && hasPending) {
+            slot.style.display = 'block';
+        } else if (filterType === 'cancelled' && hasCancelled) {
+            slot.style.display = 'block';
+        } else {
+            slot.style.display = 'none';
+        }
+    });
+    
+    // Si no hay slots visibles, mostrar un mensaje
+    const visibleSlots = document.querySelectorAll('.hour-slot[style="display: block;"]');
+    const hourSlotsContainer = document.getElementById('hourSlots');
+    
+    if (visibleSlots.length === 0 && hourSlotsContainer) {
+        const noResultsMsg = document.createElement('div');
+        noResultsMsg.className = 'text-center py-4 no-results-message';
+        noResultsMsg.innerHTML = `
+            <i class="bi bi-search text-muted" style="font-size: 2rem;"></i>
+            <p class="mt-3 mb-0 text-muted">No se encontraron reservas con el filtro seleccionado.</p>
+        `;
+        
+        // Eliminar mensajes anteriores
+        document.querySelectorAll('.no-results-message').forEach(msg => msg.remove());
+        
+        // Añadir el nuevo mensaje
+        hourSlotsContainer.appendChild(noResultsMsg);
+    } else {
+        // Eliminar mensajes de "no hay resultados" si hay slots visibles
+        document.querySelectorAll('.no-results-message').forEach(msg => msg.remove());
+    }
+}
+
+// Manejar la selección de una fecha en el calendario
+function handleDateSelect(selectInfo) {
+    if (!selectedBranchId) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'No hay sede seleccionada',
+            text: 'Por favor, selecciona una sede antes de ver detalles del día.'
+        });
+        return;
+    }
+    
+    // Obtener la fecha seleccionada
+    selectedDate = selectInfo.startStr;
+    console.log("Fecha seleccionada en el calendario:", selectedDate);
+    
+    // Actualizar el título del modal
+    const modalTitle = document.getElementById('dayDetailsModalLabel');
+    if (modalTitle) {
+        modalTitle.innerHTML = `<i class="bi bi-calendar-date me-2"></i>Detalles para ${formatDate(selectedDate)}`;
+    }
+    
+    // Mostrar indicador de carga en el modal
+    const hourSlots = document.getElementById('hourSlots');
+    if (hourSlots) {
+        hourSlots.innerHTML = `
+            <div class="text-center py-4">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Cargando...</span>
+                </div>
+                <p class="mt-3 mb-0">Cargando detalles del día...</p>
+            </div>
+        `;
+    }
+    
+    // Mostrar el modal
+    dayDetailsModal.show();
+    
+    // Cargar detalles para la fecha seleccionada
+    loadDayDetails(selectedBranchId, selectedDate);
+}
+
+// Cargar los detalles de un día específico
+async function loadDayDetails(branchId, date) {
+    try {
+        const token = localStorage.getItem('token');
+        
+        console.log(`Cargando reservas para la sede ${branchId} en la fecha ${date}`);
+        
+        // Llamar a la API para obtener los detalles del día
+        const response = await fetch(`${window.API_BASE_URL}/api/reservations/branch/${branchId}?date=${date}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Error ${response.status}: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        console.log("Respuesta de la API:", data);
+        
+        if (data.success) {
+            // Transformar los datos recibidos al formato esperado por renderDayDetails
+            const branch = branches.find(b => b.id == branchId);
+            const totalCapacity = branch ? branch.capacity || 50 : 50;
+            
+            // Organizar las reservas por hora
+            const reservationsByHour = {};
+            let totalUsedCapacity = 0;
+            
+            if (data.data && Array.isArray(data.data)) {
+                data.data.forEach(reservation => {
+                    const hour = reservation.startTime.substring(0, 5); // Tomar solo HH:MM
+                    
+                    if (!reservationsByHour[hour]) {
+                        reservationsByHour[hour] = [];
+                    }
+                    
+                    reservationsByHour[hour].push(reservation);
+                    totalUsedCapacity += reservation.numGuests || 0;
+                });
+            }
+            
+            // Crear la estructura de slots
+            const slots = [];
+            const openingTime = branch?.openingTime ? parseInt(branch.openingTime.split(':')[0]) : 9;
+            const closingTime = branch?.closingTime ? parseInt(branch.closingTime.split(':')[0]) : 22;
+            
+            for (let i = openingTime; i < closingTime; i++) {
+                const hour = `${i.toString().padStart(2, '0')}:00`;
+                const reservations = reservationsByHour[hour] || [];
+                const slotCapacity = totalCapacity / (closingTime - openingTime);
+                const usedCapacity = reservations.reduce((total, r) => total + (r.numGuests || 0), 0);
+                
+                slots.push({
+                    time: hour,
+                    available: usedCapacity < slotCapacity,
+                    totalCapacity: slotCapacity,
+                    usedCapacity: usedCapacity,
+                    remainingCapacity: Math.max(0, slotCapacity - usedCapacity),
+                    reservations: reservations
+                });
+            }
+            
+            // Crear el objeto de datos procesados
+            const processedData = {
+                totalCapacity: totalCapacity,
+                usedCapacity: totalUsedCapacity,
+                slots: slots
+            };
+            
+            console.log("Datos procesados para renderizar:", processedData);
+            
+            // Renderizar los detalles del día en el modal
+            renderDayDetails(processedData, date);
+            
+            // Si hay reservas, mostrarlas también en el calendario
+            if (data.data && Array.isArray(data.data)) {
+                const mappedReservations = data.data.map(reservation => ({
+                    id: reservation.id,
+                    date: reservation.reservationDate,
+                    time: reservation.startTime,
+                    endTime: reservation.endTime,
+                    duration: calculateDuration(reservation.startTime, reservation.endTime),
+                    people: reservation.numGuests,
+                    customerName: reservation.userName,
+                    customerEmail: reservation.userEmail || "",
+                    comments: reservation.specialRequests || "",
+                    status: reservation.status,
+                    branchId: reservation.branchId,
+                    branchName: reservation.branchName,
+                    tableId: reservation.tableId,
+                    tableNumber: reservation.tableNumber
+                }));
+                
+                updateReservationEvents(mappedReservations);
+            }
+        } else {
+            throw new Error(data.message || 'Error desconocido al obtener los detalles del día');
+        }
+    } catch (error) {
+        console.error(`Error al cargar los detalles del día ${date}:`, error);
+        
+        // Mostrar mensaje de error en el modal
+        const hourSlots = document.getElementById('hourSlots');
+        if (hourSlots) {
+            hourSlots.innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    No se pudieron cargar los detalles del día. ${error.message}
+                </div>
+                <div class="text-center">
+                    <button class="btn btn-primary btn-sm" onclick="loadDayDetails('${branchId}', '${date}')">
+                        <i class="bi bi-arrow-repeat me-1"></i>Reintentar
+                    </button>
+                </div>
+            `;
+        }
+    }
+}
+
+// Renderizar detalles del día
+function renderDayDetails(data, date) {
+    const remainingCapacity = document.getElementById('remainingCapacity');
+    const totalCapacity = document.getElementById('totalCapacity');
+    const occupancyPercentage = document.getElementById('occupancyPercentage');
+    const capacityProgressBar = document.getElementById('capacityProgressBar');
+    const reservationsContainer = document.getElementById('reservationsContainer');
+    const noReservationsMessage = document.getElementById('noReservationsMessage');
+    
+    // Actualizar información de capacidad
+    const totalCap = data.totalCapacity || 0;
+    const usedCap = data.usedCapacity || 0;
+    const remainingCap = totalCap - usedCap;
+    const percentage = totalCap > 0 ? Math.round((usedCap / totalCap) * 100) : 0;
+    
+    remainingCapacity.textContent = remainingCap;
+    totalCapacity.textContent = totalCap;
+    occupancyPercentage.textContent = `${percentage}%`;
+    
+    // Actualizar barra de progreso
+    capacityProgressBar.style.width = `${percentage}%`;
+    
+    if (percentage >= 90) {
+        capacityProgressBar.classList.remove('info', 'warning');
+        capacityProgressBar.classList.add('danger');
+    } else if (percentage >= 70) {
+        capacityProgressBar.classList.remove('info', 'danger');
+        capacityProgressBar.classList.add('warning');
+    } else {
+        capacityProgressBar.classList.remove('warning', 'danger');
+        capacityProgressBar.classList.add('info');
+    }
+    
+    // Extraer todas las reservas de los slots
+    let allReservations = [];
+    if (data.slots && Array.isArray(data.slots)) {
+        data.slots.forEach(slot => {
+            if (slot.reservations && Array.isArray(slot.reservations)) {
+                allReservations = [...allReservations, ...slot.reservations];
+            }
+        });
+    }
+    
+    // Ordenar reservaciones por hora
+    allReservations.sort((a, b) => {
+        if (a.startTime < b.startTime) return -1;
+        if (a.startTime > b.startTime) return 1;
+        return 0;
+    });
+    
+    // Mostrar reservaciones o mensaje de "no hay reservas"
+    if (allReservations.length > 0) {
+        reservationsContainer.innerHTML = '';
+        noReservationsMessage.classList.add('d-none');
+        
+        // Generar tarjeta para cada reserva
+        allReservations.forEach(reservation => {
+            const statusClass = getStatusCardClass(reservation.status);
+            const cardElement = document.createElement('div');
+            cardElement.className = `card reservation-card ${statusClass.toLowerCase()} mb-3`;
+            cardElement.setAttribute('data-reservation-id', reservation.id);
+            cardElement.setAttribute('data-status', reservation.status);
+            cardElement.setAttribute('data-time', reservation.startTime);
+            
+            const timeFormatted = formatTime(reservation.startTime);
+            const endTimeFormatted = reservation.endTime ? formatTime(reservation.endTime) : '';
+            const statusText = getStatusLabel(reservation.status);
+            const statusBadgeClass = getStatusBadgeClass(reservation.status);
+            
+            cardElement.innerHTML = `
+                <div class="status-indicator"></div>
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <span class="time-badge badge bg-dark">
+                        <i class="bi bi-clock me-1"></i>${timeFormatted}${endTimeFormatted ? ' - ' + endTimeFormatted : ''}
+                    </span>
+                    <span class="badge ${statusBadgeClass} badge-status">${statusText}</span>
+                </div>
+                <div class="card-body">
+                    <div class="guest-info">
+                        <div class="guest-icon">
+                            <i class="bi bi-person"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-0">${reservation.userName}</h6>
+                            <small class="text-muted">${reservation.userEmail || 'Sin email'}</small>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <div>
+                            <span class="badge bg-info text-white">
+                                <i class="bi bi-people me-1"></i>${reservation.numGuests} personas
+                            </span>
+                        </div>
+                        <div>
+                            <span class="badge bg-secondary">
+                                <i class="bi bi-table me-1"></i>Mesa ${reservation.tableNumber || 'No asignada'}
+                            </span>
+                        </div>
+                    </div>
+                    ${reservation.specialRequests ? 
+                        `<p class="small mb-2 text-truncate text-muted">
+                            <i class="bi bi-chat-left-text me-1"></i>${reservation.specialRequests}
+                        </p>` : ''}
+                    <div class="d-flex justify-content-between mt-2">
+                        <button class="btn btn-sm btn-outline-primary view-btn" data-id="${reservation.id}">
+                            <i class="bi bi-eye me-1"></i>Detalles
+                        </button>
+                        <div class="btn-group">
+                            ${getActionButtons(reservation.status, reservation.id)}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Añadir el evento para ver detalles
+            const viewBtn = cardElement.querySelector('.view-btn');
+            viewBtn.addEventListener('click', () => {
+                dayDetailsModal.hide();
+                showReservationDetails(reservation);
+            });
+            
+            // Añadir eventos para los botones de acción
+            const actionButtons = cardElement.querySelectorAll('.status-btn');
+            actionButtons.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const reservationId = btn.getAttribute('data-id');
+                    const newStatus = btn.getAttribute('data-status');
+                    updateReservationStatus(reservationId, newStatus);
+                });
+            });
+            
+            reservationsContainer.appendChild(cardElement);
+        });
+        
+        // Inicializar los listeners para filtros
+        initializeFilters();
+    } else {
+        reservationsContainer.innerHTML = '';
+        noReservationsMessage.classList.remove('d-none');
+    }
+}
+
+// Inicializar filtros para tarjetas de reserva
+function initializeFilters() {
+    // Filtro por estado
+    document.querySelectorAll('.filter-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const filterType = this.getAttribute('data-filter');
+            filterReservationsByStatus(filterType);
+            
+            // Desactivar filtro activo anterior y activar el nuevo
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+                btn.classList.remove('btn-primary', 'btn-outline-success', 'btn-outline-warning', 'btn-outline-danger');
+                
+                // Restaurar clase original
+                const btnFilterType = btn.getAttribute('data-filter');
+                if (btnFilterType === 'all') {
+                    btn.classList.add('btn-outline-primary');
+                } else if (btnFilterType === 'confirmed') {
+                    btn.classList.add('btn-outline-success');
+                } else if (btnFilterType === 'pending') {
+                    btn.classList.add('btn-outline-warning');
+                } else if (btnFilterType === 'cancelled') {
+                    btn.classList.add('btn-outline-danger');
+                }
+            });
+            
+            // Activar el botón seleccionado y cambiar su estilo
+            this.classList.add('active');
+            if (filterType === 'all') {
+                this.classList.remove('btn-outline-primary');
+                this.classList.add('btn-primary');
+            } else if (filterType === 'confirmed') {
+                this.classList.remove('btn-outline-success');
+                this.classList.add('btn-success');
+            } else if (filterType === 'pending') {
+                this.classList.remove('btn-outline-warning');
+                this.classList.add('btn-warning');
+            } else if (filterType === 'cancelled') {
+                this.classList.remove('btn-outline-danger');
+                this.classList.add('btn-danger');
+            }
+        });
+    });
+    
+    // Filtro por hora en tiempo real
+    const hourFilter = document.getElementById('hourFilter');
+    const clearHourFilter = document.getElementById('clearHourFilter');
+    
+    if (hourFilter) {
+        hourFilter.addEventListener('input', function() {
+            filterReservationsByHour(this.value);
+        });
+    }
+    
+    if (clearHourFilter) {
+        clearHourFilter.addEventListener('click', function() {
+            hourFilter.value = '';
+            filterReservationsByHour('');
+        });
+    }
+}
+
+// Filtrar reservas por estado
+function filterReservationsByStatus(filterType) {
+    const cards = document.querySelectorAll('.reservation-card');
+    
+    cards.forEach(card => {
+        const status = card.getAttribute('data-status').toLowerCase();
+        
+        if (filterType === 'all') {
+            card.style.display = 'block';
+        } else if (filterType === 'confirmed' && status === 'confirmed') {
+            card.style.display = 'block';
+        } else if (filterType === 'pending' && status === 'pending') {
+            card.style.display = 'block';
+        } else if (filterType === 'cancelled' && status === 'cancelled') {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+    
+    // Verificar si hay tarjetas visibles
+    const visibleCards = document.querySelectorAll('.reservation-card[style="display: block;"]');
+    const noReservationsMessage = document.getElementById('noReservationsMessage');
+    
+    if (visibleCards.length === 0) {
+        noReservationsMessage.classList.remove('d-none');
+    } else {
+        noReservationsMessage.classList.add('d-none');
+    }
+}
+
+// Filtrar reservas por hora
+function filterReservationsByHour(hourValue) {
+    if (!hourValue) {
+        // Si no hay valor, mostrar todas las tarjetas (respetando el filtro de estado activo)
+        const activeStatusFilter = document.querySelector('.filter-btn.active').getAttribute('data-filter');
+        filterReservationsByStatus(activeStatusFilter);
+        return;
+    }
+    
+    const cards = document.querySelectorAll('.reservation-card');
+    const hourToFilter = hourValue.substring(0, 5); // Formato HH:MM
+    
+    cards.forEach(card => {
+        const cardTime = card.getAttribute('data-time').substring(0, 5);
+        
+        // Comparar las horas (solo HH:MM)
+        if (cardTime === hourToFilter) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+    
+    // Verificar si hay tarjetas visibles
+    const visibleCards = document.querySelectorAll('.reservation-card[style="display: block;"]');
+    const noReservationsMessage = document.getElementById('noReservationsMessage');
+    
+    if (visibleCards.length === 0) {
+        noReservationsMessage.classList.remove('d-none');
+    } else {
+        noReservationsMessage.classList.add('d-none');
+    }
+}
+
+// Generar botones de acción según el estado actual
+function getActionButtons(status, reservationId) {
+    let buttons = '';
+    
+    switch(status) {
+        case 'PENDING':
+            buttons = `
+                <button class="btn btn-sm btn-success status-btn" data-id="${reservationId}" data-status="CONFIRMED">
+                    <i class="bi bi-check-circle me-1"></i>Confirmar
+                </button>
+                <button class="btn btn-sm btn-danger status-btn" data-id="${reservationId}" data-status="CANCELLED">
+                    <i class="bi bi-x-circle me-1"></i>Cancelar
+                </button>
+            `;
+            break;
+            
+        case 'CONFIRMED':
+            buttons = `
+                <button class="btn btn-sm btn-info status-btn" data-id="${reservationId}" data-status="COMPLETED">
+                    <i class="bi bi-check-all me-1"></i>Completar
+                </button>
+                <button class="btn btn-sm btn-danger status-btn" data-id="${reservationId}" data-status="CANCELLED">
+                    <i class="bi bi-x-circle me-1"></i>Cancelar
+                </button>
+            `;
+            break;
+            
+        case 'CANCELLED':
+            buttons = `
+                <button class="btn btn-sm btn-success status-btn" data-id="${reservationId}" data-status="CONFIRMED">
+                    <i class="bi bi-arrow-counterclockwise me-1"></i>Reactivar
+                </button>
+            `;
+            break;
+            
+        case 'COMPLETED':
+            buttons = '';  // No hay acciones para reservas completadas
+            break;
+            
+        default:
+            buttons = `
+                <button class="btn btn-sm btn-success status-btn" data-id="${reservationId}" data-status="CONFIRMED">
+                    <i class="bi bi-check-circle me-1"></i>Confirmar
+                </button>
+            `;
+    }
+    
+    return buttons;
+}
+
+// Obtener clase CSS para las tarjetas según el estado
+function getStatusCardClass(status) {
+    switch(status) {
+        case 'CONFIRMED': return 'confirmed';
+        case 'PENDING': return 'pending';
+        case 'CANCELLED': return 'cancelled';
+        case 'COMPLETED': return 'completed';
+        default: return '';
+    }
+}
+
+// Manejar click en un evento del calendario
+function handleEventClick(clickInfo) {
+    const eventId = clickInfo.event.id;
+    const eventData = reservations.find(r => r.id.toString() === eventId);
+    
+    if (eventData) {
+        // Mostrar los detalles de la reserva
+        showReservationDetails(eventData);
+    } else {
+        // Mostrar mensaje de error si no se encuentra la reserva
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'No se encontraron detalles para esta reserva.'
+        });
+    }
+}
+
 // Cargar reservas para una fecha específica
 async function loadReservationsForDate(branchId, date) {
     try {
@@ -428,7 +1001,6 @@ async function loadReservationsForDate(branchId, date) {
             
             // Actualizar eventos en el calendario
             updateReservationEvents(reservations);
-            updateStatistics(reservations);
             
             // Mensaje de éxito
             Swal.fire({
@@ -500,7 +1072,6 @@ async function loadReservationsForDateRange(branchId, startDate, endDate) {
             
             // Actualizar eventos en el calendario
             updateReservationEvents(reservations);
-            updateStatistics(reservations);
             
             // Mensaje de éxito
             Swal.fire({
@@ -650,7 +1221,6 @@ async function loadReservationsForBranch(branchId) {
             
             // Actualizar eventos en el calendario
             updateReservationEvents(reservations);
-            updateStatistics(reservations);
         } else {
             console.error("Error en la respuesta de reservas:", data.message);
             showError('Error al cargar las reservas:', data.message);
@@ -771,245 +1341,6 @@ function getStatusClass(status) {
     }
 }
 
-// Manejar la selección de una fecha en el calendario
-function handleDateSelect(selectInfo) {
-    if (!selectedBranchId) {
-        Swal.fire({
-            icon: 'warning',
-            title: 'No hay sede seleccionada',
-            text: 'Por favor, selecciona una sede antes de ver detalles del día.'
-        });
-        return;
-    }
-    
-    // Obtener la fecha seleccionada
-    const selectedDate = selectInfo.startStr;
-    console.log("Fecha seleccionada en el calendario:", selectedDate);
-    
-    // Cargar detalles para la fecha seleccionada
-    loadDayDetails(selectedBranchId, selectedDate);
-}
-
-// Manejar el clic en un evento del calendario
-function handleEventClick(eventInfo) {
-    console.log("Evento clickeado:", eventInfo.event.title);
-    const reservation = {
-        id: eventInfo.event.id,
-        date: eventInfo.event.start.toISOString().split('T')[0],
-        time: eventInfo.event.start.toTimeString().substring(0, 8),
-        people: eventInfo.event.extendedProps.people,
-        customerName: eventInfo.event.extendedProps.customerName,
-        customerEmail: eventInfo.event.extendedProps.customerEmail || '',
-        comments: eventInfo.event.extendedProps.comments || '',
-        status: eventInfo.event.extendedProps.status,
-        tableNumber: eventInfo.event.extendedProps.tableNumber
-    };
-    
-    showReservationDetails(reservation);
-}
-
-// Cargar detalles de un día específico
-async function loadDayDetails(branchId, date) {
-    if (!branchId) {
-        showError('Error', 'No se ha seleccionado ninguna sede');
-        return;
-    }
-    
-    // Validar que branchId sea un número
-    if (isNaN(parseInt(branchId))) {
-        console.error('Error: branchId debe ser un número', branchId);
-        Swal.fire({
-            icon: 'error',
-            title: 'Error de parámetro',
-            text: 'ID de sede inválido. Debe ser un valor numérico.'
-        });
-        return;
-    }
-    
-    try {
-        const token = localStorage.getItem('token');
-        
-        // Asegurarse de que la fecha esté en el formato correcto YYYY-MM-DD
-        const formattedDate = date.split('T')[0];
-        
-        // Usar el formato de fecha correcto según la API y validar branchId como número
-        const response = await fetch(`${window.API_BASE_URL}/api/reservations/branch/${parseInt(branchId)}?date=${formattedDate}`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
-        });
-        
-        console.log("Respuesta de detalles del día recibida:", response.status);
-        const data = await response.json();
-        console.log("Datos del día recibidos:", data.success, "Cantidad:", data.data?.length || 0);
-        
-        if (response.ok && data.success) {
-            // Obtener información de la sucursal
-            const branch = branches.find(b => b.id.toString() === branchId.toString());
-            
-            if (!branch) {
-                showError('Error', 'No se encontró información de la sede');
-                return;
-            }
-            
-            // Construir objeto con los datos para renderizar
-            const dayData = {
-                totalCapacity: branch.maxCapacity,
-                usedCapacity: data.data.reduce((sum, res) => sum + res.numGuests, 0),
-                slots: generateTimeSlots(data.data, branch)
-            };
-            
-            renderDayDetails(dayData, formattedDate);
-        } else {
-            console.error("Error en la respuesta de detalles del día:", data.message);
-            showError('Error al cargar los detalles del día:', data.message);
-        }
-    } catch (error) {
-        console.error('Error al cargar los detalles del día:', error);
-        showError('Error de conexión', 'No se pudieron cargar los detalles. Verifica tu conexión a internet.');
-    }
-}
-
-// Generar slots de tiempo a partir de las reservas
-function generateTimeSlots(reservations, branch) {
-    // Obtener horarios de la sede para el día
-    const today = new Date().toISOString().split('T')[0];
-    const dayOfWeek = new Date(today).toLocaleString('en-us', {weekday: 'long'}).toUpperCase();
-    
-    // Buscar el horario para el día de hoy entre los businessHours de la sede
-    const todaySchedule = branch.businessHours?.find(hour => hour.dayOfWeek === dayOfWeek);
-    
-    // Horarios predeterminados si no hay información específica
-    const openingTime = todaySchedule?.openingTime || branch.openingTime || "08:00:00";
-    const closingTime = todaySchedule?.closingTime || branch.closingTime || "22:00:00";
-    
-    // Crear slots de 30 minutos entre el horario de apertura y cierre
-    const slots = [];
-    let currentTime = new Date(`2000-01-01T${openingTime}`);
-    const endTime = new Date(`2000-01-01T${closingTime}`);
-    
-    while (currentTime < endTime) {
-        const timeString = currentTime.toTimeString().substring(0, 8);
-        
-        // Buscar reservas para este horario
-        const reservationsAtTime = reservations.filter(r => r.startTime.substring(0, 5) === timeString.substring(0, 5));
-        
-        // Calcular capacidad utilizada para este slot
-        const usedCapacity = reservationsAtTime.reduce((sum, r) => sum + r.numGuests, 0);
-        
-        // Capacidad total estimada por slot (20% de la capacidad máxima por hora)
-        const totalCapacityPerSlot = Math.round(branch.maxCapacity * 0.2);
-        
-        slots.push({
-            time: timeString,
-            available: usedCapacity < totalCapacityPerSlot,
-            totalCapacity: totalCapacityPerSlot,
-            remainingCapacity: totalCapacityPerSlot - usedCapacity,
-            reservations: reservationsAtTime
-        });
-        
-        // Avanzar 30 minutos
-        currentTime.setMinutes(currentTime.getMinutes() + 30);
-    }
-    
-    return slots;
-}
-
-// Renderizar detalles del día
-function renderDayDetails(data, date) {
-    const dayDetailsCard = document.getElementById('dayDetailsCard');
-    const selectedDateTitle = document.getElementById('selectedDateTitle');
-    const hourSlots = document.getElementById('hourSlots');
-    const remainingCapacity = document.getElementById('remainingCapacity');
-    const totalCapacity = document.getElementById('totalCapacity');
-    const occupancyPercentage = document.getElementById('occupancyPercentage');
-    const capacityProgressBar = document.getElementById('capacityProgressBar');
-    
-    // Actualizar título
-    selectedDateTitle.innerHTML = `<i class="bi bi-clock me-2"></i>Detalles para ${formatDate(date)}`;
-    
-    // Actualizar información de capacidad
-    const totalCap = data.totalCapacity || 0;
-    const usedCap = data.usedCapacity || 0;
-    const remainingCap = totalCap - usedCap;
-    const percentage = totalCap > 0 ? Math.round((usedCap / totalCap) * 100) : 0;
-    
-    remainingCapacity.textContent = remainingCap;
-    totalCapacity.textContent = totalCap;
-    occupancyPercentage.textContent = `${percentage}%`;
-    
-    // Actualizar barra de progreso
-    capacityProgressBar.style.width = `${percentage}%`;
-    
-    if (percentage >= 90) {
-        capacityProgressBar.classList.remove('info', 'warning');
-        capacityProgressBar.classList.add('danger');
-    } else if (percentage >= 70) {
-        capacityProgressBar.classList.remove('info', 'danger');
-        capacityProgressBar.classList.add('warning');
-    } else {
-        capacityProgressBar.classList.remove('warning', 'danger');
-        capacityProgressBar.classList.add('info');
-    }
-    
-    // Limpiar y actualizar slots de hora
-    hourSlots.innerHTML = '';
-    
-    if (data.slots && data.slots.length > 0) {
-        data.slots.forEach(slot => {
-            const slotElement = document.createElement('div');
-            slotElement.className = `hour-slot ${slot.available ? 'available' : 'reserved'}`;
-            
-            let reservationsInfo = '';
-            if (slot.reservations && slot.reservations.length > 0) {
-                reservationsInfo = `
-
-                    <div class="small mt-2">
-                        <strong>Reservas:</strong> ${slot.reservations.length}
-                        (${slot.reservations.reduce((total, r) => total + (r.people || 0), 0)} personas)
-                    </div>
-                    <div class="small">
-                        ${slot.reservations.map(r => `
-                            <span class="badge ${getStatusBadgeClass(r.status)} me-1">
-                                ${r.id.substring(0, 6)} - ${r.customerName} (${r.people} pers.)
-                            </span>
-                        `).join('')}
-                    </div>
-                `;
-            }
-            
-            slotElement.innerHTML = `
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <span class="fw-bold">${formatTime(slot.time)}</span>
-                        <span class="text-muted ms-2">(${slot.available ? 'Disponible' : 'Reservado'})</span>
-                    </div>
-                    <div>
-                        <span class="badge bg-${slot.available ? 'success' : 'danger'} rounded-pill">
-                            ${slot.remainingCapacity}/${slot.totalCapacity} libres
-                        </span>
-                    </div>
-                </div>
-                ${reservationsInfo}
-            `;
-            
-            hourSlots.appendChild(slotElement);
-        });
-    } else {
-        hourSlots.innerHTML = `
-            <div class="text-center py-4">
-                <i class="bi bi-calendar-x text-muted" style="font-size: 2rem;"></i>
-                <p class="mt-3 mb-0 text-muted">No hay horarios disponibles para este día</p>
-            </div>
-        `;
-    }
-    
-    // Mostrar la tarjeta
-    dayDetailsCard.style.display = 'block';
-}
-
 // Mostrar detalles de una reserva
 function showReservationDetails(reservation) {
     const modal = new bootstrap.Modal(document.getElementById('reservationDetailsModal'));
@@ -1066,7 +1397,19 @@ async function updateReservationStatus(reservationId, newStatus) {
     try {
         const token = localStorage.getItem('token');
         
-        // Usar el endpoint correcto para actualizar el estado de una reserva
+        // Mostrar indicador de carga
+        Swal.fire({
+            title: 'Actualizando estado',
+            text: 'Por favor espera...',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+        
+        console.log(`Actualizando reserva ${reservationId} a estado ${newStatus}`);
+        
+        // Realizar la solicitud al servidor
         const response = await fetch(`${window.API_BASE_URL}/api/reservations/${reservationId}/status`, {
             method: 'PATCH',
             headers: {
@@ -1077,28 +1420,58 @@ async function updateReservationStatus(reservationId, newStatus) {
         });
         
         const data = await response.json();
+        Swal.close();
         
         if (response.ok && data.success) {
+            // Mostrar mensaje de éxito
+            let statusText = '';
+            switch (newStatus) {
+                case 'CONFIRMED': statusText = 'confirmada'; break;
+                case 'CANCELLED': statusText = 'cancelada'; break;
+                case 'COMPLETED': statusText = 'completada'; break;
+                case 'PENDING': statusText = 'marcada como pendiente'; break;
+                default: statusText = 'actualizada';
+            }
+            
             Swal.fire({
                 icon: 'success',
                 title: 'Estado actualizado',
-                text: `La reserva ha sido ${newStatus === 'CONFIRMED' ? 'confirmada' : 'cancelada'} exitosamente.`
+                text: `La reserva ha sido ${statusText} exitosamente.`,
+                timer: 2000,
+                showConfirmButton: false
             });
             
-            // Cerrar el modal
-            const modal = bootstrap.Modal.getInstance(document.getElementById('reservationDetailsModal'));
-            modal.hide();
+            // Cerrar cualquier modal que esté abierto
+            const reservationModal = bootstrap.Modal.getInstance(document.getElementById('reservationDetailsModal'));
+            if (reservationModal) {
+                reservationModal.hide();
+            }
             
-            // Recargar las reservas
-            if (selectedBranchId) {
-                loadReservationsForBranch(selectedBranchId);
+            // Recargar las reservas del día seleccionado
+            if (selectedBranchId && selectedDate) {
+                setTimeout(() => {
+                    loadDayDetails(selectedBranchId, selectedDate);
+                }, 500);
             }
         } else {
-            showError('Error al actualizar el estado:', data.message);
+            const errorMsg = data.message || 'Error desconocido al actualizar el estado';
+            console.error(`Error al actualizar estado: ${errorMsg}`);
+            
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: `No se pudo actualizar el estado: ${errorMsg}`
+            });
         }
     } catch (error) {
-        console.error('Error al actualizar el estado:', error);
-        showError('Error de conexión', 'No se pudo actualizar el estado. Verifica tu conexión a internet.');
+        console.error('Error al actualizar el estado de la reserva:', error);
+        Swal.close();
+        
+        Swal.fire({
+            icon: 'error',
+            title: 'Error de conexión',
+            text: 'Hubo un problema al comunicarse con el servidor. Por favor, verifica tu conexión e intenta nuevamente.'
+        });
     }
 }
 
@@ -1117,6 +1490,7 @@ function getStatusLabel(status) {
         case 'CONFIRMED': return 'Confirmada';
         case 'PENDING': return 'Pendiente';
         case 'CANCELLED': return 'Cancelada';
+        case 'COMPLETED': return 'Completada';
         default: return 'Desconocido';
     }
 }
@@ -1126,6 +1500,7 @@ function getStatusBadgeClass(status) {
         case 'CONFIRMED': return 'bg-success';
         case 'PENDING': return 'bg-warning text-dark';
         case 'CANCELLED': return 'bg-danger';
+        case 'COMPLETED': return 'bg-info';
         default: return 'bg-secondary';
     }
 }
@@ -1418,6 +1793,15 @@ function initializeCalendar() {
             hour: '2-digit',
             minute: '2-digit',
             hour12: true
+        },
+        eventDidMount: function(info) {
+            // Añadir tooltip con detalles de la reserva
+            new bootstrap.Tooltip(info.el, {
+                title: `${info.event.title} - ${getStatusLabel(info.event.extendedProps.status)}`,
+                placement: 'top',
+                trigger: 'hover',
+                container: 'body'
+            });
         }
     });
     
