@@ -3,10 +3,12 @@ let branches = [];
 let locationMap;
 let markers = [];
 let selectedBranchId = null;
+let selectedTableId = null;
 let selectedDate = null;
 let selectedTime = null;
 let datePicker;
 let reservationDetails = {};
+let availableTables = [];
 
 // Inicializar cuando el DOM esté cargado
 document.addEventListener('DOMContentLoaded', function() {
@@ -15,6 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
     loadBranches();
     initializeDatePicker();
     setupFormListeners();
+    initializeSidebar();
     
     // Comprobar si hay un usuario autenticado
     const token = localStorage.getItem('token');
@@ -29,7 +32,7 @@ document.addEventListener('DOMContentLoaded', function() {
             cancelButtonText: 'Cancelar'
         }).then((result) => {
             if (result.isConfirmed) {
-                window.location.href = 'login.html?redirect=user-reserva.html';
+                window.location.href = 'index.html';
             } else {
                 window.location.href = 'index.html';
             }
@@ -39,6 +42,23 @@ document.addEventListener('DOMContentLoaded', function() {
         loadUserInfo();
     }
 });
+
+// Inicializar el sidebar
+function initializeSidebar() {
+    document.querySelector('.toggle-btn').addEventListener('click', function () {
+        const sidebar = document.querySelector('.sidebar');
+        const main = document.querySelector('.main');
+
+        sidebar.classList.toggle('hidden');
+
+        // Ajustar el ancho del main cuando se oculta el sidebar
+        if (sidebar.classList.contains('hidden')) {
+            main.style.width = '100%';
+        } else {
+            main.style.width = 'calc(100% - 90px)';
+        }
+    });
+}
 
 // Inicializar la visualización por pasos
 function initializeSteps() {
@@ -53,16 +73,8 @@ function initializeSteps() {
     
     // Configurar botones de navegación
     document.getElementById('nextToStep2').addEventListener('click', function() {
-        if (!selectedBranchId) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Selección requerida',
-                text: 'Por favor, selecciona una sede para continuar.'
-            });
-            return;
-        }
-        
         goToStep(2);
+        loadTablesForBranch(selectedBranchId);
     });
     
     document.getElementById('backToStep1').addEventListener('click', function() {
@@ -70,17 +82,8 @@ function initializeSteps() {
     });
     
     document.getElementById('nextToStep3').addEventListener('click', function() {
-        if (!selectedDate || !selectedTime) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Selección requerida',
-                text: 'Por favor, selecciona una fecha y hora para continuar.'
-            });
-            return;
-        }
-        
         goToStep(3);
-        updateReservationSummary();
+        loadAvailableDates();
     });
     
     document.getElementById('backToStep2').addEventListener('click', function() {
@@ -88,520 +91,217 @@ function initializeSteps() {
     });
     
     document.getElementById('nextToStep4').addEventListener('click', function() {
-        if (!validateReservationForm()) {
-            return;
-        }
-        
+        goToStep(4);
+        updateReservationSummary();
+    });
+    
+    document.getElementById('backToStep3').addEventListener('click', function() {
+        goToStep(3);
+    });
+    
+    document.getElementById('confirmReservation').addEventListener('click', function() {
         submitReservation();
+    });
+
+    // Configurar el checkbox de términos
+    document.getElementById('termsCheckbox').addEventListener('change', function() {
+        document.getElementById('confirmReservation').disabled = !this.checked;
     });
 }
 
 // Navegar a un paso específico
-function goToStep(step) {
-    // Ocultar todos los contenidos de paso
+function goToStep(stepNumber) {
+    // Ocultar todos los contenidos
     document.getElementById('step1Content').style.display = 'none';
     document.getElementById('step2Content').style.display = 'none';
     document.getElementById('step3Content').style.display = 'none';
     document.getElementById('step4Content').style.display = 'none';
     
-    // Quitar clase activa de todos los pasos
-    document.querySelectorAll('.step').forEach(item => {
-        item.classList.remove('active', 'completed');
-    });
+    // Desmarcar todos los pasos
+    document.getElementById('step1').classList.remove('active');
+    document.getElementById('step2').classList.remove('active');
+    document.getElementById('step3').classList.remove('active');
+    document.getElementById('step4').classList.remove('active');
     
-    // Marcar pasos previos como completados
-    for (let i = 1; i < step; i++) {
-        document.getElementById(`step${i}`).classList.add('completed');
+    // Mostrar el paso actual y marcarlo como activo
+    document.getElementById('step' + stepNumber + 'Content').style.display = 'block';
+    document.getElementById('step' + stepNumber).classList.add('active');
+    
+    // Si vamos al paso 1, actualizamos el mapa (puede haber cambiado de tamaño)
+    if (stepNumber === 1 && locationMap) {
+        setTimeout(() => locationMap.invalidateSize(), 100);
     }
     
-    // Marcar paso actual como activo
-    document.getElementById(`step${step}`).classList.add('active');
-    
-    // Mostrar contenido del paso actual
-    document.getElementById(`step${step}Content`).style.display = 'block';
-    
-    // Acciones específicas para cada paso
-    if (step === 2) {
-        if (locationMap) {
-            setTimeout(() => {
-                locationMap.invalidateSize();
-            }, 100);
-        }
-        
-        updateSelectedBranchInfo();
-        loadAvailableDates();
-    } else if (step === 3) {
-        updateReservationSummary();
-    }
+    // Añadir animación
+    document.getElementById('step' + stepNumber + 'Content').classList.add('animate__fadeIn');
+    setTimeout(() => {
+        document.getElementById('step' + stepNumber + 'Content').classList.remove('animate__fadeIn');
+    }, 1000);
 }
 
-// Inicializar el mapa con Leaflet
+// Configurar eventos del formulario
+function setupFormListeners() {
+    // Establecer eventos para la confirmación final
+    document.getElementById('termsCheckbox').addEventListener('change', function() {
+        document.getElementById('confirmReservation').disabled = !this.checked;
+    });
+    
+    document.getElementById('confirmReservation').addEventListener('click', function() {
+        submitReservation();
+    });
+    
+    // Evento cambio en campos para actualizar resumen
+    document.getElementById('specialRequests').addEventListener('input', function() {
+        if (selectedBranchId && selectedTableId && selectedDate && selectedTime) {
+            updateReservationSummary();
+        }
+    });
+}
+
+// Inicializar mapa
 function initializeMap() {
-    locationMap = L.map('locationMap').setView([4.6097, -74.0817], 11); // Bogotá por defecto
+    locationMap = L.map('locationMap').setView([4.6097, -74.0817], 13); // Bogotá por defecto
     
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        maxZoom: 19,
+        attribution: '© OpenStreetMap contributors'
     }).addTo(locationMap);
     
-    // Asegurar que el mapa se renderice correctamente
-    setTimeout(() => {
+    // Actualizar mapa cuando cambie de tamaño
+    setTimeout(function() {
         locationMap.invalidateSize();
-    }, 100);
+    }, 400);
 }
 
-// Cargar sedes desde la API
+// Cargar sedes
 async function loadBranches() {
+    const token = localStorage.getItem('token');
     try {
-        const loadingHtml = `
-            <div class="col-12 text-center py-5">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Cargando sedes...</span>
-                </div>
-                <p class="mt-3">Cargando sedes disponibles...</p>
-            </div>
-        `;
-        document.getElementById('locationCards').innerHTML = loadingHtml;
+        // Mostrar indicador de carga
+        document.getElementById('branchCards').innerHTML = '<div class="text-center p-4"><div class="spinner-border text-primary"></div><p class="mt-2">Cargando sedes...</p></div>';
         
-        console.log("Iniciando carga de sedes disponibles...");
-        console.log("URL de API:", window.API_BASE_URL);
-        
-        // Para sedes disponibles debemos usar /public ya que no requiere autenticación
-        const response = await fetch(`${window.API_BASE_URL}/api/v1/branches/public`, {
+        const response = await fetch(`${window.API_BASE_URL}/api/v1/branches`, {
             method: 'GET',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             }
         });
         
-        console.log("Respuesta recibida:", response.status);
+        if (!response.ok) {
+            throw new Error('Error al cargar las sedes');
+        }
         
-        const data = await response.json();
-        console.log("Datos recibidos:", data);
-        
-        if (response.ok && data.success) {
-            // Filtrar solo sedes activas
-            branches = data.data.filter(branch => branch.status === 'ACTIVE');
-            console.log(`Sedes activas encontradas: ${branches.length}`);
+        const result = await response.json();
+        if (result.success) {
+            branches = result.data;
+            renderBranchCards(branches);
+            addBranchesToMap(branches);
             
-            if (branches.length === 0) {
-                document.getElementById('locationCards').innerHTML = `
-                    <div class="col-12 text-center py-5">
-                        <i class="bi bi-building-x text-muted mb-3" style="font-size: 3rem;"></i>
-                        <h5>No hay sedes disponibles</h5>
-                        <p class="text-muted">En este momento no hay sedes disponibles para reservas.</p>
-                    </div>
-                `;
-            } else {
-                renderBranchSummary(branches);
-                renderBranchCards(branches);
-                addBranchesToMap(branches);
-            }
+            // Configurar buscador
+            setupBranchSearch();
         } else {
-            console.error('Error en la respuesta:', data);
-            document.getElementById('locationCards').innerHTML = `
-                <div class="col-12 text-center py-5">
-                    <i class="bi bi-exclamation-triangle text-warning mb-3" style="font-size: 3rem;"></i>
-                    <h5>Error al cargar sedes</h5>
-                    <p class="text-muted">${data.message || 'No se pudieron cargar las sedes disponibles'}</p>
-                    <button class="btn btn-outline-primary mt-3" onclick="loadBranches()">
-                        <i class="bi bi-arrow-clockwise me-2"></i>Reintentar
-                    </button>
-                </div>
-            `;
-            showError('Error al cargar las sedes', data.message || 'No se pudieron cargar las sedes disponibles');
+            throw new Error(result.message || 'Error al cargar las sedes');
         }
     } catch (error) {
-        console.error('Error al cargar las sedes:', error);
-        document.getElementById('locationCards').innerHTML = `
-            <div class="col-12 text-center py-5">
-                <i class="bi bi-wifi-off text-muted mb-3" style="font-size: 3rem;"></i>
-                <h5>Error de conexión</h5>
-                <p class="text-muted">No se pudieron cargar las sedes. Verifica tu conexión a internet.</p>
-                <button class="btn btn-outline-primary mt-3" onclick="loadBranches()">
-                    <i class="bi bi-arrow-clockwise me-2"></i>Reintentar
-                </button>
-            </div>
-        `;
-        showError('Error de conexión', 'No se pudieron cargar las sedes. Verifica tu conexión a internet.');
+        console.error('Error:', error);
+        document.getElementById('branchCards').innerHTML = '<div class="alert alert-danger">Error al cargar las sedes. Por favor, intenta de nuevo.</div>';
     }
 }
 
-// Renderizar resumen de sedes disponibles
-function renderBranchSummary(branches) {
-    const summaryContainer = document.getElementById('branchSummary');
-    if (!summaryContainer) return;
+// Renderizar tarjetas de sedes
+function renderBranchCards(branchList) {
+    const branchCardsContainer = document.getElementById('branchCards');
+    branchCardsContainer.innerHTML = '';
     
-    // Obtener estadísticas de sedes
-    const totalBranches = branches.length;
-    const highCapacityBranches = branches.filter(b => b.maxCapacity > 150).length;
-    const mediumCapacityBranches = branches.filter(b => b.maxCapacity <= 150 && b.maxCapacity >= 80).length;
-    const lowCapacityBranches = branches.filter(b => b.maxCapacity < 80).length;
-    
-    // Crear contenido HTML para el resumen
-    summaryContainer.innerHTML = `
-        <div class="row row-cols-2 row-cols-md-4 g-3 mb-4">
-            <div class="col">
-                <div class="card h-100 border-0 shadow-sm bg-light">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="card-subtitle mb-1 text-muted">Sedes Disponibles</h6>
-                                <h2 class="card-title mb-0">${totalBranches}</h2>
-                            </div>
-                            <div class="icon-shape bg-primary text-white rounded-circle shadow">
-                                <i class="bi bi-building"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col">
-                <div class="card h-100 border-0 shadow-sm bg-light">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="card-subtitle mb-1 text-muted">Capacidad Alta</h6>
-                                <h2 class="card-title mb-0">${highCapacityBranches}</h2>
-                            </div>
-                            <div class="icon-shape bg-success text-white rounded-circle shadow">
-                                <i class="bi bi-people-fill"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col">
-                <div class="card h-100 border-0 shadow-sm bg-light">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="card-subtitle mb-1 text-muted">Capacidad Media</h6>
-                                <h2 class="card-title mb-0">${mediumCapacityBranches}</h2>
-                            </div>
-                            <div class="icon-shape bg-warning text-white rounded-circle shadow">
-                                <i class="bi bi-people"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col">
-                <div class="card h-100 border-0 shadow-sm bg-light">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="card-subtitle mb-1 text-muted">Capacidad Baja</h6>
-                                <h2 class="card-title mb-0">${lowCapacityBranches}</h2>
-                            </div>
-                            <div class="icon-shape bg-danger text-white rounded-circle shadow">
-                                <i class="bi bi-person"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-}
-
-// Renderizar tarjetas de sucursales con scroll vertical
-function renderBranchCards(branches) {
-    const locationCards = document.getElementById('locationCards');
-    locationCards.innerHTML = '';
-    
-    // Agregar el contenedor de búsqueda y filtro
-    const searchContainer = document.createElement('div');
-    searchContainer.className = 'search-container mb-3';
-    searchContainer.innerHTML = `
-        <div class="input-group">
-            <span class="input-group-text bg-white">
-                <i class="bi bi-search"></i>
-            </span>
-            <input type="text" id="branchSearchInput" class="form-control" placeholder="Buscar por nombre, dirección...">
-            <button class="btn btn-outline-primary" type="button" id="filterBranchesBtn">
-                <i class="bi bi-funnel"></i> Filtros
-            </button>
-        </div>
-        <div id="filterOptions" class="filter-options mt-2 p-3 border rounded bg-light" style="display: none;">
-            <div class="row g-2">
-                <div class="col-md-4">
-                    <label class="form-label mb-1">Capacidad</label>
-                    <select id="capacityFilter" class="form-select form-select-sm">
-                        <option value="all">Todas</option>
-                        <option value="high">Alta (150+)</option>
-                        <option value="medium">Media (80-150)</option>
-                        <option value="low">Baja (<80)</option>
-                    </select>
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label mb-1">Orden</label>
-                    <select id="sortOrder" class="form-select form-select-sm">
-                        <option value="nameAsc">Nombre (A-Z)</option>
-                        <option value="nameDesc">Nombre (Z-A)</option>
-                        <option value="capacityDesc">Mayor capacidad</option>
-                        <option value="capacityAsc">Menor capacidad</option>
-                    </select>
-                </div>
-                <div class="col-md-4 d-flex align-items-end">
-                    <button id="applyFiltersBtn" class="btn btn-primary btn-sm w-100">Aplicar</button>
-                </div>
-            </div>
-        </div>
-    `;
-    locationCards.appendChild(searchContainer);
-    
-    // Contenedor de scroll vertical para las sedes
-    const cardsContainer = document.createElement('div');
-    cardsContainer.className = 'branches-scroll-container';
-    cardsContainer.style.maxHeight = '500px';
-    cardsContainer.style.overflowY = 'auto';
-    cardsContainer.style.paddingRight = '5px';
-    locationCards.appendChild(cardsContainer);
-    
-    if (branches.length === 0) {
-        cardsContainer.innerHTML = `
-            <div class="col-12 text-center py-5">
-                <i class="bi bi-building-x text-muted mb-3" style="font-size: 3rem;"></i>
-                <h5>No hay sedes disponibles</h5>
-                <p class="text-muted">En este momento no hay sedes disponibles para reservas.</p>
-            </div>
-        `;
+    if (branchList.length === 0) {
+        branchCardsContainer.innerHTML = '<div class="alert alert-info">No hay sedes disponibles</div>';
         return;
     }
     
-    // Crear un contenedor tipo grid para las tarjetas
-    const rowContainer = document.createElement('div');
-    rowContainer.className = 'row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3';
-    cardsContainer.appendChild(rowContainer);
-    
-    branches.forEach((branch, index) => {
-        // Obtener información de reservas (simulada por ahora)
-        const reservationsCount = Math.floor(Math.random() * 15); // Simular conteo de reservas
-        
+    branchList.forEach(branch => {
         const card = document.createElement('div');
-        card.className = 'col animate__animated animate__fadeIn';
-        card.style.animationDelay = `${index * 0.1}s`;
+        card.className = 'card mb-2 branch-card';
+        if (branch.id === selectedBranchId) {
+            card.classList.add('border-primary');
+        }
+        
+        const statusClass = branch.status === 'OPEN' ? 'bg-success' : 'bg-danger';
+        const statusText = branch.status === 'OPEN' ? 'Abierto' : 'Cerrado';
         
         card.innerHTML = `
-            <div class="card h-100 location-card shadow-sm" data-id="${branch.id}">
-                <div class="position-relative overflow-hidden branch-img-container">
-                    <img src="${branch.imageUrl || 'https://via.placeholder.com/400x200?text=Sin+Imagen'}" 
-                         class="card-img-top" alt="${branch.name}">
-                    <div class="branch-details">
-                        <h5 class="text-white mb-1">${branch.name}</h5>
-                        <p class="text-white-50 mb-0"><i class="bi bi-geo-alt me-1"></i>${branch.address}</p>
-                    </div>
-                    <span class="reservation-badge">${reservationsCount} reservas hoy</span>
+            <div class="card-body py-2">
+                <div class="d-flex align-items-center justify-content-between">
+                    <h6 class="card-title mb-0">${branch.name}</h6>
+                    <span class="badge ${statusClass}">${statusText}</span>
                 </div>
-                <div class="card-body">
-                    <div class="d-flex justify-content-between mb-2">
-                        <span class="badge bg-light text-dark"><i class="bi bi-people me-1"></i>${branch.maxCapacity} personas</span>
-                        <span class="badge bg-light text-dark"><i class="bi bi-clock me-1"></i>${formatTime(branch.openingTime || '11:00:00')} - ${formatTime(branch.closingTime || '23:00:00')}</span>
-                    </div>
-                    <p class="card-text small mb-3 branch-description">${branch.description || 'Sin descripción disponible'}</p>
-                    <div class="capacity-indicator mb-2">
-                        <div class="progress" style="height: 5px;">
-                            <div class="progress-bar ${reservationsCount > 10 ? 'bg-danger' : reservationsCount > 5 ? 'bg-warning' : 'bg-success'}" 
-                                 style="width: ${(reservationsCount / 15) * 100}%"></div>
-                        </div>
-                        <div class="d-flex justify-content-between small text-muted mt-1">
-                            <span>Disponibilidad: ${Math.max(0, 15 - reservationsCount)} espacios</span>
-                            <span>${Math.round(100 - (reservationsCount / 15) * 100)}%</span>
-                        </div>
-                    </div>
-                    <button class="btn btn-primary w-100 select-branch-btn">
-                        <i class="bi bi-check-circle me-2"></i>Seleccionar esta sede
-                    </button>
-                </div>
+                <p class="card-text small mb-1">${branch.address}</p>
+                <p class="card-text small text-muted mb-0">
+                    <i class="bi bi-telephone"></i> ${branch.phone || 'No disponible'}
+                </p>
             </div>
         `;
         
-        rowContainer.appendChild(card);
-    });
-    
-    // Añadir eventos a los botones de selección
-    document.querySelectorAll('.select-branch-btn').forEach(button => {
-        button.addEventListener('click', function() {
-            const card = this.closest('.location-card');
-            const branchId = card.dataset.id;
-            
-            // Quitar selección previa
-            document.querySelectorAll('.location-card').forEach(c => {
-                c.classList.remove('border-primary');
+        card.addEventListener('click', function() {
+            // Deseleccionar todas las tarjetas
+            document.querySelectorAll('.branch-card').forEach(card => {
+                card.classList.remove('border-primary');
             });
             
-            // Marcar como seleccionada
-            card.classList.add('border-primary');
+            // Seleccionar esta tarjeta
+            this.classList.add('border-primary');
+            selectedBranchId = branch.id;
             
-            // Activar el botón de continuar
+            // Centrar mapa en esta sede
+            locationMap.setView([branch.latitude, branch.longitude], 16);
+            
+            // Habilitar botón siguiente
             document.getElementById('nextToStep2').disabled = false;
-            
-            // Guardar la selección
-            selectedBranchId = branchId;
-            
-            // Centrar el mapa en la sede seleccionada
-            centerMapOnBranch(branchId);
-            
-            // Actualizar marcadores en el mapa
-            updateMarkerSelection(branchId);
         });
-    });
-    
-    // Implementar funcionalidad de búsqueda
-    const searchInput = document.getElementById('branchSearchInput');
-    searchInput.addEventListener('input', function() {
-        const searchTerm = this.value.trim().toLowerCase();
-        filterBranches(searchTerm);
-    });
-    
-    // Implementar funcionalidad de filtros
-    document.getElementById('filterBranchesBtn').addEventListener('click', function() {
-        const filterOptions = document.getElementById('filterOptions');
-        filterOptions.style.display = filterOptions.style.display === 'none' ? 'block' : 'none';
-    });
-    
-    document.getElementById('applyFiltersBtn').addEventListener('click', function() {
-        const searchTerm = document.getElementById('branchSearchInput').value.trim().toLowerCase();
-        const capacityFilter = document.getElementById('capacityFilter').value;
-        const sortOrder = document.getElementById('sortOrder').value;
         
-        let filteredBranches = [...branches];
-        
-        // Aplicar filtro de capacidad
-        if (capacityFilter !== 'all') {
-            switch (capacityFilter) {
-                case 'high':
-                    filteredBranches = filteredBranches.filter(b => b.maxCapacity > 150);
-                    break;
-                case 'medium':
-                    filteredBranches = filteredBranches.filter(b => b.maxCapacity <= 150 && b.maxCapacity >= 80);
-                    break;
-                case 'low':
-                    filteredBranches = filteredBranches.filter(b => b.maxCapacity < 80);
-                    break;
-            }
-        }
-        
-        // Aplicar ordenamiento
-        switch (sortOrder) {
-            case 'nameAsc':
-                filteredBranches.sort((a, b) => a.name.localeCompare(b.name));
-                break;
-            case 'nameDesc':
-                filteredBranches.sort((a, b) => b.name.localeCompare(a.name));
-                break;
-            case 'capacityDesc':
-                filteredBranches.sort((a, b) => b.maxCapacity - a.maxCapacity);
-                break;
-            case 'capacityAsc':
-                filteredBranches.sort((a, b) => a.maxCapacity - b.maxCapacity);
-                break;
-        }
-        
-        // Renderizar las sedes filtradas
-        renderBranchCards(filteredBranches);
-        
-        // Cerrar el panel de filtros
-        document.getElementById('filterOptions').style.display = 'none';
-    });
-}
-
-// Filtrar sedes por término de búsqueda
-function filterBranches(searchTerm) {
-    if (!searchTerm || searchTerm.length < 2) {
-        // Mostrar todas las sedes
-        document.querySelectorAll('.location-card').forEach(card => {
-            card.closest('.col').style.display = '';
-        });
-        return;
-    }
-    
-    document.querySelectorAll('.location-card').forEach(card => {
-        const branchName = card.querySelector('h5').textContent.toLowerCase();
-        const branchAddress = card.querySelector('.branch-details p').textContent.toLowerCase();
-        const branchDescription = card.querySelector('.branch-description').textContent.toLowerCase();
-        
-        if (branchName.includes(searchTerm) || 
-            branchAddress.includes(searchTerm) || 
-            branchDescription.includes(searchTerm)) {
-            card.closest('.col').style.display = '';
-        } else {
-            card.closest('.col').style.display = 'none';
-        }
+        branchCardsContainer.appendChild(card);
     });
 }
 
 // Añadir sedes al mapa
-function addBranchesToMap(branches) {
+function addBranchesToMap(branchList) {
     // Limpiar marcadores anteriores
     markers.forEach(marker => locationMap.removeLayer(marker));
     markers = [];
     
-    // Bounds para ajustar el zoom
+    // Límites para ajustar el mapa
     const bounds = L.latLngBounds();
     
-    branches.forEach(branch => {
+    branchList.forEach(branch => {
         if (branch.latitude && branch.longitude) {
-            // Crear un elemento HTML personalizado para el marcador
-            const markerHtml = `
-                <div class="branch-marker" data-id="${branch.id}">
-                    <i class="bi bi-geo-alt-fill"></i>
-                </div>
-            `;
-            
-            const customIcon = L.divIcon({
-                html: markerHtml,
-                className: '',
-                iconSize: [30, 30],
-                iconAnchor: [15, 30]
-            });
-            
-            const marker = L.marker([branch.latitude, branch.longitude], { 
-                icon: customIcon,
-                title: branch.name
-            }).addTo(locationMap);
-            
-            // Crear popup personalizado
-            const popupContent = `
-                <div class="branch-marker-popup">
-                    <h6>${branch.name}</h6>
-                    <p class="small text-muted mb-2">${branch.address}</p>
-                    <div class="d-flex justify-content-between mb-2">
-                        <span class="badge bg-light text-dark"><i class="bi bi-people me-1"></i>${branch.maxCapacity}</span>
-                        <span class="badge bg-light text-dark"><i class="bi bi-clock me-1"></i>${branch.openingTime || '11:00'} - ${branch.closingTime || '23:00'}</span>
-                    </div>
-                    <button class="btn btn-primary btn-sm w-100 select-map-branch-btn" 
-                            data-id="${branch.id}">
-                        Seleccionar
-                    </button>
-                </div>
-            `;
-            
-            const popup = L.popup({
-                closeButton: true,
-                className: 'branch-popup',
-                maxWidth: 300
-            }).setContent(popupContent);
-            
-            marker.bindPopup(popup);
-            
-            // Añadir evento al botón dentro del popup
-            marker.on('popupopen', () => {
-                const popupEl = marker.getPopup().getElement();
-                if (popupEl) {
-                    const selectBtn = popupEl.querySelector('.select-map-branch-btn');
-                    if (selectBtn) {
-                        selectBtn.addEventListener('click', () => {
-                            selectBranchFromMap(branch.id);
-                        });
+            const marker = L.marker([branch.latitude, branch.longitude])
+                .addTo(locationMap)
+                .bindPopup(`
+                    <strong>${branch.name}</strong><br>
+                    ${branch.address}<br>
+                    <span class="badge ${branch.status === 'OPEN' ? 'bg-success' : 'bg-danger'}">
+                        ${branch.status === 'OPEN' ? 'Abierto' : 'Cerrado'}
+                    </span>
+                `);
+                
+            marker.on('click', function() {
+                selectedBranchId = branch.id;
+                
+                // Actualizar tarjetas
+                document.querySelectorAll('.branch-card').forEach(card => {
+                    card.classList.remove('border-primary');
+                });
+                
+                const branchCards = document.querySelectorAll('.branch-card');
+                for (let i = 0; i < branchCards.length; i++) {
+                    if (branchCards[i].querySelector('.card-title').textContent === branch.name) {
+                        branchCards[i].classList.add('border-primary');
+                        branchCards[i].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                     }
                 }
-            });
-            
-            // Añadir evento click al marcador
-            marker.on('click', () => {
-                // Guardar referencia para el popup
-                marker._branchId = branch.id;
+                
+                // Habilitar botón siguiente
+                document.getElementById('nextToStep2').disabled = false;
             });
             
             markers.push(marker);
@@ -609,453 +309,338 @@ function addBranchesToMap(branches) {
         }
     });
     
-    // Ajustar el mapa para que se vean todos los marcadores
-    if (bounds.isValid()) {
+    // Ajustar el mapa si hay marcadores
+    if (markers.length > 0) {
         locationMap.fitBounds(bounds, { padding: [50, 50] });
     }
 }
 
-// Actualizar la selección de marcadores en el mapa
-function updateMarkerSelection(selectedId) {
-    // Actualizar estilo de los marcadores
-    markers.forEach(marker => {
-        const markerElement = marker.getElement();
-        if (markerElement) {
-            const markerIcon = markerElement.querySelector('.branch-marker');
-            if (markerIcon) {
-                const markerId = markerIcon.dataset.id;
-                
-                if (markerId === selectedId) {
-                    markerIcon.classList.add('selected');
-                } else {
-                    markerIcon.classList.remove('selected');
-                }
+// Configurar buscador de sedes
+function setupBranchSearch() {
+    const searchInput = document.getElementById('searchBranch');
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        
+        if (searchTerm.length === 0) {
+            renderBranchCards(branches);
+            addBranchesToMap(branches);
+            return;
+        }
+        
+        const filteredBranches = branches.filter(branch => {
+            return branch.name.toLowerCase().includes(searchTerm) || 
+                branch.address.toLowerCase().includes(searchTerm);
+        });
+        
+        renderBranchCards(filteredBranches);
+        addBranchesToMap(filteredBranches);
+    });
+}
+
+// Cargar las mesas disponibles para una sede
+async function loadTablesForBranch(branchId) {
+    const token = localStorage.getItem('token');
+    try {
+        // Actualizar información de la sede
+        updateSelectedBranchInfo();
+        
+        const response = await fetch(`${window.API_BASE_URL}/api/tables/branch/${branchId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             }
+        });
+        
+        if (!response.ok) {
+            throw new Error('Error al cargar las mesas');
+        }
+        
+        const result = await response.json();
+        if (result.success) {
+            const branchData = result.data;
+            availableTables = branchData.tables;
+            
+            renderTables(branchData);
+        } else {
+            throw new Error(result.message || 'Error al cargar las mesas');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'No se pudieron cargar las mesas. Por favor, intente más tarde.'
+        });
+    }
+}
+
+// Inicializar el selector de fechas
+function initializeDatePicker() {
+    datePicker = flatpickr("#datepicker", {
+        locale: "es",
+        minDate: "today",
+        dateFormat: "Y-m-d",
+        maxDate: new Date().fp_incr(30), // Permite reservar hasta 30 días en el futuro
+        disable: [
+            function(date) {
+                // Desactivar días que están completamente ocupados (implementar lógica según API)
+                return false;
+            }
+        ],
+        onChange: function(selectedDates, dateStr) {
+            selectedDate = dateStr;
+            loadAvailableTimeSlots(selectedDate);
         }
     });
 }
 
-// Centrar el mapa en una sede específica
-function centerMapOnBranch(branchId) {
-    const branch = branches.find(b => b.id.toString() === branchId.toString());
-    
-    if (branch && branch.latitude && branch.longitude) {
-        locationMap.setView([branch.latitude, branch.longitude], 15);
-        
-        // Encontrar y abrir el popup del marcador
-        markers.forEach(marker => {
-            if (marker._branchId === branch.id) {
-                marker.openPopup();
-            }
-        });
+// Cargar fechas disponibles
+function loadAvailableDates() {
+    // Esta función puede consultar a la API para obtener fechas disponibles
+    // Por ahora simplemente reiniciamos el datepicker
+    if (datePicker) {
+        datePicker.setDate([]);
     }
+    
+    // Limpiar slots de horarios
+    document.getElementById('timeSlots').innerHTML = '';
+    
+    // Desactivar botón siguiente hasta que se seleccione fecha y hora
+    document.getElementById('nextToStep4').disabled = true;
 }
 
-// Cargar fechas disponibles para la sede seleccionada
-async function loadAvailableDates() {
-    if (!selectedBranchId) return;
+// Cargar horarios disponibles para una fecha
+function loadAvailableTimeSlots(selectedDate) {
+    // Horarios disponibles (idealmente esto vendría de la API)
+    const availableHours = ['12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '19:00', '19:30', '20:00', '20:30', '21:00', '21:30'];
     
-    try {
-        // Para BurgerBoom, necesitamos extraer las fechas disponibles basándonos en los horarios de atención
-        const response = await fetch(`${window.API_BASE_URL}/api/business-hours/branch/${selectedBranchId}/schedule`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-        
-        const data = await response.json();
-        
-        if (response.ok && data.success) {
-            // Extraer días de la semana abiertos
-            const openDays = data.data.schedule
-                .filter(day => day.isOpen)
-                .map(day => day.dayOfWeek);
-            
-            // Generar fechas disponibles para los próximos 60 días
-            const availableDates = [];
-            const today = new Date();
-            
-            for (let i = 0; i < 60; i++) {
-                const date = new Date();
-                date.setDate(today.getDate() + i);
-                
-                // Convertir el día de la semana al formato esperado (MONDAY, TUESDAY, etc.)
-                const dayOfWeek = date.toLocaleString('en-us', {weekday: 'long'}).toUpperCase();
-                
-                if (openDays.includes(dayOfWeek)) {
-                    availableDates.push(date.toISOString().split('T')[0]);
-                }
-            }
-            
-            // Actualizar el calendario con las fechas disponibles
-            datePicker.set('disable', [
-                function(date) {
-                    // Deshabilitar fechas que no están en la lista de disponibles
-                    const dateString = date.toISOString().split('T')[0];
-                    return !availableDates.includes(dateString);
-                }
-            ]);
-            
-            // Si no hay fechas disponibles, mostrar mensaje
-            if (availableDates.length === 0) {
-                Swal.fire({
-                    icon: 'info',
-                    title: 'Sin fechas disponibles',
-                    text: 'No hay fechas disponibles para reservar en esta sede.'
-                });
-            }
-        } else {
-            showError('Error al cargar fechas disponibles:', data.message);
-        }
-    } catch (error) {
-        console.error('Error al cargar fechas disponibles:', error);
-        showError('Error de conexión', 'No se pudieron cargar las fechas disponibles.');
-    }
-}
-
-// Actualizar fechas disponibles cuando cambia el mes
-function updateAvailableDates() {
-    if (selectedBranchId) {
-        loadAvailableDates();
-    }
-}
-
-// Cargar horarios disponibles para una fecha específica
-async function loadTimeSlotsForDate(date) {
-    if (!selectedBranchId || !date) return;
-    
-    document.getElementById('noDateSelected').classList.add('d-none');
-    
-    // Mostrar indicador de carga
     const timeSlotsContainer = document.getElementById('timeSlots');
-    timeSlotsContainer.classList.remove('d-none');
-    timeSlotsContainer.innerHTML = `
-        <div class="text-center py-4">
-            <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Cargando horarios...</span>
-            </div>
-            <p class="mt-3">Cargando horarios disponibles...</p>
-        </div>
-    `;
+    timeSlotsContainer.innerHTML = '';
     
-    try {
-        // Verificar capacidad disponible para la fecha
-        const capacityResponse = await fetch(`${window.API_BASE_URL}/api/v1/branches/${selectedBranchId}/capacity?date=${date}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
+    // Generar botones de horarios
+    availableHours.forEach(time => {
+        const timeButton = document.createElement('button');
+        timeButton.type = 'button';
+        timeButton.className = 'btn btn-outline-primary m-1';
+        timeButton.dataset.time = time;
+        timeButton.textContent = time;
         
-        const capacityData = await capacityResponse.json();
-        
-        // Obtener horarios de la sede para ese día
-        const scheduleResponse = await fetch(`${window.API_BASE_URL}/api/business-hours/branch/${selectedBranchId}/schedule`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-        
-        const scheduleData = await scheduleResponse.json();
-        
-        if (capacityResponse.ok && scheduleResponse.ok && 
-            capacityData.success && scheduleData.success) {
-            
-            // Obtener el día de la semana para la fecha seleccionada
-            const selectedDay = new Date(date).toLocaleString('en-us', {weekday: 'long'}).toUpperCase();
-            
-            // Encontrar horario para ese día
-            const daySchedule = scheduleData.data.schedule.find(day => day.dayOfWeek === selectedDay);
-            
-            if (!daySchedule || !daySchedule.isOpen) {
-                timeSlotsContainer.innerHTML = `
-                    <div class="text-center py-4">
-                        <i class="bi bi-calendar-x text-muted" style="font-size: 2rem;"></i>
-                        <p class="mt-3">Este día está cerrado y no hay horarios disponibles.</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            // Generar slots de tiempo disponibles
-            const branch = branches.find(b => b.id === selectedBranchId);
-            const availableCapacity = capacityData.data || 0;
-            const totalCapacity = branch.maxCapacity || 100;
-            
-            // Información para mostrar
-            const scheduleInfo = {
-                totalCapacity: totalCapacity,
-                usedCapacity: totalCapacity - availableCapacity,
-                slots: generateTimeSlots(daySchedule.openingTime, daySchedule.closingTime, date)
-            };
-            
-            renderTimeSlots(scheduleInfo);
-        } else {
-            showError('Error al cargar horarios:', 
-                capacityData.message || scheduleData.message || 'No se pudieron obtener los horarios');
-            timeSlotsContainer.innerHTML = `
-                <div class="text-center py-4">
-                    <i class="bi bi-exclamation-triangle text-warning" style="font-size: 2rem;"></i>
-                    <p class="mt-3">No se pudieron cargar los horarios para esta fecha.</p>
-                </div>
-            `;
-        }
-    } catch (error) {
-        console.error('Error al cargar horarios:', error);
-        showError('Error de conexión', 'No se pudieron cargar los horarios disponibles.');
-        timeSlotsContainer.innerHTML = `
-            <div class="text-center py-4">
-                <i class="bi bi-wifi-off text-muted" style="font-size: 2rem;"></i>
-                <p class="mt-3">Error de conexión. Por favor, intenta de nuevo.</p>
-            </div>
-        `;
-    }
-}
-
-// Generar slots de tiempo a partir de horarios de apertura y cierre
-function generateTimeSlots(openingTime, closingTime, date) {
-    // Crear slots de 1 hora entre el horario de apertura y cierre
-    const slots = [];
-    
-    // Añadir 30 minutos de margen al inicio y fin del horario
-    const startTime = new Date(`2000-01-01T${openingTime}`);
-    startTime.setMinutes(startTime.getMinutes() + 30);
-    
-    const endTime = new Date(`2000-01-01T${closingTime}`);
-    endTime.setMinutes(endTime.getMinutes() - 30);
-    
-    const currentTime = new Date(startTime);
-    
-    while (currentTime <= endTime) {
-        const timeString = currentTime.toTimeString().substring(0, 8);
-        
-        // En una aplicación real, aquí verificaríamos la capacidad disponible para cada slot
-        // usando el endpoint adecuado de BurgerBoom
-        const remainingCapacity = 10; // Este es un valor ficticio
-        
-        slots.push({
-            time: timeString,
-            available: remainingCapacity > 0,
-            remainingCapacity: remainingCapacity
-        });
-        
-        // Avanzar 1 hora
-        currentTime.setHours(currentTime.getHours() + 1);
-    }
-    
-    return slots;
-}
-
-// Renderizar slots de horarios disponibles
-function renderTimeSlots(scheduleData) {
-    const timeSlots = document.getElementById('timeSlots');
-    const hourSlots = document.getElementById('hourSlots');
-    
-    // Si no hay datos de horario
-    if (!scheduleData || !scheduleData.slots || scheduleData.slots.length === 0) {
-        timeSlots.innerHTML = `
-            <div class="text-center py-4">
-                <i class="bi bi-calendar-x text-muted" style="font-size: 2rem;"></i>
-                <p class="mt-3">No hay horarios disponibles para esta fecha.</p>
-            </div>
-        `;
-        return;
-    }
-    
-    timeSlots.classList.remove('d-none');
-    hourSlots.innerHTML = '';
-    
-    // Actualizar información de capacidad
-    const totalCapacity = scheduleData.totalCapacity || 0;
-    const usedCapacity = scheduleData.usedCapacity || 0;
-    const availableCapacity = totalCapacity - usedCapacity;
-    const availabilityPercentage = totalCapacity > 0 ? Math.round((availableCapacity / totalCapacity) * 100) : 0;
-    
-    document.getElementById('dateAvailability').textContent = `${availabilityPercentage}%`;
-    document.getElementById('dateCapacity').textContent = `${availableCapacity} de ${totalCapacity} lugares disponibles`;
-    
-    // Actualizar barra de progreso
-    const capacityBar = document.getElementById('dateCapacityBar');
-    capacityBar.style.width = `${100 - availabilityPercentage}%`;
-    
-    // Cambiar clase según disponibilidad
-    capacityBar.className = 'capacity-progress';
-    if (availabilityPercentage < 30) {
-        capacityBar.classList.add('danger');
-    } else if (availabilityPercentage < 60) {
-        capacityBar.classList.add('warning');
-    } else {
-        capacityBar.classList.add('info');
-    }
-    
-    // Crear slots de horario con animación
-    scheduleData.slots.forEach((slot, index) => {
-        const time = slot.time;
-        const available = slot.available;
-        const remainingCapacity = slot.remainingCapacity || 0;
-        
-        const slotElement = document.createElement('div');
-        slotElement.className = 'col animate__animated animate__fadeIn';
-        slotElement.style.animationDelay = `${index * 0.05}s`;
-        
-        const timeSlotClass = available ? 'time-slot' : 'time-slot disabled';
-        
-        slotElement.innerHTML = `
-            <div class="${timeSlotClass}" data-time="${time}">
-                ${formatTime(time)}
-                ${available ? `<small class="d-block text-muted">${remainingCapacity} disponibles</small>` : ''}
-            </div>
-        `;
-        
-        hourSlots.appendChild(slotElement);
-    });
-    
-    // Añadir eventos a los slots de tiempo
-    document.querySelectorAll('.time-slot:not(.disabled)').forEach(slot => {
-        slot.addEventListener('click', function() {
-            // Desmarcar selección previa
-            document.querySelectorAll('.time-slot').forEach(s => {
-                s.classList.remove('selected');
+        // Añadir evento de clic
+        timeButton.addEventListener('click', function() {
+            // Deseleccionar todos los botones
+            document.querySelectorAll('#timeSlots button').forEach(btn => {
+                btn.classList.remove('active');
             });
             
-            // Marcar como seleccionado
-            this.classList.add('selected');
+            // Seleccionar este botón
+            this.classList.add('active');
+            selectedTime = time;
             
-            // Guardar tiempo seleccionado
-            selectedTime = this.dataset.time;
-            
-            // Activar botón de continuar
-            document.getElementById('nextToStep3').disabled = false;
+            // Habilitar botón siguiente
+            document.getElementById('nextToStep4').disabled = false;
         });
+        
+        timeSlotsContainer.appendChild(timeButton);
     });
 }
 
 // Actualizar información de la sede seleccionada
 function updateSelectedBranchInfo() {
-    if (!selectedBranchId) return;
-    
-    const branch = branches.find(b => b.id.toString() === selectedBranchId.toString());
+    const branch = branches.find(b => b.id === selectedBranchId);
     if (!branch) return;
     
-    const infoElement = document.getElementById('selectedBranchInfo');
-    infoElement.innerHTML = `
-        <strong>${branch.name}</strong> - ${branch.address}
-        <div class="small text-muted mt-1">
-            <i class="bi bi-clock me-1"></i>${branch.openingTime || '11:00'} - ${branch.closingTime || '23:00'} |
-            <i class="bi bi-people me-1"></i>Capacidad: ${branch.maxCapacity} personas
-        </div>
-    `;
+    document.getElementById('branchNameDisplay').textContent = branch.name;
+}
+
+// Renderizar mesas disponibles
+function renderTables(branchData) {
+    const tablesContainer = document.getElementById('tablesList');
+    tablesContainer.innerHTML = '';
+    
+    const capacityPercentage = (branchData.currentTablesCapacity / branchData.maxBranchCapacity) * 100;
+    document.getElementById('capacityProgress').style.width = `${capacityPercentage}%`;
+    document.getElementById('capacityText').textContent = `${branchData.currentTablesCapacity}/${branchData.maxBranchCapacity} capacidad`;
+    
+    const selectedGuestCount = parseInt(document.getElementById('guestCount').value);
+    
+    // Filtrar mesas por capacidad y estado
+    let filteredTables = branchData.tables.filter(table => {
+        return table.capacity >= selectedGuestCount && table.status === 'AVAILABLE';
+    });
+    
+    if (filteredTables.length === 0) {
+        tablesContainer.innerHTML = '<div class="col-12"><div class="alert alert-info">No hay mesas disponibles para el número de personas seleccionado</div></div>';
+        document.getElementById('nextToStep3').disabled = true;
+        return;
+    }
+    
+    // Ordenar mesas por capacidad (más cercana al número de personas)
+    filteredTables.sort((a, b) => a.capacity - b.capacity);
+    
+    filteredTables.forEach(table => {
+        const tableCard = document.createElement('div');
+        tableCard.className = 'col-md-3 col-sm-6';
+        
+        let statusClass = 'bg-success';
+        if (table.status === 'OCCUPIED') statusClass = 'bg-danger';
+        if (table.status === 'RESERVED') statusClass = 'bg-warning';
+        
+        tableCard.innerHTML = `
+            <div class="card table-card h-100 ${table.id === selectedTableId ? 'border-primary' : ''}" data-table-id="${table.id}">
+                <div class="card-header ${statusClass} text-white d-flex justify-content-between align-items-center py-2">
+                    <h6 class="mb-0">Mesa ${table.tableNumber}</h6>
+                    <span class="badge bg-light text-dark">${table.capacity} personas</span>
+                </div>
+                <div class="card-body text-center">
+                    <img src="./assets/img/mesa.png" alt="Mesa" class="img-fluid" style="max-height: 100px;">
+                    <p class="mt-2 mb-0">Ubicación: ${table.location}</p>
+                </div>
+            </div>
+        `;
+        
+        tablesContainer.appendChild(tableCard);
+        
+        // Añadir evento de clic para seleccionar la mesa
+        tableCard.querySelector('.table-card').addEventListener('click', function() {
+            if (table.status === 'AVAILABLE') {
+                // Deseleccionar todas las mesas
+                document.querySelectorAll('.table-card').forEach(card => {
+                    card.classList.remove('border-primary');
+                });
+                
+                // Seleccionar esta mesa
+                this.classList.add('border-primary');
+                selectedTableId = table.id;
+                
+                // Habilitar botón siguiente
+                document.getElementById('nextToStep3').disabled = false;
+            }
+        });
+    });
+    
+    // Actualizar el filtro por número de personas
+    document.getElementById('guestCount').addEventListener('change', function() {
+        renderTables(branchData);
+    });
 }
 
 // Actualizar resumen de reserva
 function updateReservationSummary() {
-    if (!selectedBranchId || !selectedDate || !selectedTime) return;
-    
-    const branch = branches.find(b => b.id.toString() === selectedBranchId.toString());
+    const branch = branches.find(b => b.id === selectedBranchId);
     if (!branch) return;
     
-    document.getElementById('summaryBranchName').textContent = branch.name;
-    document.getElementById('summaryBranchAddress').textContent = branch.address;
-    
-    document.getElementById('summaryDate').textContent = formatDate(selectedDate);
-    document.getElementById('summaryTime').textContent = formatTime(selectedTime);
-    
-    // Actualizar número de personas si ya está seleccionado
+    const selectedTable = availableTables.find(table => table.id === selectedTableId);
     const guestCount = document.getElementById('guestCount').value;
-    if (guestCount) {
-        document.getElementById('summaryGuests').textContent = `${guestCount} personas`;
-    } else {
-        document.getElementById('summaryGuests').textContent = 'Pendiente de seleccionar';
-    }
-}
-
-// Cargar información del usuario
-async function loadUserInfo() {
-    try {
-        const token = localStorage.getItem('token');
-        if (!token) return;
-        
-        const response = await fetch(`${window.API_BASE_URL}/api/v1/user/profile`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
-        });
-        
-        const data = await response.json();
-        
-        if (response.ok && data.success) {
-            const user = data.data;
-            
-            // Prellenar formulario con datos del usuario
-            document.getElementById('guestName').value = user.name || '';
-            document.getElementById('guestEmail').value = user.email || '';
-            document.getElementById('guestPhone').value = user.phone || '';
-        }
-    } catch (error) {
-        console.error('Error al cargar información del usuario:', error);
-    }
-}
-
-// Configurar listeners para el formulario
-function setupFormListeners() {
-    // Actualizar resumen cuando cambia el número de personas
-    document.getElementById('guestCount').addEventListener('change', function() {
-        const guests = this.value;
-        if (guests) {
-            document.getElementById('summaryGuests').textContent = guests === '9+' ? 'Más de 9 personas' : `${guests} personas`;
-        }
-    });
     
-    // Mostrar términos y condiciones cuando se hace clic en el enlace
-    document.querySelector('a[data-bs-toggle="modal"]').addEventListener('click', function(e) {
-        e.preventDefault();
-        const termsModal = new bootstrap.Modal(document.getElementById('termsModal'));
-        termsModal.show();
-    });
+    const summaryHTML = `
+        <div class="row">
+            <div class="col-12 mb-3">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-building me-2 text-primary"></i>
+                    <div>
+                        <h6 class="mb-0">Sede</h6>
+                        <p class="mb-0">${branch.name}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 mb-3">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-geo-alt me-2 text-primary"></i>
+                    <div>
+                        <h6 class="mb-0">Dirección</h6>
+                        <p class="mb-0">${branch.address}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-table me-2 text-primary"></i>
+                    <div>
+                        <h6 class="mb-0">Mesa</h6>
+                        <p class="mb-0">Mesa ${selectedTable ? selectedTable.tableNumber : 'No especificada'}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-people me-2 text-primary"></i>
+                    <div>
+                        <h6 class="mb-0">Personas</h6>
+                        <p class="mb-0">${guestCount} ${guestCount == 1 ? 'persona' : 'personas'}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-calendar-date me-2 text-primary"></i>
+                    <div>
+                        <h6 class="mb-0">Fecha</h6>
+                        <p class="mb-0">${formatDate(selectedDate)}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-clock me-2 text-primary"></i>
+                    <div>
+                        <h6 class="mb-0">Hora</h6>
+                        <p class="mb-0">${selectedTime}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('reservationSummary').innerHTML = summaryHTML;
+    
+    // Guardar detalles para el envío
+    reservationDetails = {
+        branchId: selectedBranchId,
+        reservationDate: selectedDate,
+        startTime: `${selectedTime}:00`,
+        endTime: calculateEndTime(selectedDate, selectedTime, 120), // 2 horas de duración por defecto
+        numGuests: parseInt(guestCount),
+        specialRequests: document.getElementById('specialRequests').value || 'Ninguna',
+        preferredTableId: selectedTableId
+    };
+}
+
+// Calcular hora de fin basada en la duración
+function calculateEndTime(date, startTime, durationMinutes) {
+    const startDateTime = new Date(`${date}T${startTime}:00`);
+    startDateTime.setMinutes(startDateTime.getMinutes() + durationMinutes);
+    
+    const hours = startDateTime.getHours().toString().padStart(2, '0');
+    const minutes = startDateTime.getMinutes().toString().padStart(2, '0');
+    
+    return `${hours}:${minutes}:00`;
 }
 
 // Validar formulario de reserva
 function validateReservationForm() {
-    const form = document.getElementById('reservationForm');
-    
-    if (form.checkValidity() === false) {
-        form.classList.add('was-validated');
+    if (!selectedBranchId) {
+        showError('Error', 'Debe seleccionar una sede');
         return false;
     }
     
-    // Validaciones adicionales
-    const name = document.getElementById('guestName').value.trim();
-    const email = document.getElementById('guestEmail').value.trim();
-    const phone = document.getElementById('guestPhone').value.trim();
-    const guests = document.getElementById('guestCount').value;
-    const termsCheck = document.getElementById('termsCheck').checked;
-    
-    if (name.length < 3) {
-        showError('Validación', 'El nombre debe tener al menos 3 caracteres.');
+    if (!selectedTableId) {
+        showError('Error', 'Debe seleccionar una mesa');
         return false;
     }
     
-    if (!validateEmail(email)) {
-        showError('Validación', 'Por favor, ingresa un correo electrónico válido.');
+    if (!selectedDate) {
+        showError('Error', 'Debe seleccionar una fecha');
         return false;
     }
     
-    if (phone.length < 7) {
-        showError('Validación', 'El número de teléfono debe tener al menos 7 dígitos.');
+    if (!selectedTime) {
+        showError('Error', 'Debe seleccionar una hora');
         return false;
     }
     
-    if (!guests) {
-        showError('Validación', 'Debes seleccionar el número de personas.');
-        return false;
-    }
-    
-    if (!termsCheck) {
-        showError('Validación', 'Debes aceptar los términos y condiciones para continuar.');
+    if (!document.getElementById('termsCheckbox').checked) {
+        showError('Error', 'Debe aceptar los términos y condiciones');
         return false;
     }
     
@@ -1063,144 +648,118 @@ function validateReservationForm() {
 }
 
 // Enviar reserva al servidor
+let isSubmitting = false; // Variable para evitar envíos múltiples
+
 async function submitReservation() {
+    // Evitar múltiples envíos
+    if (isSubmitting) return;
+    
+    if (!validateReservationForm()) return;
+    
+    // Marcar como en proceso de envío
+    isSubmitting = true;
+    
+    // Deshabilitar botón para evitar doble clic
+    const submitButton = document.getElementById('confirmReservation');
+    if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Procesando...';
+    }
+    
+    const token = localStorage.getItem('token');
     try {
-        const token = localStorage.getItem('token');
-        const userId = localStorage.getItem('userId');
+        // Obtener el ID del usuario desde el token
+        const payload = jwt_decode(token);
+        const userId = payload.userId;
         
-        if (!token || !userId) {
-            showError('Error de autenticación', 'Debes iniciar sesión para realizar una reserva.');
-            return;
-        }
-        
-        // Mostrar loading
+        // Mostrar notificación de carga
         Swal.fire({
-            title: 'Procesando tu reserva',
-            html: 'Estamos confirmando tu reserva, por favor espera...',
+            title: 'Procesando',
+            text: 'Enviando su reserva...',
+            icon: 'info',
+            showConfirmButton: false,
             allowOutsideClick: false,
             didOpen: () => {
                 Swal.showLoading();
             }
         });
         
-        // Recopilar datos del formulario
-        const name = document.getElementById('guestName').value.trim();
-        const email = document.getElementById('guestEmail').value.trim();
-        const phone = document.getElementById('guestPhone').value.trim();
-        let guests = document.getElementById('guestCount').value;
-        const specialRequests = document.getElementById('specialRequests').value.trim();
-        
-        // Convertir '9+' a un número
-        if (guests === '9+') guests = 10;
-        
-        // Calcular hora de fin (2 horas después de la hora de inicio)
-        const startTime = selectedTime;
-        const startDate = new Date(`2000-01-01T${startTime}`);
-        const endDate = new Date(startDate);
-        endDate.setHours(endDate.getHours() + 2);
-        const endTime = endDate.toTimeString().substring(0, 8);
-        
-        // Crear objeto de reserva adaptado al formato de BurgerBoom
-        const reservationData = {
-            branchId: selectedBranchId,
-            reservationDate: selectedDate,
-            startTime: startTime,
-            endTime: endTime,
-            numGuests: parseInt(guests),
-            specialRequests: specialRequests
-        };
-        
-        // Endpoint adaptado según la documentación de BurgerBoom
         const response = await fetch(`${window.API_BASE_URL}/api/reservations/user/${userId}`, {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify(reservationData)
+            body: JSON.stringify(reservationDetails)
         });
         
-        const data = await response.json();
+        if (!response.ok) {
+            throw new Error('Error al crear la reserva');
+        }
         
-        if (response.ok && data.success) {
-            // Guardar detalles de la reserva para la pantalla de confirmación
-            reservationDetails = {
-                id: data.data.id,
-                branchName: getBranchName(selectedBranchId),
-                date: formatDate(selectedDate),
-                time: formatTime(startTime),
-                guests: guests
-            };
-            
-            // Actualizar pantalla de confirmación
-            document.getElementById('reservationCode').textContent = data.data.id.substring(0, 8);
-            document.getElementById('confirmationDateTime').textContent = `${formatDate(selectedDate)}, ${formatTime(startTime)}`;
-            document.getElementById('confirmationBranch').textContent = getBranchName(selectedBranchId);
-            document.getElementById('confirmationGuests').textContent = guests === '9+' ? 'Más de 9 personas' : `${guests} personas`;
-            
-            // Avanzar al paso 4 (confirmación)
-            goToStep(4);
-            
-            // Cerrar el modal de carga
-            Swal.close();
+        const result = await response.json();
+        if (result.success) {
+            Swal.fire({
+                icon: 'success',
+                title: '¡Reserva creada!',
+                text: 'Su reserva ha sido confirmada exitosamente.',
+                confirmButtonText: 'Aceptar'
+            }).then(() => {
+                window.location.href = 'user-dashboard.html';
+            });
         } else {
-            showError('Error al procesar la reserva', data.message || 'No se pudo completar la reserva. Por favor, intenta de nuevo.');
+            throw new Error(result.message || 'Error al crear la reserva');
         }
     } catch (error) {
-        console.error('Error al enviar la reserva:', error);
-        showError('Error de conexión', 'Hubo un problema al procesar tu reserva. Por favor, verifica tu conexión a internet e intenta de nuevo.');
+        console.error('Error:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: error.message || 'No se pudo crear la reserva. Por favor, intente más tarde.'
+        });
+        
+        // Restaurar el botón en caso de error
+        if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.innerHTML = 'Confirmar Reserva';
+        }
+        
+        // Restaurar la variable de control
+        isSubmitting = false;
     }
 }
 
-// Obtener nombre de una sede por su ID
-function getBranchName(branchId) {
-    const branch = branches.find(b => b.id.toString() === branchId.toString());
-    return branch ? branch.name : 'Sede desconocida';
+// Cargar información del usuario
+async function loadUserInfo() {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    
+    try {
+        const payload = jwt_decode(token);
+        document.getElementById('username').textContent = payload.name || 'Usuario';
+    } catch (error) {
+        console.error('Error decodificando token:', error);
+    }
 }
 
 // Funciones de utilidad
-function calculateDistance(lat1, lon1, lat2, lon2) {
-    const R = 6371; // Radio de la Tierra en km
-    const dLat = deg2rad(lat2-lat1);
-    const dLon = deg2rad(lon2-lon1); 
-    const a = 
-        Math.sin(dLat/2) * Math.sin(dLat/2) +
-        Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
-        Math.sin(dLon/2) * Math.sin(dLon/2); 
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
-    const distance = R * c; // Distancia en km
-    return distance;
-}
-
-function deg2rad(deg) {
-    return deg * (Math.PI/180);
-}
-
-function validateEmail(email) {
-    const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return re.test(String(email).toLowerCase());
-}
-
 function formatDate(dateString) {
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    const date = new Date(dateString);
-    return date.toLocaleDateString('es-ES', options);
-}
-
-function formatTime(timeString) {
-    if (!timeString) return '';
+    if (!dateString) return '';
     
-    const parts = timeString.split(':');
-    if (parts.length < 2) return timeString;
-    
-    return `${parts[0]}:${parts[1]}`;
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString('es-ES', options);
 }
 
 function showError(title, message) {
     Swal.fire({
         icon: 'error',
         title: title,
-        text: message,
-        confirmButtonText: 'Entendido'
+        text: message
     });
+}
+
+// Obtener nombre de una sede por su ID
+function getBranchName(branchId) {
+    const branch = branches.find(b => b.id === branchId);
+    return branch ? branch.name : 'Desconocida';
 }

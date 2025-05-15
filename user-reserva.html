@@ -21,586 +21,267 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <!-- Animate.css -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-    <!-- Custom CSS para reservas -->
-    <style>
-        body {
-            background-color: #f8f9fa;
-        }
-        
-        .location-card {
-            transition: all 0.3s ease;
-            cursor: pointer;
-            border: none !important;
-            overflow: hidden;
-            border-radius: 10px;
-        }
-        
-        .location-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-        }
-        
-        .location-card .card-img-top {
-            height: 180px;
-            object-fit: cover;
-            transition: all 0.5s ease;
-        }
-        
-        .location-card:hover .card-img-top {
-            transform: scale(1.05);
-        }
-        
-        .map-container {
-            height: 400px;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-        }
-        
-        .branch-details {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
-            color: white;
-            padding: 20px;
-            border-radius: 0 0 10px 10px;
-        }
-        
-        .time-slot {
-            padding: 10px;
-            margin: 5px;
-            border-radius: 5px;
-            background-color: #f0f0f0;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            text-align: center;
-        }
-        
-        .time-slot:hover {
-            background-color: #e0e0e0;
-        }
-        
-        .time-slot.selected {
-            background-color: #007bff;
-            color: white;
-        }
-        
-        .time-slot.disabled {
-            background-color: #f8f9fa;
-            color: #adb5bd;
-            cursor: not-allowed;
-            text-decoration: line-through;
-        }
-        
-        .capacity-meter {
-            height: 8px;
-            background-color: #e9ecef;
-            border-radius: 4px;
-            margin-top: 5px;
-            overflow: hidden;
-        }
-        
-        .capacity-progress {
-            height: 100%;
-            border-radius: 4px;
-            transition: width 0.5s ease;
-        }
-        
-        .capacity-progress.info {
-            background-color: #0dcaf0;
-        }
-        
-        .capacity-progress.warning {
-            background-color: #ffc107;
-        }
-        
-        .capacity-progress.danger {
-            background-color: #dc3545;
-        }
-        
-        .step-indicator {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 30px;
-        }
-        
-        .step {
-            flex: 1;
-            text-align: center;
-            padding: 10px;
-            position: relative;
-        }
-        
-        .step::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            right: 0;
-            top: 25px;
-            height: 3px;
-            background-color: #dee2e6;
-            z-index: 1;
-        }
-        
-        .step:first-child::before {
-            left: 50%;
-        }
-        
-        .step:last-child::before {
-            right: 50%;
-        }
-        
-        .step-circle {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background-color: #dee2e6;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 10px;
-            position: relative;
-            z-index: 2;
-            transition: all 0.3s ease;
-        }
-        
-        .step.active .step-circle {
-            background-color: #007bff;
-            color: white;
-        }
-        
-        .step.completed .step-circle {
-            background-color: #28a745;
-            color: white;
-        }
-        
-        .step-title {
-            font-weight: 500;
-            margin-bottom: 5px;
-        }
-        
-        .step-description {
-            font-size: 0.8rem;
-            color: #6c757d;
-        }
-        
-        .reservation-summary {
-            background-color: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-        }
-        
-        .reservation-confirmation {
-            text-align: center;
-            padding: 40px 20px;
-        }
-        
-        .reservation-confirmation i {
-            font-size: 5rem;
-            color: #28a745;
-            margin-bottom: 20px;
-        }
-        
-        .feature-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background-color: rgba(0, 123, 255, 0.1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 15px;
-        }
-        
-        .feature-icon i {
-            font-size: 1.5rem;
-            color: #007bff;
-        }
-        
-        .branch-marker {
-            background-color: #007bff;
-            color: white;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1rem;
-            border: 2px solid white;
-            box-shadow: 0 0 10px rgba(0,0,0,0.2);
-        }
-        
-        .branch-marker.selected {
-            background-color: #28a745;
-            transform: scale(1.2);
-        }
-        
-        .branch-marker-popup {
-            min-width: 200px;
-        }
-        
-        .animated-fade {
-            animation: fadeIn 0.5s ease-in-out;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-    </style>
 </head>
 
-<body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
-        <div class="container">
-            <a class="navbar-brand d-flex align-items-center" href="index.html">
-                <i class='bx bxs-cube-alt me-2 text-primary' style="font-size: 2rem;"></i>
-                <span class="fw-bold">RestauranteApp</span>
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="index.html">Inicio</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="menu.html">Menú</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="user-reserva.html">Reservar</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="contacto.html">Contacto</a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                            data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class='bx bxs-user-circle me-1'></i>Mi Cuenta
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                            <li><a class="dropdown-item" href="perfil.html">Mi Perfil</a></li>
-                            <li><a class="dropdown-item" href="mis-reservas.html">Mis Reservas</a></li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li><a class="dropdown-item" href="#" id="logoutButton">Cerrar Sesión</a></li>
-                        </ul>
-                    </li>
-                </ul>
+<body class="d-flex flex-column h-100">
+    <div class="wrapper">
+        <!-- Sidebar -->
+        <div class="sidebar bg-primary">
+            <div class="text-center p-2">
+                <!-- Logo -->
+                <i class='bx bxs-cube-alt bx-lg text-whithe'></i>
             </div>
-        </div>
-    </nav>
-
-    <!-- Contenido principal -->
-    <div class="container py-5">
-        <!-- Pasos de reserva -->
-        <div class="step-indicator mb-5">
-            <div class="step active" id="step1">
-                <div class="step-circle">1</div>
-                <div class="step-title">Sede</div>
-                <div class="step-description">Selecciona ubicación</div>
-            </div>
-            <div class="step" id="step2">
-                <div class="step-circle">2</div>
-                <div class="step-title">Fecha y Hora</div>
-                <div class="step-description">Elige tu preferencia</div>
-            </div>
-            <div class="step" id="step3">
-                <div class="step-circle">3</div>
-                <div class="step-title">Detalles</div>
-                <div class="step-description">Completa información</div>
-            </div>
-            <div class="step" id="step4">
-                <div class="step-circle">4</div>
-                <div class="step-title">Confirmación</div>
-                <div class="step-description">Reserva completa</div>
-            </div>
+            <ul class="sidebar-nav mt-1">
+                <li class="sidebar-item">
+                    <a href="user-dashboard.html" class="sidebar-link">
+                        <i class='bx bxs-dashboard'></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="user-reserva.html" class="sidebar-link active">
+                        <i class='bx bxs-calendar-check'></i>
+                        <span>Reservas</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="user-menu.html" class="sidebar-link">
+                        <i class='bx bxs-food-menu'></i>
+                        <span>Menú</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="user-perfil.html" class="sidebar-link">
+                        <i class='bx bxs-user'></i>
+                        <span>Mi Perfil</span>
+                    </a>
+                </li>
+            </ul>
         </div>
 
-        <!-- Sección 1: Selección de sede -->
-        <div id="step1Content" class="animated fadeIn">
-            <div class="row mb-4">
-                <div class="col-12">
-                    <h2 class="mb-4 text-center">Selecciona una Sede</h2>
-                    <p class="text-center text-muted mb-5">Elige la ubicación de tu preferencia para tu próxima visita</p>
-                    
-                    <!-- Buscador de sedes -->
-                    <div class="row justify-content-center mb-4">
-                        <div class="col-md-6">
-                            <div class="input-group shadow-sm">
-                                <input type="text" class="form-control" id="locationSearch" placeholder="Buscar por nombre o dirección...">
-                                <button class="btn btn-primary" type="button" id="searchBranchBtn">
-                                    <i class="bi bi-search"></i>
-                                </button>
-                            </div>
+        <!-- Main content -->
+        <div class="main">
+            <!-- Navbar -->
+            <nav class="navbar navbar-expand-lg navbar-light bg-white shadow p-0">
+                <div class="container-fluid px-3">
+                    <!-- Toggle sidebar button -->
+                    <button class="toggle-btn bg-transparent border-0" type="button">
+                        <i class='bx bx-menu fs-4'></i>
+                    </button>
+
+                    <div class="d-flex justify-content-between w-100 align-items-center">
+                        <div>
+                            <h5 class="mb-0">Reservaciones</h5>
                         </div>
-                    </div>
-                    
-                    <!-- Mapa de sedes -->
-                    <div class="map-container shadow" id="locationMap"></div>
-                </div>
-            </div>
-            
-            <!-- Listado de sedes -->
-            <h3 class="mb-4">Nuestras Sedes</h3>
-            <div class="row row-cols-1 row-cols-md-3 g-4" id="locationCards">
-                <!-- Las tarjetas de sede se generarán dinámicamente -->
-                <div class="col">
-                    <div class="card h-100 shadow-sm location-card animate__animated animate__fadeIn">
-                        <div class="position-relative overflow-hidden">
-                            <img src="https://via.placeholder.com/400x200" class="card-img-top" alt="Sede Centro">
-                            <div class="overlay-gradient"></div>
-                        </div>
-                        <div class="card-body">
-                            <h5 class="card-title">Cargando sedes...</h5>
-                            <div class="d-flex justify-content-center my-3">
-                                <div class="spinner-border text-primary" role="status">
-                                    <span class="visually-hidden">Cargando...</span>
-                                </div>
-                            </div>
+                        <div class="dropdown">
+                            <button class="btn btn-link dropdown-toggle text-decoration-none" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class='bx bxs-user-circle fs-4 me-1'></i>
+                                <span id="username">Usuario</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                <li><a class="dropdown-item" href="user-perfil.html">Mi Perfil</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><button class="dropdown-item" id="logoutBtn">Cerrar Sesión</button></li>
+                            </ul>
                         </div>
                     </div>
                 </div>
-            </div>
-            
-            <div class="d-flex justify-content-end mt-4">
-                <button class="btn btn-primary" id="nextToStep2" disabled>
-                    Continuar <i class="bi bi-arrow-right ms-2"></i>
-                </button>
-            </div>
-        </div>
+            </nav>
 
-        <!-- Sección 2: Selección de fecha y hora -->
-        <div id="step2Content" class="animated fadeIn" style="display: none;">
-            <div class="row">
-                <div class="col-12">
-                    <h2 class="mb-4 text-center">Selecciona Fecha y Hora</h2>
-                    <p class="text-center text-muted mb-5" id="selectedBranchInfo">Sede seleccionada</p>
-                </div>
-            </div>
-            
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="card shadow-sm border-0 h-100">
-                        <div class="card-header bg-primary-subtle border-0">
-                            <h5 class="card-title m-0">Selecciona una fecha</h5>
-                        </div>
-                        <div class="card-body">
-                            <div id="datePicker"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card shadow-sm border-0 h-100">
-                        <div class="card-header bg-primary-subtle border-0">
-                            <h5 class="card-title m-0" id="timeSelectionTitle">Selecciona una hora</h5>
-                        </div>
-                        <div class="card-body">
-                            <div id="noDateSelected" class="text-center py-5">
-                                <i class="bi bi-calendar3 text-muted" style="font-size: 3rem;"></i>
-                                <p class="mt-3 text-muted">Por favor, selecciona una fecha primero</p>
+            <!-- Contenido principal -->
+            <div class="container-fluid p-4">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <!-- Indicador de pasos -->
+                        <div class="d-flex justify-content-between mb-4 step-indicator">
+                            <div class="step active" id="step1">
+                                <div class="step-circle">1</div>
+                                <div class="step-title">Seleccionar Sede</div>
                             </div>
-                            <div id="timeSlots" class="d-none">
-                                <div class="capacity-info mb-3">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <strong>Disponibilidad:</strong> <span id="dateAvailability">85%</span>
-                                        </div>
-                                        <div>
-                                            <span id="dateCapacity">85 de 100 lugares disponibles</span>
+                            <div class="step" id="step2">
+                                <div class="step-circle">2</div>
+                                <div class="step-title">Seleccionar Mesa</div>
+                            </div>
+                            <div class="step" id="step3">
+                                <div class="step-circle">3</div>
+                                <div class="step-title">Fecha y Hora</div>
+                            </div>
+                            <div class="step" id="step4">
+                                <div class="step-circle">4</div>
+                                <div class="step-title">Confirmar</div>
+                            </div>
+                        </div>
+
+                        <!-- Contenido de los pasos -->
+                        <div id="stepsContent">
+                            <!-- Paso 1: Seleccionar Sede -->
+                            <div id="step1Content" class="animate__animated animate__fadeIn">
+                                <div class="row mb-4">
+                                    <div class="col-md-6">
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                            <input type="text" class="form-control" id="searchBranch" placeholder="Buscar sede...">
                                         </div>
                                     </div>
-                                    <div class="capacity-meter">
-                                        <div class="capacity-progress info" id="dateCapacityBar" style="width: 15%"></div>
+                                </div>
+                                <div class="row mb-4">
+                                    <div class="col-md-5">
+                                        <div id="branchCards" class="overflow-auto" style="max-height: 500px;"></div>
+                                    </div>
+                                    <div class="col-md-7">
+                                        <div class="map-container">
+                                            <div id="locationMap" style="height: 100%;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-end mt-3">
+                                    <button id="nextToStep2" class="btn btn-primary" disabled>
+                                        Siguiente <i class="bi bi-arrow-right"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Paso 2: Seleccionar Mesa -->
+                            <div id="step2Content" class="animate__animated animate__fadeIn" style="display: none;">
+                                <div class="row mb-4">
+                                    <div class="col-md-6">
+                                        <h5 class="card-title" id="branchNameDisplay"></h5>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <div class="capacity-meter w-100 me-2">
+                                                <div id="capacityProgress" class="capacity-progress info" style="width: 0%;"></div>
+                                            </div>
+                                            <span id="capacityText" class="small">0/0 mesas</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 text-end">
+                                        <div class="input-group w-50 ms-auto">
+                                            <span class="input-group-text"><i class="bi bi-people-fill"></i></span>
+                                            <select class="form-select" id="guestCount">
+                                                <option value="1">1 persona</option>
+                                                <option value="2" selected>2 personas</option>
+                                                <option value="3">3 personas</option>
+                                                <option value="4">4 personas</option>
+                                                <option value="5">5 personas</option>
+                                                <option value="6">6 personas</option>
+                                                <option value="8">8 personas</option>
+                                                <option value="10">10 personas</option>
+                                            </select>
+                                        </div>
                                     </div>
                                 </div>
                                 
-                                <div class="row row-cols-3 g-2" id="hourSlots">
-                                    <!-- Slots de hora se generarán dinámicamente -->
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="card">
+                                            <div class="card-header d-flex justify-content-between align-items-center">
+                                                <h6 class="mb-0">Mesas disponibles</h6>
+                                                <div class="d-flex">
+                                                    <span class="badge bg-success me-2">Disponible</span>
+                                                    <span class="badge bg-danger me-2">Ocupada</span>
+                                                    <span class="badge bg-warning">Reservada</span>
+                                                </div>
+                                            </div>
+                                            <div class="card-body">
+                                                <div id="tablesList" class="row g-3"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between mt-3">
+                                    <button id="backToStep1" class="btn btn-outline-secondary">
+                                        <i class="bi bi-arrow-left"></i> Anterior
+                                    </button>
+                                    <button id="nextToStep3" class="btn btn-primary" disabled>
+                                        Siguiente <i class="bi bi-arrow-right"></i>
+                                    </button>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="d-flex justify-content-between mt-4">
-                <button class="btn btn-outline-secondary" id="backToStep1">
-                    <i class="bi bi-arrow-left me-2"></i> Volver
-                </button>
-                <button class="btn btn-primary" id="nextToStep3" disabled>
-                    Continuar <i class="bi bi-arrow-right ms-2"></i>
-                </button>
-            </div>
-        </div>
 
-        <!-- Sección 3: Detalles de la reserva -->
-        <div id="step3Content" class="animated fadeIn" style="display: none;">
-            <div class="row">
-                <div class="col-12">
-                    <h2 class="mb-4 text-center">Detalles de la Reserva</h2>
-                    <p class="text-center text-muted mb-5">Completa la información para finalizar tu reserva</p>
-                </div>
-            </div>
-            
-            <div class="row">
-                <div class="col-md-7">
-                    <div class="card shadow-sm border-0">
-                        <div class="card-header bg-primary-subtle border-0">
-                            <h5 class="card-title m-0">Información de contacto</h5>
-                        </div>
-                        <div class="card-body">
-                            <form id="reservationForm">
-                                <div class="row mb-3">
+                            <!-- Paso 3: Fecha y Hora -->
+                            <div id="step3Content" class="animate__animated animate__fadeIn" style="display: none;">
+                                <div class="row mb-4">
                                     <div class="col-md-6">
-                                        <label for="guestName" class="form-label">Nombre completo</label>
-                                        <input type="text" class="form-control" id="guestName" required>
+                                        <div class="card h-100">
+                                            <div class="card-header">
+                                                <h6 class="mb-0">Seleccionar Fecha</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <input type="text" id="datepicker" class="form-control mb-3" placeholder="Seleccionar fecha">
+                                                <div class="text-muted small">
+                                                    <p><i class="bi bi-info-circle"></i> Seleccione una fecha para ver los horarios disponibles.</p>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div class="col-md-6">
-                                        <label for="guestEmail" class="form-label">Correo electrónico</label>
-                                        <input type="email" class="form-control" id="guestEmail" required>
+                                        <div class="card h-100">
+                                            <div class="card-header">
+                                                <h6 class="mb-0">Seleccionar Hora</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div id="timeSlots" class="d-flex flex-wrap"></div>
+                                                <div class="text-muted small mt-3">
+                                                    <p><i class="bi bi-clock"></i> La duración de la reserva es de 2 horas por defecto.</p>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="row mb-3">
-                                    <div class="col-md-6">
-                                        <label for="guestPhone" class="form-label">Teléfono</label>
-                                        <input type="tel" class="form-control" id="guestPhone" required>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="guestCount" class="form-label">Número de personas</label>
-                                        <select class="form-select" id="guestCount" required>
-                                            <option value="">Seleccionar</option>
-                                            <option value="1">1 persona</option>
-                                            <option value="2">2 personas</option>
-                                            <option value="3">3 personas</option>
-                                            <option value="4">4 personas</option>
-                                            <option value="5">5 personas</option>
-                                            <option value="6">6 personas</option>
-                                            <option value="7">7 personas</option>
-                                            <option value="8">8 personas</option>
-                                            <option value="9+">9+ personas</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="specialRequests" class="form-label">Solicitudes especiales</label>
-                                    <textarea class="form-control" id="specialRequests" rows="3" placeholder="Ej. Celebración de cumpleaños, alergias alimentarias, preferencia de mesa..."></textarea>
-                                </div>
-                                <div class="form-check mb-3">
-                                    <input class="form-check-input" type="checkbox" id="termsCheck" required>
-                                    <label class="form-check-label" for="termsCheck">
-                                        Acepto los <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">términos y condiciones</a>
-                                    </label>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-5">
-                    <div class="card shadow-sm border-0">
-                        <div class="card-header bg-primary-subtle border-0">
-                            <h5 class="card-title m-0">Resumen de la reserva</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="reservation-summary">
-                                <div class="d-flex align-items-center mb-3 pb-3 border-bottom">
-                                    <i class="bi bi-building me-3 text-primary fs-4"></i>
-                                    <div>
-                                        <h6 class="mb-0" id="summaryBranchName">Sede Centro</h6>
-                                        <p class="text-muted mb-0" id="summaryBranchAddress">Calle Principal #123, Centro</p>
-                                    </div>
-                                </div>
-                                <div class="d-flex align-items-center mb-3 pb-3 border-bottom">
-                                    <i class="bi bi-calendar-date me-3 text-primary fs-4"></i>
-                                    <div>
-                                        <h6 class="mb-0" id="summaryDate">Viernes, 12 de Mayo 2023</h6>
-                                        <p class="text-muted mb-0" id="summaryTime">19:00 hrs</p>
-                                    </div>
-                                </div>
-                                <div class="d-flex align-items-center">
-                                    <i class="bi bi-people me-3 text-primary fs-4"></i>
-                                    <div>
-                                        <h6 class="mb-0" id="summaryGuests">4 personas</h6>
-                                        <p class="text-muted mb-0">Reserva a tu nombre</p>
-                                    </div>
+                                
+                                <div class="d-flex justify-content-between mt-3">
+                                    <button id="backToStep2" class="btn btn-outline-secondary">
+                                        <i class="bi bi-arrow-left"></i> Anterior
+                                    </button>
+                                    <button id="nextToStep4" class="btn btn-primary" disabled>
+                                        Siguiente <i class="bi bi-arrow-right"></i>
+                                    </button>
                                 </div>
                             </div>
-                            
-                            <div class="mt-4">
-                                <h6>Información importante:</h6>
-                                <ul class="small text-muted">
-                                    <li>Tu reserva estará disponible por 15 minutos después de la hora seleccionada.</li>
-                                    <li>Para cancelar, debes hacerlo con al menos 2 horas de anticipación.</li>
-                                    <li>Recibirás un correo de confirmación con los detalles de tu reserva.</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="d-flex justify-content-between mt-4">
-                <button class="btn btn-outline-secondary" id="backToStep2">
-                    <i class="bi bi-arrow-left me-2"></i> Volver
-                </button>
-                <button class="btn btn-primary" id="nextToStep4">
-                    Confirmar Reserva <i class="bi bi-check2-circle ms-2"></i>
-                </button>
-            </div>
-        </div>
 
-        <!-- Sección 4: Confirmación -->
-        <div id="step4Content" class="animated fadeIn" style="display: none;">
-            <div class="row justify-content-center">
-                <div class="col-md-8">
-                    <div class="card shadow-sm border-0">
-                        <div class="card-body">
-                            <div class="reservation-confirmation">
-                                <i class="bi bi-check-circle"></i>
-                                <h2 class="mb-3">¡Tu reserva ha sido confirmada!</h2>
-                                <p class="mb-4">Hemos enviado un correo electrónico con los detalles de tu reserva.</p>
-                                <div class="alert alert-primary" role="alert">
-                                    <h5 class="alert-heading">Código de Reserva: <span id="reservationCode">RES-123456</span></h5>
-                                    <p>Guarda este código para consultar tu reserva en el futuro.</p>
-                                </div>
-                                <div class="row row-cols-1 row-cols-md-3 g-4 mt-3">
-                                    <div class="col">
-                                        <div class="feature-icon mx-auto">
-                                            <i class="bi bi-calendar-check"></i>
+                            <!-- Paso 4: Confirmar Reserva -->
+                            <div id="step4Content" class="animate__animated animate__fadeIn" style="display: none;">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card mb-4">
+                                            <div class="card-header">
+                                                <h6 class="mb-0">Resumen de Reserva</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div id="reservationSummary"></div>
+                                            </div>
                                         </div>
-                                        <h5>Fecha y Hora</h5>
-                                        <p class="text-muted" id="confirmationDateTime">12 Mayo 2023, 19:00</p>
                                     </div>
-                                    <div class="col">
-                                        <div class="feature-icon mx-auto">
-                                            <i class="bi bi-building"></i>
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h6 class="mb-0">Información Adicional</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <form id="reservationForm">
+                                                    <div class="mb-3">
+                                                        <label for="specialRequests" class="form-label">Solicitudes Especiales (opcional)</label>
+                                                        <textarea class="form-control" id="specialRequests" rows="3" placeholder="Indique cualquier solicitud especial..."></textarea>
+                                                    </div>
+                                                    <div class="form-check mb-3">
+                                                        <input class="form-check-input" type="checkbox" id="termsCheckbox">
+                                                        <label class="form-check-label" for="termsCheckbox">
+                                                            Acepto los <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">términos y condiciones</a>
+                                                        </label>
+                                                    </div>
+                                                </form>
+                                            </div>
                                         </div>
-                                        <h5>Sede</h5>
-                                        <p class="text-muted" id="confirmationBranch">Sede Centro</p>
-                                    </div>
-                                    <div class="col">
-                                        <div class="feature-icon mx-auto">
-                                            <i class="bi bi-people"></i>
-                                        </div>
-                                        <h5>Invitados</h5>
-                                        <p class="text-muted" id="confirmationGuests">4 personas</p>
                                     </div>
                                 </div>
-                                <div class="mt-5">
-                                    <a href="index.html" class="btn btn-primary me-2">
-                                        <i class="bi bi-house me-2"></i>Volver al inicio
-                                    </a>
-                                    <a href="mis-reservas.html" class="btn btn-outline-primary">
-                                        <i class="bi bi-list-ul me-2"></i>Ver mis reservas
-                                    </a>
+                                
+                                <div class="d-flex justify-content-between mt-3">
+                                    <button id="backToStep3" class="btn btn-outline-secondary">
+                                        <i class="bi bi-arrow-left"></i> Anterior
+                                    </button>
+                                    <button id="confirmReservation" class="btn btn-success" disabled>
+                                        <i class="bi bi-check-circle"></i> Confirmar Reserva
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -612,52 +293,32 @@
 
     <!-- Modal de términos y condiciones -->
     <div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="termsModalLabel">Términos y Condiciones</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <h6>1. Políticas de Reserva</h6>
+                    <h6>Política de Reservas</h6>
                     <p>Al realizar una reserva, usted acepta las siguientes condiciones:</p>
                     <ul>
-                        <li>Las reservas están sujetas a disponibilidad.</li>
-                        <li>El restaurante se reserva el derecho de cancelar una reserva en caso de fuerza mayor.</li>
-                        <li>Se requiere confirmación por parte del restaurante para garantizar la reserva.</li>
-                        <li>La mesa se mantendrá reservada durante 15 minutos después de la hora programada.</li>
+                        <li>Las reservas deben ser canceladas con al menos 2 horas de antelación.</li>
+                        <li>En caso de no presentarse, se podrá aplicar un cargo por no-show.</li>
+                        <li>La reserva tiene una tolerancia de 15 minutos después de la hora seleccionada.</li>
+                        <li>El restaurante se reserva el derecho de reasignar su mesa si no se presenta dentro del tiempo de tolerancia.</li>
                     </ul>
-                    
-                    <h6>2. Cancelaciones</h6>
-                    <p>Para cancelar una reserva, deberá hacerlo con al menos 2 horas de anticipación. Las cancelaciones pueden realizarse a través de:</p>
-                    <ul>
-                        <li>Su cuenta de usuario</li>
-                        <li>Contactando directamente al restaurante</li>
-                    </ul>
-                    
-                    <h6>3. Uso de Datos Personales</h6>
-                    <p>Al realizar una reserva, usted consiente que recopilemos y utilicemos su información personal para:</p>
-                    <ul>
-                        <li>Gestionar su reserva</li>
-                        <li>Contactarle en caso de cambios o cancelaciones</li>
-                        <li>Mejorar nuestros servicios</li>
-                    </ul>
-                    <p>Sus datos serán tratados de acuerdo con nuestra Política de Privacidad.</p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Acepto</button>
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Aceptar</button>
                 </div>
             </div>
         </div>
-    </div>
-
-    <!-- Core JS -->
+    </div>    <!-- Core JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.14.5/sweetalert2.all.js"
-        integrity="sha512-AbjPD2rIZFzBugvnJKl8IZmGWWmjmZrYysHZaryYg0+XkoqDpmuKKRxDfVPCaHzf1SB3cwSKkgeEd7xLOmBusQ=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <!-- Flatpickr JS -->
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
@@ -669,7 +330,7 @@
     <script src="./assets/js/user/reservas/user-reservas.js"></script>
     <script src="./assets/js/config/jwt-decode.js"></script>
     <script src="./assets/js/config/validate-auth.js"></script>
-    <script src="./assets/js/config/logout.js"></script>
+    <script src="./assets/js/user/user-logout.js"></script>
 </body>
 
 </html>
